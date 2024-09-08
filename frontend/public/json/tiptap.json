@@ -1,0 +1,140 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "paragraph",
+      "content": [
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "bold"
+            }
+          ],
+          "text": "we "
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "italic"
+            }
+          ],
+          "text": "sahbi "
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "highlight"
+            }
+          ],
+          "text": "kach "
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "bold"
+            }
+          ],
+          "text": "jdid"
+        },
+        {
+          "type": "text",
+          "text": " "
+        }
+      ]
+    },
+    {
+      "type": "orderedList",
+      "attrs": {
+        "start": 1
+      },
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "text": "roht ldar"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "italic"
+                    }
+                  ],
+                  "text": "9rit "
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    }
+                  ],
+                  "text": "khrit"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "bulletList",
+      "content": [
+        {
+          "type": "listItem",
+          "content": [
+            {
+              "type": "paragraph",
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "bold"
+                    },
+                    {
+                      "type": "italic"
+                    },
+                    {
+                      "type": "highlight"
+                    }
+                  ],
+                  "text": "ouah ly3ya"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

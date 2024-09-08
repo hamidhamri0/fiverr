@@ -37,6 +37,7 @@ import PricingPackageCard from "./components/PricingPackageCard";
 import PackagesTable from "./components/PackagesTable";
 import UserProfile from "./components/UserProfile";
 import LoginCard from "./components/LoginCard";
+import GigCreationPage from "./components/GigCreationPage";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import ProfilePage from "./components/ProfilePage";
 import { create } from "domain";
@@ -338,7 +339,7 @@ export default async function Home() {
         <MainHeader />
       </UserInfoStoreProvider>
       {/* <AdminPage /> */}
-      <GigOverviewCreation />
+      <GigCreationPage />
       {/* <Provider>
         <GetUsers />
         <Test />

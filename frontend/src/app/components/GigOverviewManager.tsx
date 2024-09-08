@@ -2,53 +2,22 @@
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  useForm,
-  FormProvider,
   useFormContext,
   useWatch,
   useController,
   Control,
+  FieldErrors,
 } from "react-hook-form";
 import { useOutsideClick } from "../Hooks/useOutsideClick";
 import debounce from "./utils/debounce";
 
-export default function ReactHookFormContext() {
-  const methods = useForm();
-  return (
-    <FormProvider {...methods}>
-      <GigForm />
-    </FormProvider>
-  );
-}
-
-const GigForm = () => {
+export default function GigOverviewForm() {
   const methods = useFormContext();
-  const { formState } = methods;
+  const {
+    formState: { errors },
+  } = methods;
 
-  // const preSubmitCheck = (values) => {
-  //   let isValid = true;
-  //   for (const metadata in values) {
-  //     let val = values[metadata];
-  //     console.log(metadata, val);
-  //     let isArray = Array.isArray(val);
-  //     if (isArray) {
-  //       if (val.length < 1) {
-  //         setError(`metadataTag.${metadata}`, {
-  //           message: `${metadata} is mandatory`,
-  //         });
-  //         isValid = false;
-  //       }
-  //     } else if (!val) {
-  //       setError(`metadataTag.${metadata}`, {
-  //         message: `${metadata} is mandatory`,
-  //       });
-  //       isValid = false;
-  //     }
-  //   }
-  //   return isValid; // Return false if there are errors
-  // };
-
-  const onSubmit = (data) => {
+  const onSubmit = (data: any) => {
     console.log(data, "SUBMITTED");
   };
 
@@ -70,9 +39,12 @@ const GigForm = () => {
           Save & Continue
         </button>
       </form>
+      <p className="mt-1 text-xs text-red-500">
+        {errors.root && (errors.root.message as string)}
+      </p>
     </div>
   );
-};
+}
 
 const TitleInput = () => {
   const {
@@ -116,9 +88,9 @@ const TitleInput = () => {
           className={`w-full rounded-md border p-2 ${errors.title ? "border-red-500" : "border-gray-300"}`}
           placeholder="I will do something I'm really good at"
         />
-        {errors?.title && (
-          <p className="mt-1 text-xs text-red-500">{errors.title.message}</p>
-        )}
+        <p className="mt-1 text-sm text-red-500">
+          {errors.title && (errors.title.message as string)}
+        </p>
         <LettersCount />
       </div>
     </div>
@@ -130,7 +102,9 @@ function LettersCount() {
     name: "title",
   });
   return (
-    <p className="mt-1 text-xs text-gray-500">{watchTitle?.length}/80 max</p>
+    <p className="mt-1 text-xs text-gray-500">
+      {watchTitle?.length || 0}/80 max
+    </p>
   );
 }
 
@@ -165,6 +139,7 @@ function Category() {
   const {
     register,
     formState: { errors },
+    setError,
   } = useFormContext();
 
   const [categories, setCategories] = useState([]);
@@ -180,24 +155,19 @@ function Category() {
         if (data.error) throw new Error(data.message);
         setCategories(data);
       } catch (err) {
-        console.log(err);
+        setError("root", {
+          type: "manual",
+          message: err instanceof Error ? err?.message : "Something went wrong",
+        });
       }
     }
     fetchCategories();
-  }, []);
+  }, [setError]);
   return (
     <select
       {...register("category", { required: "Category is required" })}
       id="category"
       className={`flex-1 rounded-md border p-2 text-sm ${errors.category ? "border-red-500" : "border-gray-300"}`}
-      // onChange={() => {
-      //   let values = getValues();
-      //   for (let key in values) {
-      //     if (key !== "title" && key !== "category") {
-      //       setValue(key, "");
-      //     }
-      //   }
-      // }}
     >
       <option value="">Select a category</option>
       {categories.map((category: categoryType) => (
@@ -215,7 +185,7 @@ function Subcategory() {
   const {
     register,
     setValue,
-    unregister,
+    setError,
     formState: { errors },
   } = useFormContext();
 
@@ -224,9 +194,9 @@ function Subcategory() {
   });
 
   useEffect(() => {
+    setValue("subCategory", "");
+    if (!category) return;
     async function fetchSubCategories() {
-      setValue("subCategory", "");
-      if (!category) return;
       try {
         const data = await (
           await fetch(
@@ -239,11 +209,16 @@ function Subcategory() {
         if (data.error) throw new Error(data.message);
         setSubCategories(data);
       } catch (err) {
+        setError("root", {
+          type: "manual",
+          message:
+            (err instanceof Error && err?.message) || "Something went wrong",
+        });
         console.log(err);
       }
     }
     fetchSubCategories();
-  }, [category, setValue]);
+  }, [category, setValue, setError]);
 
   return (
     <select
@@ -268,6 +243,7 @@ const ServiceTypeSelect = () => {
     register,
     formState: { errors },
     setValue,
+    setError,
   } = useFormContext();
 
   const [services, setServices] = useState([]);
@@ -276,9 +252,9 @@ const ServiceTypeSelect = () => {
   });
 
   useEffect(() => {
+    setValue("serviceType", "");
+    if (!subCategory) return;
     async function fetchServices() {
-      setValue("serviceType", "");
-      if (!subCategory) return;
       try {
         const data = await (
           await fetch(
@@ -291,11 +267,16 @@ const ServiceTypeSelect = () => {
         if (data.error) throw new Error(data.message);
         setServices(data);
       } catch (err) {
+        setError("root", {
+          type: "manual",
+          message:
+            (err instanceof Error && err?.message) || "Something went wrong",
+        });
         console.log(err);
       }
     }
     fetchServices();
-  }, [subCategory, setValue]);
+  }, [subCategory, setValue, setError]);
 
   if (!subCategory) return null;
 
@@ -338,6 +319,7 @@ const Metadata = () => {
     control,
     register,
     unregister,
+    setError,
     formState: { errors },
   } = useFormContext();
 
@@ -354,7 +336,6 @@ const Metadata = () => {
   useEffect(() => {
     setValue("metadataTag", {});
     if (!service) return;
-    let values: MetadataTagsDefaultValues = {};
     async function fetchServiceMetadata() {
       try {
         const data = await (
@@ -366,6 +347,7 @@ const Metadata = () => {
           )
         ).json();
         if (data.error) throw new Error(data.message);
+        let values: MetadataTagsDefaultValues = {};
         data.forEach((meta: MetadataType) => {
           if (!registeredFieldsRef.current[meta.name]) {
             register(`metadataTag.${meta.name}`, {
@@ -380,33 +362,16 @@ const Metadata = () => {
         });
         setMetadata(data);
       } catch (err) {
+        setError("root", {
+          type: "manual",
+          message:
+            (err instanceof Error && err?.message) || "Something went wrong",
+        });
         console.log(err);
       }
     }
     fetchServiceMetadata();
-  }, [service, setValue, register, unregister]);
-
-  /*
-
- for (const metadata in values) {
-          let val = values[metadata];
-          if (val) {
-            let isArray = Array.isArray(val);
-            if (!isArray) return true;
-            if (val.length < 1) {
-              console.log("popopopopppopopo");
-              setError(`metadataTag.${metadata}`, {
-                message: `${metadata} is mandatory`,
-              });
-            }
-          } else {
-            setError(`metadataTag.${metadata}`, {
-              message: `${metadata} is mandatory`,
-            });
-          }
-        }
-
-  */
+  }, [service, setValue, register, unregister, setError]);
 
   if (!service || !metadata.length) return null;
   return (
@@ -417,8 +382,9 @@ const Metadata = () => {
           {metadata.map((meta: MetadataType, index: number) => {
             const metadataName = meta.name;
             const selectedMeta = metadata[selectedMetadata];
-            const hasError = errors.metadataTag?.[metadataName];
-            // console.log(errors);
+            const hasError = (
+              errors as FieldErrors<{ metadataTag: Record<string, any> }>
+            ).metadataTag?.[metadataName];
             return (
               <div
                 key={meta.name}
@@ -433,7 +399,6 @@ const Metadata = () => {
           })}
         </div>
 
-        {/* <input type="hidden" {...mtd.field} /> */}
         <div className="p-2">
           <p className="mb-4 text-sm font-semibold text-gray-500">
             Select the features you support
@@ -471,7 +436,6 @@ function MultiSelect({ metadata }: MetadataProps) {
   });
 
   function isDisabled(id: string) {
-    console.log(metadataTags);
     if (!metadataTags || metadataTags.length < 3) return false;
     return !metadataTags.includes(id);
   }
@@ -506,7 +470,7 @@ function MultiSelect({ metadata }: MetadataProps) {
 }
 
 function Select({ metadata }: MetadataProps) {
-  const { register, control } = useFormContext();
+  const { register } = useFormContext();
 
   return (
     <div className={`p-2`}>
@@ -686,8 +650,10 @@ const TagsInput: React.FC<TagInputProps> = ({ control, maxTags = 5 }) => {
           ))}
         </div>
       )}
-      {errors.tags ? (
-        <p className="mt-1 text-xs text-red-500">{errors.tags.message}</p>
+      {typeof errors ? (
+        <p className="mt-1 text-xs text-red-500">
+          {typeof errors.tags?.message === "string" && errors.tags.message}
+        </p>
       ) : (
         <p className="mt-1 text-xs text-gray-500">
           {maxTags} tags maximum. Use letters and numbers only.
