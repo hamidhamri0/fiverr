@@ -5,6 +5,9 @@ import { MetadataService } from 'src/modules/metadata/metadata.service';
 import { ServiceService } from 'src/modules/service/service.service';
 import { SubcategoryService } from 'src/modules/subcategory/subcategory.service';
 import { MetadataType } from '../modules/metadata/DTO/create-metadata.dto';
+import { TagService } from 'src/modules/tag/tag.service';
+import { FeatureService } from 'src/modules/feature/feature.service';
+import { FeatureOptionService } from 'src/modules/feature-option/feature-option.service';
 
 @Injectable()
 export class DatabaseSeeder {
@@ -14,6 +17,9 @@ export class DatabaseSeeder {
     private readonly serviceService: ServiceService,
     private readonly metadataService: MetadataService,
     private readonly metadataTagService: MetadataTagService,
+    private readonly tagService: TagService,
+    private readonly FeatureService: FeatureService,
+    private readonly FeatureOptionService: FeatureOptionService,
   ) {}
 
   async deleteAll() {
@@ -22,15 +28,100 @@ export class DatabaseSeeder {
     await this.serviceService.deleteAllServices();
     await this.subcategoryService.deleteAllSubcategories();
     await this.categoryService.deleteAllCategories();
+    await this.tagService.deleteAllTags();
+    await this.FeatureService.deleteAllFeatures();
+    await this.FeatureOptionService.deleteAllFeatureOptions();
   }
 
   async seed() {
+    const tags = [
+      'Web Development',
+      'Mobile App Development',
+      'Frontend Development',
+      'Backend Development',
+      'Full Stack Development',
+      'iOS Development',
+      'Android Development',
+      'Graphic Design',
+      'Logo Design',
+      'Brand Identity',
+      'UX/UI Design',
+      'Web Design',
+      'Mobile App Design',
+      'Content Writing',
+      'Copywriting',
+      'Blog Posts',
+      'Translation',
+      'General Translation',
+      'Legal Translation',
+    ];
+
+    const deliveryTimeOptions = [
+      '1 DAY DELIVERY',
+      '2 DAYS DELIVERY',
+      '3 DAYS DELIVERY',
+      '4 DAYS DELIVERY',
+      '5 DAYS DELIVERY',
+      '6 DAYS DELIVERY',
+      '7 DAYS DELIVERY',
+      '14 DAYS DELIVERY',
+      '21 DAYS DELIVERY',
+      '28 DAYS DELIVERY',
+      '35 DAYS DELIVERY',
+      '42 DAYS DELIVERY',
+      '49 DAYS DELIVERY',
+      '56 DAYS DELIVERY',
+      '63 DAYS DELIVERY',
+      '70 DAYS DELIVERY',
+      '77 DAYS DELIVERY',
+      '84 DAYS DELIVERY',
+      '91 DAYS DELIVERY',
+      '98 DAYS DELIVERY',
+    ];
+
     const categories = [
       {
         name: 'Technology & Programming',
         subcategories: [
           {
             name: 'Web Development',
+            features: [
+              { name: 'Package Name', type: 'input', options: null },
+              { name: 'Package Description', type: 'input', options: null },
+              {
+                name: 'Delivery Time',
+                type: 'select',
+                options: deliveryTimeOptions,
+              },
+              {
+                name: 'Framework',
+                type: 'select',
+                options: ['React', 'Angular', 'Vue.js', 'Svelte'],
+              },
+              {
+                name: 'CSS Preprocessor',
+                type: 'select',
+                options: ['Sass', 'Less', 'Stylus', 'PostCSS'],
+              },
+              { name: 'Responsive Design', type: 'checkbox', options: null },
+              { name: 'Code Review', type: 'checkbox', options: null },
+              {
+                name: 'Testing Framework',
+                type: 'select',
+                options: ['Jest', 'Mocha', 'Chai', 'Jasmine'],
+              },
+              {
+                name: 'Build Tool',
+                type: 'select',
+                options: ['Webpack', 'Gulp', 'Grunt', 'Parcel'],
+              },
+              {
+                name: 'Version Control',
+                type: 'select',
+                options: ['Git', 'SVN', 'Mercurial'],
+              },
+              { name: 'Price', type: 'range', options: null },
+            ],
             services: [
               {
                 name: 'Frontend Development',
@@ -81,6 +172,46 @@ export class DatabaseSeeder {
           },
           {
             name: 'Mobile App Development',
+            features: [
+              { name: 'Package Name', type: 'input', options: null },
+              { name: 'Package Description', type: 'input', options: null },
+              {
+                name: 'Delivery Time',
+                type: 'select',
+                options: deliveryTimeOptions,
+              },
+              {
+                name: 'Platform',
+                type: 'select',
+                options: ['iOS', 'Android', 'Cross-platform'],
+              },
+              {
+                name: 'App Type',
+                type: 'select',
+                options: ['Native', 'Hybrid', 'PWA'],
+              },
+              {
+                name: 'UI Framework',
+                type: 'select',
+                options: ['UIKit', 'SwiftUI', 'Storyboard'],
+              },
+              {
+                name: 'Testing Framework',
+                type: 'select',
+                options: ['JUnit', 'Espresso', 'XCTest'],
+              },
+              {
+                name: 'Build Tool',
+                type: 'select',
+                options: ['Gradle', 'Maven', 'CocoaPods'],
+              },
+              {
+                name: 'Version Control',
+                type: 'select',
+                options: ['Git', 'SVN', 'Mercurial'],
+              },
+              { name: 'Price', type: 'range', options: null },
+            ],
             services: [
               {
                 name: 'iOS Development',
@@ -121,6 +252,43 @@ export class DatabaseSeeder {
         subcategories: [
           {
             name: 'Graphic Design',
+            features: [
+              { name: 'Package Name', type: 'input', options: null },
+              { name: 'Package Description', type: 'input', options: null },
+              {
+                name: 'Delivery Time',
+                type: 'select',
+                options: deliveryTimeOptions,
+              },
+              {
+                name: 'Style',
+                type: 'select',
+                options: ['Minimalist', 'Vintage', 'Hand-drawn', 'Abstract'],
+              },
+              {
+                name: 'File Format',
+                type: 'select',
+                options: ['AI', 'EPS', 'PNG', 'SVG'],
+              },
+              { name: 'Source Files', type: 'checkbox', options: null },
+              {
+                name: 'Color Scheme',
+                type: 'select',
+                options: [
+                  'Monochrome',
+                  'Analogous',
+                  'Complementary',
+                  'Triadic',
+                ],
+              },
+              {
+                name: 'Design Tool',
+                type: 'select',
+                options: ['Adobe Illustrator', 'CorelDRAW', 'Inkscape'],
+              },
+              { name: 'Print Ready', type: 'checkbox', options: null },
+              { name: 'Price', type: 'range', options: null },
+            ],
             services: [
               {
                 name: 'Logo Design',
@@ -166,6 +334,35 @@ export class DatabaseSeeder {
           },
           {
             name: 'UX/UI Design',
+            features: [
+              { name: 'Package Name', type: 'input', options: null },
+              { name: 'Package Description', type: 'input', options: null },
+              {
+                name: 'Delivery Time',
+                type: 'select',
+                options: deliveryTimeOptions,
+              },
+              {
+                name: 'Design Tool',
+                type: 'select',
+                options: ['Figma', 'Sketch', 'Adobe XD', 'InVision'],
+              },
+              { name: 'Responsive Design', type: 'checkbox', options: null },
+              { name: 'Prototyping', type: 'checkbox', options: null },
+              { name: 'User Testing', type: 'checkbox', options: null },
+              {
+                name: 'Wireframing',
+                type: 'select',
+                options: ['Low-fidelity', 'High-fidelity'],
+              },
+              { name: 'Accessibility', type: 'checkbox', options: null },
+              {
+                name: 'Interaction Design',
+                type: 'select',
+                options: ['Microinteractions', 'Animations'],
+              },
+              { name: 'Price', type: 'range', options: null },
+            ],
             services: [
               {
                 name: 'Web Design',
@@ -206,6 +403,35 @@ export class DatabaseSeeder {
         subcategories: [
           {
             name: 'Content Writing',
+            features: [
+              { name: 'Package Name', type: 'input', options: null },
+              { name: 'Package Description', type: 'input', options: null },
+              {
+                name: 'Delivery Time',
+                type: 'select',
+                options: deliveryTimeOptions,
+              },
+              {
+                name: 'Topics',
+                type: 'select',
+                options: [
+                  'Technology',
+                  'Health',
+                  'Finance',
+                  'Travel',
+                  'Lifestyle',
+                ],
+              },
+              { name: 'SEO Optimization', type: 'checkbox', options: null },
+              {
+                name: 'Tone',
+                type: 'select',
+                options: ['Professional', 'Casual', 'Humorous', 'Formal'],
+              },
+              { name: 'Research', type: 'checkbox', options: null },
+              { name: 'Plagiarism Check', type: 'checkbox', options: null },
+              { name: 'Price', type: 'range', options: null },
+            ],
             services: [
               {
                 name: 'Blog Posts',
@@ -252,6 +478,38 @@ export class DatabaseSeeder {
           },
           {
             name: 'Translation',
+            features: [
+              { name: 'Package Name', type: 'input', options: null },
+              { name: 'Package Description', type: 'input', options: null },
+              {
+                name: 'Delivery Time',
+                type: 'select',
+                options: deliveryTimeOptions,
+              },
+              {
+                name: 'Language Pair',
+                type: 'select',
+                options: [
+                  'English to Spanish',
+                  'English to French',
+                  'Chinese to English',
+                  'German to English',
+                ],
+              },
+              {
+                name: 'Specialization',
+                type: 'select',
+                options: ['Business', 'Technical', 'Literary', 'Medical'],
+              },
+              {
+                name: 'Certification',
+                type: 'select',
+                options: ['Certified', 'Notarized', 'Standard'],
+              },
+              { name: 'Proofreading', type: 'checkbox', options: null },
+              { name: 'Localization', type: 'checkbox', options: null },
+              { name: 'Price', type: 'range', options: null },
+            ],
             services: [
               {
                 name: 'General Translation',
@@ -299,6 +557,10 @@ export class DatabaseSeeder {
       },
     ];
 
+    for (const tag of tags) {
+      await this.tagService.createTag(tag);
+    }
+
     for (const categoryData of categories) {
       const category = await this.categoryService.createCategory({
         name: categoryData.name,
@@ -309,6 +571,34 @@ export class DatabaseSeeder {
           category.id,
           { name: subcategoryData.name },
         );
+
+        for (const featureData of subcategoryData.features) {
+          const feature = await this.FeatureService.createFeature(
+            subcategory.id,
+            {
+              name: featureData.name,
+              type:
+                featureData.type === 'select'
+                  ? 'select'
+                  : featureData.type === 'checkbox'
+                    ? 'checkbox'
+                    : featureData.type === 'input'
+                      ? 'input'
+                      : featureData.type === 'range'
+                        ? 'range'
+                        : null,
+            },
+          );
+
+          if (featureData.type === 'select' && featureData.options?.length) {
+            for (const option of featureData.options) {
+              await this.FeatureOptionService.createFeatureOption(
+                feature.id,
+                option,
+              );
+            }
+          }
+        }
 
         for (const serviceData of subcategoryData.services) {
           const service = await this.serviceService.createService({
@@ -321,7 +611,7 @@ export class DatabaseSeeder {
               serviceId: service.id,
               name: metadataData.name,
               type:
-                metadataData.type == 'select'
+                metadataData.type === 'select'
                   ? MetadataType.SELECT
                   : MetadataType.MULTI_SELECT,
             });

@@ -43,6 +43,10 @@ export class FeatureOptionService {
     return this.featureOptionRepository.delete({ id });
   }
 
+  async deleteAllFeatureOptions() {
+    return this.featureOptionRepository.delete({});
+  }
+
   async updateFeatureOption(id: number, featureOptionValue: string) {
     return this.featureOptionRepository.update(
       { id },

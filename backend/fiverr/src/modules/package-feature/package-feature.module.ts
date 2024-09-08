@@ -9,5 +9,6 @@ import { PackageModule } from '../package/package.module';
   imports: [TypeOrmModule.forFeature([PackageFeature]), PackageModule],
   controllers: [PackageFeatureController],
   providers: [PackageFeatureService],
+  exports: [PackageFeatureService],
 })
 export class PackageFeatureModule {}

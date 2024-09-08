@@ -16,7 +16,9 @@ export class PackageFeature {
   @Column({ default: true })
   isIncluded: boolean;
 
-  @ManyToOne(() => Package, (package_) => package_.packageFeatures)
+  @ManyToOne(() => Package, (package_) => package_.packageFeatures, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'packageId' })
   package: Package;
 

@@ -9,5 +9,6 @@ import { FeatureModule } from '../feature/feature.module';
   imports: [TypeOrmModule.forFeature([FeatureOption]), FeatureModule],
   controllers: [FeatureOptionController],
   providers: [FeatureOptionService],
+  exports: [FeatureOptionService],
 })
 export class FeatureOptionModule {}

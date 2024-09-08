@@ -6,12 +6,15 @@ import {
   Patch,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { TagService } from './tag.service';
 import { ParseIdPipe } from 'src/common/pipes/parse-id.pipe';
 import { NameValidationPipe } from 'src/common/pipes/name-validation.pipe';
+import { LoggedUserGuard } from 'src/common/guards/logged-user.guard';
 
-@Controller('tag')
+@Controller('tags')
+@UseGuards(new LoggedUserGuard())
 export class TagController {
   constructor(private readonly tagService: TagService) {}
 

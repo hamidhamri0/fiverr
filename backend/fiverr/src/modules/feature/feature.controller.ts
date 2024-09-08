@@ -22,6 +22,13 @@ export class FeatureController {
     return this.featureService.findOneByName(name);
   }
 
+  @Get('/getAllFeaturesBySubcategoryId')
+  async getAllFeaturesBySubcategoryId(
+    @Query('subcategoryId', ParseIdPipe) subcategoryId: number,
+  ) {
+    return this.featureService.getAllFeaturesBySubcategoryId(subcategoryId);
+  }
+
   @Post('/createFeature')
   async createFeature(
     @Query('subcategoryId', ParseIdPipe) subcategoryId: number,

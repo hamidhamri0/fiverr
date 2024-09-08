@@ -4,8 +4,10 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  BeforeInsert,
 } from 'typeorm';
 import { Feature } from '../feature/feature.entity';
+import { BadRequestException } from '@nestjs/common';
 
 @Entity('feature_options')
 export class FeatureOption {
@@ -21,4 +23,13 @@ export class FeatureOption {
   })
   @JoinColumn({ name: 'featureId' })
   feature: Feature;
+
+  @BeforeInsert()
+  async validateFeatureType() {
+    if (this.feature.type !== 'select') {
+      throw new BadRequestException(
+        'Feature type must be "select" to create a FeatureOption',
+      );
+    }
+  }
 }

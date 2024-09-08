@@ -25,6 +25,13 @@ export class FeatureService {
     return this.featureRepository.findOne({ where: { name } });
   }
 
+  async getAllFeaturesBySubcategoryId(subcategoryId: number) {
+    return this.featureRepository.find({
+      where: { subcategory: { id: subcategoryId } },
+      relations: ['options'],
+    });
+  }
+
   async createFeature(subcategoryId: number, feature: CreateFeatureDTO) {
     // Fetch the Subcategory entity using the subcategoryId from the DTO
     const subcategory =
@@ -45,6 +52,10 @@ export class FeatureService {
 
   async deleteFeature(id: number) {
     return this.featureRepository.delete({ id });
+  }
+
+  async deleteAllFeatures() {
+    return this.featureRepository.delete({});
   }
 
   async updateFeature(id: number, feature: CreateFeatureDTO) {

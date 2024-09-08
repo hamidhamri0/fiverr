@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Tag } from './tag.entity';
-import { Repository } from 'typeorm';
+import { ILike, Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class TagService {
   }
 
   async findOneByName(name: string) {
-    return this.tagRepository.findOne({ where: { name } });
+    return this.tagRepository.find({ where: { name: ILike(`%${name}%`) } });
   }
 
   async createTag(tag: string) {
@@ -31,6 +31,10 @@ export class TagService {
 
   async deleteTag(id: number) {
     return this.tagRepository.delete({ id });
+  }
+
+  async deleteAllTags() {
+    return this.tagRepository.delete({});
   }
 
   async updateTag(id: number, tag: string) {

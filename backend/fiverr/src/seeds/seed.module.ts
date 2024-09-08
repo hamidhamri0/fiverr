@@ -7,6 +7,9 @@ import { SubcategoryModule } from 'src/modules/subcategory/subcategory.module';
 import { DatabaseSeeder } from './seed.service';
 import { SeedCommand } from './seedCommand';
 import { SeedController } from './seed.controller';
+import { TagModule } from 'src/modules/tag/tag.module';
+import { FeatureModule } from 'src/modules/feature/feature.module';
+import { FeatureOptionModule } from 'src/modules/feature-option/feature-option.module';
 
 /**
  * Import and provide seeder classes.
@@ -20,6 +23,9 @@ import { SeedController } from './seed.controller';
     ServiceModule,
     MetadataModule,
     MetadataTagModule,
+    TagModule,
+    FeatureModule,
+    FeatureOptionModule,
   ],
   controllers: [SeedController],
   providers: [DatabaseSeeder, SeedCommand],
