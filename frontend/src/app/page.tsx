@@ -1,5 +1,3 @@
-"use client";
-
 import WelcomeContent from "./components/WelcomeContent";
 import GigSlides from "./components/GigSlides";
 import SavedGigsForYou from "./components/SavedGigsForYou";
@@ -39,8 +37,17 @@ import PricingPackageCard from "./components/PricingPackageCard";
 import PackagesTable from "./components/PackagesTable";
 import UserProfile from "./components/UserProfile";
 import LoginCard from "./components/LoginCard";
-import { useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import ProfilePage from "./components/ProfilePage";
+import { create } from "domain";
+import {
+  createStateStore,
+  initCounterStore,
+  State,
+  StateStore,
+} from "./components/zustand";
+import { useStore } from "zustand";
+import UserInfoStoreProvider from "./components/stores/UserInfoStore";
 
 //bg-[url('/bigImages/ProgrammingBanner.webp')
 
@@ -217,10 +224,126 @@ export const reviews = [
 //   );
 // }
 
-export default function Home() {
+// export const StateStoreContext = createContext<StateStoreApi | undefined>(
+//   undefined,
+// );
+// export type StateStoreApi = ReturnType<typeof createStateStore>;
+
+// const contextAPI = createContext(null);
+
+// const Provider = ({ children }: { children: React.ReactNode }) => {
+//   const storeRef = useRef<StateStoreApi>();
+//   if (!storeRef.current) {
+//     storeRef.current = createStateStore(initCounterStore());
+//   }
+
+//   return (
+//     <StateStoreContext.Provider value={storeRef.current}>
+//       {children}
+//     </StateStoreContext.Provider>
+//   );
+// };
+
+// const useCounterStore = <T,>(selector: (store: StateStore) => T): T => {
+//   const StaterStoreContext = useContext(StateStoreContext);
+
+//   if (!StaterStoreContext) {
+//     throw new Error(`useCounterStore must be used within CounterStoreProvider`);
+//   }
+
+//   return useStore(StaterStoreContext, selector);
+// };
+
+// function GetUsers() {
+//   const users = useCounterStore((state) => state.users);
+//   const setUsers = useCounterStore((state) => state.setUsers);
+//   function getUsers() {
+//     fetch("http://localhost:3001/user/getAllUsers", {
+//       credentials: "include",
+//     })
+//       .then((res) => res.json())
+//       .then((data) => setUsers(data));
+//   }
+//   console.log("GetUsers ", "rendering..");
+
+//   return (
+//     <div>
+//       <h1>Users</h1>
+//       {users.length > 0 && (
+//         <ul>
+//           {users.map((user) => (
+//             <li key={user?.id}>{user?.name}</li>
+//           ))}
+//         </ul>
+//       )}
+//       <button onClick={getUsers}>Get Users</button>
+//     </div>
+//   );
+// }
+
+// function Test() {
+//   const email = useCounterStore((state) => state.email);
+//   const setEmail = useCounterStore((state) => state.setEmail);
+//   console.log("Test ", "rendering..");
+
+//   return (
+//     <div>
+//       <p>{email}</p>
+//       <input
+//         className="bg-gray-500"
+//         type="text"
+//         value={email}
+//         onChange={(e) => setEmail(e.target.value)}
+//       />
+//     </div>
+//   );
+// }
+// function Test2() {
+//   const username = useCounterStore((state) => state.username);
+//   console.log("Test2 ", "rendering..");
+//   return (
+//     <div>
+//       <p>{username}</p>
+//     </div>
+//   );
+// }
+import { cookies } from "next/headers";
+import AdminPage from "./components/AdminPage";
+import GigOverviewCreation from "./components/GigOverviewManager";
+
+export default async function Home() {
+  //access cookies in nextjs server component
+  const cookieStore = cookies();
+  const sessionCookie = cookieStore.get("connect.sid");
+  let userSession = null;
+  if (sessionCookie) {
+    try {
+      userSession = await (
+        await fetch("http://localhost:3001/auth/session", {
+          credentials: "include",
+          headers: {
+            "Content-Type": "application/json",
+            Cookie: `connect.sid=${sessionCookie.value}`,
+          },
+        })
+      ).json();
+      if (userSession?.error) userSession = null;
+    } catch (err) {
+      console.log(err);
+    }
+  }
   return (
     <div className="text-[#74767e] dark:bg-gray-800 dark:text-gray-200">
-      <MainHeader />
+      <UserInfoStoreProvider initialState={{ user: userSession }}>
+        <MainHeader />
+      </UserInfoStoreProvider>
+      {/* <AdminPage /> */}
+      <GigOverviewCreation />
+      {/* <Provider>
+        <GetUsers />
+        <Test />
+        // <Test2 />
+      </Provider> */}
       {/* <GigOverview /> */}
       {/* <SlideShow
         images={[
@@ -242,7 +365,7 @@ export default function Home() {
       /> */}
       {/* <ReviewsCarousel /> */}
       {/* <UserProfileCard /> */}
-      <ProfilePage />
+      {/* <ProfilePage /> */}
       {/* <LoginCard isModal={false} /> */}
       {/* <Reviews
         allRatings={600}

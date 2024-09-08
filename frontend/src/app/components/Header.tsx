@@ -13,6 +13,7 @@ import useLoginStore from "./stores/loginStore";
 import SideNav from "./SideNav";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { SlEnvolope } from "react-icons/sl";
+import { useUserInfoStore } from "./stores/UserInfoStore";
 
 type FiverrProCardType = {
   icon: ReactNode;
@@ -121,8 +122,10 @@ const exploreOptions = [
 ];
 
 export default function Header() {
-  const [profile, setProfile] = useState({});
   const toggleLoginMode = useLoginStore((state) => state.toggleLoginMode);
+  const user = useUserInfoStore((state) => state.user);
+
+  console.log(user);
 
   return (
     <header className="border-b-0 bg-white px-4 py-5">
@@ -131,7 +134,7 @@ export default function Header() {
       >
         <SideNav />
         <div
-          className={`w-20 cursor-pointer items-center sm:flex ${profile ? "sm:w-full" : ""} sm:justify-center`}
+          className={`w-20 cursor-pointer items-center sm:flex ${user ? "sm:w-full" : ""} sm:justify-center`}
         >
           <svg
             width="89"
@@ -158,7 +161,7 @@ export default function Header() {
           </a>
         </form>
         <Menus>
-          {profile ? (
+          {user ? (
             <ul className="flex items-center justify-around gap-4">
               <div className="flex items-center sm:hidden">
                 <Menus.Toggle direction="right" id="notifcation">
@@ -245,8 +248,9 @@ export default function Header() {
               </li>
               <li className="relative h-8 w-8 cursor-pointer">
                 <img
+                  alt="Profile"
                   className="h-full w-full rounded-full"
-                  src="/images/yacine.png"
+                  src={user.picture}
                 />
                 <span className="absolute bottom-0 right-0 block h-3 w-3 rounded-full border border-white bg-green-500"></span>
               </li>

@@ -13,6 +13,8 @@ import { FaApple, FaFacebookF } from "react-icons/fa";
 import { twMerge } from "tailwind-merge";
 import useLoginStore from "./stores/loginStore";
 import { FaArrowLeftLong } from "react-icons/fa6";
+import { useGoogleLogin } from "@react-oauth/google";
+import { useRouter } from "next/navigation";
 
 function LoginCardLeft() {
   return (
@@ -47,6 +49,9 @@ function LoginCardLeft() {
   );
 }
 
+// 332029646132-gea7ndchld2h8r8kc3jrvqumu2ee1t8j.apps.googleusercontent.com
+// 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
+
 function LoginOptions({
   onCloseModal,
   isModal,
@@ -56,10 +61,21 @@ function LoginOptions({
   onCloseModal?: () => void;
   setLogin: React.Dispatch<React.SetStateAction<string>>;
 }) {
+  const router = useRouter();
+
   const { loginMode, toggleLoginMode } = useLoginStore((state) => ({
     loginMode: state.loginMode,
     toggleLoginMode: state.toggleLoginMode,
   }));
+  const handleGoogleSuccess = (credentialResponse: any) => {
+    window.location.href = "http://localhost:3001/auth/google";
+  };
+
+  const login = useGoogleLogin({
+    onSuccess: handleGoogleSuccess,
+    onError: () => console.log("Login Failed"),
+  });
+
   return (
     <>
       <div className="lg:hidden">
@@ -117,9 +133,11 @@ function LoginOptions({
           grow={true}
           className="mb-3 border-gray-200 hover:border-gray-200 hover:bg-gray-100 hover:bg-opacity-40 hover:text-black"
           color="white"
+          onClick={() => router.push("http://localhost:3001/auth/google")}
         >
           Continue with Google
         </Button>
+
         <Button
           onClick={() => setLogin("loginEmail")}
           IconLeft={<MdOutlineEmail size={20} />}
@@ -164,6 +182,14 @@ function EmailLogin({
 }: {
   setLogin: Dispatch<SetStateAction<string>>;
 }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  function handleLogin() {
+    fetch("http://localhost:3001/auth/login");
+    console.log(email, password);
+  }
+
   return (
     <div>
       <button
@@ -181,11 +207,17 @@ function EmailLogin({
       <div>
         <label className="mb-2 block font-semibold">Email or username</label>
         <input
+          onChange={(e) => {
+            setEmail(() => e.target.value);
+          }}
           type="text"
           className="mb-4 w-full rounded-lg border border-gray-200 p-2 outline-none"
         />
         <label className="mb-2 block font-semibold">Password</label>
         <input
+          onChange={(e) => {
+            setPassword(() => e.target.value);
+          }}
           type="password"
           className="mb-4 w-full rounded-lg border border-gray-200 p-2 outline-none"
         />
