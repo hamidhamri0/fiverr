@@ -1,6 +1,13 @@
 "use client";
 
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   useFormContext,
   useWatch,
@@ -10,14 +17,18 @@ import {
 } from "react-hook-form";
 import { useOutsideClick } from "../Hooks/useOutsideClick";
 import debounce from "./utils/debounce";
+import { sub } from "date-fns";
+import { useGigcontext } from "./GigCreationPage";
 
-export default function GigOverviewForm() {
+export default function GigOverviewForm({ onClick }: { onClick: () => void }) {
   const methods = useFormContext();
+
   const {
     formState: { errors },
   } = methods;
 
   const onSubmit = (data: any) => {
+    onClick();
     console.log(data, "SUBMITTED");
   };
 
@@ -137,10 +148,22 @@ const CategorySelect = () => {
 
 function Category() {
   const {
-    register,
+    setValue,
     formState: { errors },
     setError,
+    control,
   } = useFormContext();
+
+  const {
+    field: { value: category, onChange: setCategory, ref: categoryRef },
+  } = useController({
+    control,
+    name: "category",
+    rules: {
+      required: "Category is required",
+    },
+    defaultValue: "",
+  });
 
   const [categories, setCategories] = useState([]);
 
@@ -165,8 +188,13 @@ function Category() {
   }, [setError]);
   return (
     <select
-      {...register("category", { required: "Category is required" })}
+      ref={categoryRef}
       id="category"
+      value={category}
+      onChange={(e) => {
+        setCategory(e.target.value);
+        setValue("subcategory", "");
+      }}
       className={`flex-1 rounded-md border p-2 text-sm ${errors.category ? "border-red-500" : "border-gray-300"}`}
     >
       <option value="">Select a category</option>
@@ -181,20 +209,34 @@ function Category() {
 
 function Subcategory() {
   const [subCategories, setSubCategories] = useState([]);
-
   const {
-    register,
     setValue,
     setError,
     formState: { errors },
+    control,
+    unregister,
   } = useFormContext();
+
+  const {
+    field: {
+      value: subcategory,
+      onChange: setSubcategory,
+      ref: subcategoryRef,
+    },
+  } = useController({
+    control,
+    name: "subcategory",
+    rules: {
+      required: "subcategory is required",
+    },
+    defaultValue: "",
+  });
 
   const category = useWatch({
     name: "category",
   });
 
   useEffect(() => {
-    setValue("subCategory", "");
     if (!category) return;
     async function fetchSubCategories() {
       try {
@@ -222,16 +264,19 @@ function Subcategory() {
 
   return (
     <select
-      {...register("subCategory", {
-        required: "Sub-category is required",
-      })}
-      id="subCategory"
+      ref={subcategoryRef}
+      value={subcategory}
+      onChange={(e) => {
+        setSubcategory(e.target.value);
+        setValue("serviceType", "");
+        unregister("serviceType");
+      }}
       className={`flex-1 rounded-md border p-2 text-sm ${errors.category ? "border-red-500" : "border-gray-300"}`}
     >
       <option value="">Select a sub-category</option>
-      {subCategories.map((subCategory: categoryType) => (
-        <option key={subCategory.id} value={subCategory.id}>
-          {subCategory.name}
+      {subCategories.map((subcategory: categoryType) => (
+        <option key={subcategory.id} value={subcategory.id}>
+          {subcategory.name}
         </option>
       ))}
     </select>
@@ -240,25 +285,38 @@ function Subcategory() {
 
 const ServiceTypeSelect = () => {
   const {
-    register,
-    formState: { errors },
+    formState: { errors, dirtyFields },
     setValue,
     setError,
+    control,
+    getValues,
+    unregister,
   } = useFormContext();
 
+  const { setMetadata } = useGigcontext();
+
   const [services, setServices] = useState([]);
-  const subCategory = useWatch({
-    name: "subCategory",
+  const subcategory = useWatch({
+    name: "subcategory",
+  });
+  const {
+    field: { value: service, onChange: setService, ref: serviceRef },
+  } = useController({
+    control,
+    name: "serviceType",
+    rules: {
+      required: "service is required",
+    },
+    defaultValue: "",
   });
 
   useEffect(() => {
-    setValue("serviceType", "");
-    if (!subCategory) return;
+    if (!subcategory) return;
     async function fetchServices() {
       try {
         const data = await (
           await fetch(
-            `http://localhost:3001/service/getServicesBySubcategoryId?subcategoryId=${subCategory}`,
+            `http://localhost:3001/service/getServicesBySubcategoryId?subcategoryId=${subcategory}`,
             {
               credentials: "include",
             },
@@ -276,9 +334,11 @@ const ServiceTypeSelect = () => {
       }
     }
     fetchServices();
-  }, [subCategory, setValue, setError]);
+  }, [subcategory, setValue, setError]);
 
-  if (!subCategory) return null;
+  // console.log(service);
+
+  if (!subcategory) return null;
 
   return (
     <div className="mb-6 grid grid-cols-[1fr_2fr]">
@@ -290,10 +350,18 @@ const ServiceTypeSelect = () => {
       </label>
 
       <select
-        {...register("serviceType", {
-          required: "Service type is required",
-        })}
-        id="serviceType"
+        ref={serviceRef}
+        value={service}
+        onChange={(e) => {
+          setService(e.target.value);
+          let values = getValues()?.["metadataTag"] || {};
+          if (Object.keys(values).length) {
+            for (let key of Object.keys(values)) {
+              unregister(`metadataTag.${key}`);
+            }
+          }
+          setMetadata([]);
+        }}
         className={`w-full rounded-md border p-2 text-sm ${errors.serviceType ? "border-red-500" : "border-gray-300"}`}
       >
         <option className="text-sm" value="">
@@ -316,26 +384,30 @@ type MetadataTagsDefaultValues = {
 const Metadata = () => {
   const {
     setValue,
+    watch,
     control,
     register,
     unregister,
     setError,
+    getValues,
     formState: { errors },
   } = useFormContext();
 
-  const registeredFieldsRef = useRef<Record<string, boolean>>({});
+  const { metadata, setMetadata } = useGigcontext();
 
-  const [metadata, setMetadata] = useState<MetadataType[]>([]);
   const [selectedMetadata, setSelectedMetadata] = useState(0);
+  const ref = useRef<boolean>(false);
 
   const service = useWatch({
     name: "serviceType",
     control,
   });
 
+  console.log("metadata are: ", metadata);
+
   useEffect(() => {
-    setValue("metadataTag", {});
     if (!service) return;
+    let values: MetadataTagsDefaultValues = {};
     async function fetchServiceMetadata() {
       try {
         const data = await (
@@ -347,19 +419,7 @@ const Metadata = () => {
           )
         ).json();
         if (data.error) throw new Error(data.message);
-        let values: MetadataTagsDefaultValues = {};
-        data.forEach((meta: MetadataType) => {
-          if (!registeredFieldsRef.current[meta.name]) {
-            register(`metadataTag.${meta.name}`, {
-              required:
-                meta.type === "multi_select"
-                  ? "Select at least one tag"
-                  : "Select a tag",
-            });
-            registeredFieldsRef.current[meta.name] = true;
-          }
-          values[meta.name] = meta.type === "multi_select" ? [] : "";
-        });
+
         setMetadata(data);
       } catch (err) {
         setError("root", {
@@ -371,7 +431,21 @@ const Metadata = () => {
       }
     }
     fetchServiceMetadata();
-  }, [service, setValue, register, unregister, setError]);
+  }, [service, setValue, register, unregister, setError, getValues]);
+
+  // useEffect(() => {
+  //   if (ref.current) {
+  //     const values = getValues()?.["metadataTag"] || {};
+  //     for (let key of Object.keys(values)) {
+  //       console.log(key);
+  //       unregister(`metadataTag.${key}`);
+  //     }
+  //   } else {
+  //     ref.current = true;
+  //   }
+  // }, [service, getValues, unregister]);
+
+  console.log(watch());
 
   if (!service || !metadata.length) return null;
   return (
@@ -399,12 +473,19 @@ const Metadata = () => {
           })}
         </div>
 
-        <div className="p-2">
-          <p className="mb-4 text-sm font-semibold text-gray-500">
-            Select the features you support
-          </p>
-          <MetadataFactory metadata={metadata[selectedMetadata]} />
-        </div>
+        {metadata.map((metadata, index) => {
+          return (
+            <div
+              key={index}
+              className={`p-2 ${index == selectedMetadata ? "block" : "hidden"}`}
+            >
+              <p className="mb-4 text-sm font-semibold text-gray-500">
+                Select the features you support
+              </p>
+              <MetadataFactory metadata={metadata} />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -427,13 +508,30 @@ type MetadataProps = {
 };
 
 function MultiSelect({ metadata }: MetadataProps) {
-  const { register, control } = useFormContext();
+  const { control } = useFormContext();
 
-  // Watch the specific field
-  const metadataTags = useWatch({
+  // const metadataTags = useWatch({
+  //   name: `metadataTag.${metadata.name}`,
+  // });
+
+  const {
+    field: { value: metadataTags, onChange: setMetadataTags },
+  } = useController({
     control,
     name: `metadataTag.${metadata.name}`,
+    defaultValue: [],
+    rules: {
+      validate: (value) => {
+        if (!value.length) return "You need to select at least one tag";
+        if (value.length > 5) return "You can only select 5 tags";
+        return true;
+      },
+    },
   });
+
+  // useEffect(() => {
+
+  // }, [])
 
   function isDisabled(id: string) {
     if (!metadataTags || metadataTags.length < 3) return false;
@@ -446,18 +544,15 @@ function MultiSelect({ metadata }: MetadataProps) {
         {metadata.metadataTags.map((tag) => (
           <div key={tag.id} className="mb-2 flex items-center">
             <input
+              onChange={(e) =>
+                setMetadataTags([...metadataTags, e.target.value])
+              }
               type="checkbox"
               id={String(tag.id)}
               value={tag.id}
+              checked={metadataTags.includes(String(tag.id))}
               className={`mr-2 h-4 w-4 rounded-3xl border-gray-300 accent-black focus:ring-black ${isDisabled(String(tag.id)) ? "cursor-not-allowed text-gray-500" : "cursor-pointer text-black"}`}
               disabled={isDisabled(String(tag.id))}
-              {...register(`metadataTag.${metadata.name}`, {
-                validate: (value) => {
-                  if (!value) return "You need to select at least one tag";
-                  if (value.length > 5) return "You can only select 5 tags";
-                  return true;
-                },
-              })}
             />
             <label htmlFor={tag.name} className="text-sm text-gray-700">
               {tag.name}
@@ -470,14 +565,26 @@ function MultiSelect({ metadata }: MetadataProps) {
 }
 
 function Select({ metadata }: MetadataProps) {
-  const { register } = useFormContext();
+  const { control } = useFormContext();
+  const {
+    field: { value: metadataTag, onChange: setMetadataTag },
+  } = useController({
+    name: `metadataTag.${metadata.name}`,
+    control,
+    rules: {
+      required: "Select a tag",
+    },
+    defaultValue: "",
+  });
 
+  console.log(metadataTag);
   return (
     <div className={`p-2`}>
       <select
-        {...register(`metadataTag.${metadata.name}`, {
-          required: "Select a tag",
-        })}
+        value={metadataTag}
+        onChange={(e) => {
+          setMetadataTag(e.target.value);
+        }}
         className="w-full rounded-md border border-gray-300 p-2 focus:outline-none"
       >
         <option value="">Select a {metadata.name}</option>
@@ -494,9 +601,9 @@ function Select({ metadata }: MetadataProps) {
 function MetadataFactory({ metadata }: MetadataProps) {
   switch (metadata.type) {
     case "multi_select":
-      return <MultiSelect key={Math.random() * 1000} metadata={metadata} />;
+      return <MultiSelect key={Math.random() * 100000} metadata={metadata} />;
     case "select":
-      return <Select key={Math.random() * 1000} metadata={metadata} />;
+      return <Select key={Math.random() * 100000} metadata={metadata} />;
     default:
       return null;
   }

@@ -31,6 +31,7 @@ import { CommandModule } from 'nestjs-command';
 import { SeedCommand } from './seeds/seedCommand';
 import { DatabaseSeeder } from './seeds/seed.service';
 import { SeederModule } from './seeds/seed.module';
+import { FaqModule } from './modules/faq/faq.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { SeederModule } from './seeds/seed.module';
       // entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
+    FaqModule,
     SeederModule,
     CommandModule,
     UserModule,
@@ -62,6 +64,7 @@ import { SeederModule } from './seeds/seed.module';
     PackageFeatureModule,
     AuthModule,
     PassportModule.register({ session: true }),
+    FaqModule,
   ],
   controllers: [AppController],
   providers: [AppService, SeedCommand, DatabaseSeeder],

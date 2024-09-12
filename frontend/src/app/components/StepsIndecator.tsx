@@ -5,6 +5,7 @@ interface StepProps {
   label: string;
   isActive: boolean;
   isCompleted: boolean;
+  onClick: (step: number) => void;
 }
 
 const Step: React.FC<StepProps> = ({
@@ -12,6 +13,7 @@ const Step: React.FC<StepProps> = ({
   label,
   isActive,
   isCompleted,
+  onClick,
 }) => {
   const circleClasses = isCompleted
     ? "bg-green-500 text-white"
@@ -20,7 +22,12 @@ const Step: React.FC<StepProps> = ({
       : "bg-gray-200 text-gray-500";
 
   return (
-    <div className="flex items-center whitespace-nowrap">
+    <div
+      onClick={() => {
+        isCompleted && onClick(number - 1);
+      }}
+      className="flex cursor-pointer items-center whitespace-nowrap"
+    >
       <div
         className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${circleClasses}`}
       >
@@ -37,9 +44,13 @@ const Step: React.FC<StepProps> = ({
 
 interface StepIndicatorProps {
   currentStep: number;
+  onClick: (step: number) => void;
 }
 
-const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
+const StepIndicator: React.FC<StepIndicatorProps> = ({
+  currentStep,
+  onClick,
+}) => {
   const steps = [
     "Overview",
     "Pricing",
@@ -54,6 +65,7 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({ currentStep }) => {
       {steps.map((step, index) => (
         <React.Fragment key={step}>
           <Step
+            onClick={onClick}
             number={index + 1}
             label={step}
             isActive={index === currentStep}

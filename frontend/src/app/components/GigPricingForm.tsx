@@ -1,11 +1,13 @@
-import React, { useEffect } from "react";
+import React, { Dispatch, SetStateAction, useEffect } from "react";
 import {
   FieldErrors,
   FieldValues,
+  useController,
   useFormContext,
   useWatch,
 } from "react-hook-form";
 import { MdError } from "react-icons/md";
+import customSortFeatures from "./utils/customSortFeatures";
 
 type Option = {
   id: number;
@@ -44,6 +46,49 @@ function ErrorMenu({
   );
 }
 
+function SelectInput({
+  feature,
+  typeOfPackage,
+}: {
+  feature: FeatureType[number];
+  typeOfPackage: string;
+}) {
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext();
+  return (
+    <td className="h-full border border-gray-200">
+      <div className="relative min-h-full">
+        <select
+          {...register(`${typeOfPackage}.${feature.name}`, {
+            required: {
+              value: feature.name === "Delivery Time" ? true : false,
+              message: "This field is required",
+            },
+          })}
+          id="countries"
+          className="relative w-full rounded-lg px-2 py-4 text-sm text-gray-900 outline-none"
+        >
+          <option value="">Select</option>
+          {feature.options.map((option) => {
+            return (
+              <option key={option.id} value={option.value}>
+                {option.value}
+              </option>
+            );
+          })}
+        </select>
+        <ErrorMenu
+          featureName={feature.name}
+          typeOfPackage={typeOfPackage}
+          errors={errors}
+        />
+      </div>
+    </td>
+  );
+}
+
 function NumberInput({
   featureName,
   typeOfPackage,
@@ -56,9 +101,6 @@ function NumberInput({
     formState: { errors },
     getValues,
   } = useFormContext();
-  const text = useWatch({
-    name: `${typeOfPackage}.${featureName}`,
-  });
   return (
     <td className="h-full border border-gray-200">
       <div className="relative">
@@ -77,7 +119,6 @@ function NumberInput({
               if (value < 5) {
                 return "Minimum price is $5";
               }
-              // i want to validate if basic price is less than standard price and standard price is less than premium price, its must
               if (typeOfPackage === "standard") {
                 if (values.basic.Price >= values.standard.Price) {
                   return "Standard Price must be higher than basic Price";
@@ -109,13 +150,26 @@ function TextArea({
   featureName: string;
   typeOfPackage: string;
 }) {
+  const { control } = useFormContext();
+
   const {
-    register,
     formState: { errors },
-  } = useFormContext();
-  const text = useWatch({
+    field: { value, onChange },
+  } = useController({
+    control,
     name: `${typeOfPackage}.${featureName}`,
+    rules: {
+      required: {
+        value: true,
+        message: "This field is required",
+      },
+      minLength: {
+        value: 5,
+        message: "Minimum length is 5 characters",
+      },
+    },
   });
+
   return (
     <td
       className={`relative border border-gray-200 text-center align-middle ${
@@ -123,31 +177,8 @@ function TextArea({
       }`}
     >
       <textarea
-        disabled={
-          featureName === "Package Description" && text?.length >= 50
-            ? true
-            : featureName === "Package Name" && text?.length >= 30
-              ? true
-              : false
-        }
-        {...register(`${typeOfPackage}.${featureName}`, {
-          required: {
-            value: true,
-            message: "This field is required",
-          },
-          minLength: {
-            value: 5,
-            message: "Minimum length is 5 characters",
-          },
-          maxLength: {
-            value: featureName === "Package Description" ? 50 : 30,
-            message: `
-                Maximum length is ${
-                  featureName === "Package Description" ? 50 : 30
-                } characters
-            `,
-          },
-        })}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
         placeholder={
           featureName === "packageDescription"
             ? "describe your package"
@@ -164,29 +195,18 @@ function TextArea({
   );
 }
 
-function FactoryFeature(feature: FeatureType[number], typeOfPackage: string) {
+function FactoryFeature({
+  feature,
+  typeOfPackage,
+}: {
+  feature: FeatureType[number];
+  typeOfPackage: string;
+}) {
   const { register } = useFormContext();
 
   switch (feature.type) {
     case "select":
-      return (
-        <td className="h-full border border-gray-200 text-center align-middle">
-          <select
-            {...register(`${typeOfPackage}.${feature.name}`)}
-            id="countries"
-            className="w-full rounded-lg p-2.5 text-sm text-gray-900 outline-none"
-          >
-            <option value="">Select</option>
-            {feature.options.map((option) => {
-              return (
-                <option key={option.id} value={option.value}>
-                  {option.value}
-                </option>
-              );
-            })}
-          </select>
-        </td>
-      );
+      return <SelectInput feature={feature} typeOfPackage={typeOfPackage} />;
     case "input":
       return (
         <TextArea typeOfPackage={typeOfPackage} featureName={feature.name} />
@@ -211,11 +231,10 @@ function FactoryFeature(feature: FeatureType[number], typeOfPackage: string) {
   }
 }
 
-export default function GigPricingForm() {
+export default function GigPricingForm({ onClick }: { onClick: () => void }) {
   const [features, setFeatures] = React.useState<FeatureType>([]);
   const { handleSubmit } = useFormContext();
 
-  //   console.log(watch());
   useEffect(() => {
     async function getAllFeaturesWithOptions() {
       try {
@@ -228,36 +247,7 @@ export default function GigPricingForm() {
         );
         let data = await response.json();
         if (data.message) throw new Error(data.message);
-        const customSortFeatures = function (features: FeatureType) {
-          const customOrder = [
-            "Package Name",
-            "Package Description",
-            "Delivery Time",
-          ];
 
-          return features.sort((a, b) => {
-            // Always put 'price' at the end
-            if (a.name === "price") return 1;
-            if (b.name === "price") return -1;
-
-            const indexA = customOrder.indexOf(a.name);
-            const indexB = customOrder.indexOf(b.name);
-
-            if (indexA !== -1 && indexB !== -1) {
-              // Both features are in the custom order
-              return indexA - indexB;
-            } else if (indexA !== -1) {
-              // Only a is in the custom order
-              return -1;
-            } else if (indexB !== -1) {
-              // Only b is in the custom order
-              return 1;
-            } else {
-              // Neither are in the custom order, sort alphabetically
-              return a.name.localeCompare(b.name);
-            }
-          });
-        };
         data = customSortFeatures(data);
         setFeatures(data);
         console.log(data);
@@ -268,11 +258,15 @@ export default function GigPricingForm() {
     getAllFeaturesWithOptions();
   }, []);
 
+  function submit(data: any) {
+    onClick();
+  }
+
   if (features.length === 0) return null;
 
   return (
     <div className="mx-auto max-w-[800px] p-4">
-      <form onSubmit={handleSubmit((d) => console.log(d))}>
+      <form onSubmit={handleSubmit(submit)}>
         <table className="w-full">
           <colgroup>
             <col
@@ -312,7 +306,13 @@ export default function GigPricingForm() {
                 <tr key={feature.name}>
                   <td className="min-w-[220px] whitespace-nowrap bg-gray-50 p-3 px-4 text-left text-sm font-medium text-gray-500"></td>
                   {["basic", "standard", "premium"].map((type) => {
-                    return FactoryFeature(feature, type);
+                    return (
+                      <FactoryFeature
+                        key={`${feature.name}-${type}`}
+                        feature={feature}
+                        typeOfPackage={type}
+                      />
+                    );
                   })}
                 </tr>
               );
@@ -348,7 +348,13 @@ export default function GigPricingForm() {
                     {feature.name}
                   </td>
                   {["basic", "standard", "premium"].map((type) => {
-                    return FactoryFeature(feature, type);
+                    return (
+                      <FactoryFeature
+                        key={`${feature.name}-${type}`}
+                        feature={feature}
+                        typeOfPackage={type}
+                      />
+                    );
                   })}
                 </tr>
               );
@@ -359,7 +365,7 @@ export default function GigPricingForm() {
           type="submit"
           className="mt-4 block w-full rounded-md bg-green-500 px-4 py-2 text-white"
         >
-          Submit
+          Save & Continue
         </button>
       </form>
     </div>

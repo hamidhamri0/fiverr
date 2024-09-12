@@ -23,8 +23,17 @@ export class Gig {
   @Column()
   title: string;
 
+  @Column('jsonb')
+  aboutGig: string;
+
   @Column('text')
   description: string;
+
+  @Column('boolean', { default: false })
+  isPublished: boolean;
+
+  @Column('numeric', { default: 2 })
+  step: number;
 
   @ManyToOne(() => User, (user) => user.gigs, {
     nullable: false,

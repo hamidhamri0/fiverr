@@ -49,6 +49,7 @@ import {
 } from "./components/zustand";
 import { useStore } from "zustand";
 import UserInfoStoreProvider from "./components/stores/UserInfoStore";
+import Test from "./components/Test";
 
 //bg-[url('/bigImages/ProgrammingBanner.webp')
 
@@ -283,24 +284,11 @@ export const reviews = [
 // }
 
 // function Test() {
-//   const email = useCounterStore((state) => state.email);
-//   const setEmail = useCounterStore((state) => state.setEmail);
 //   console.log("Test ", "rendering..");
 
-//   return (
-//     <div>
-//       <p>{email}</p>
-//       <input
-//         className="bg-gray-500"
-//         type="text"
-//         value={email}
-//         onChange={(e) => setEmail(e.target.value)}
-//       />
-//     </div>
-//   );
+//   return <div></div>;
 // }
 // function Test2() {
-//   const username = useCounterStore((state) => state.username);
 //   console.log("Test2 ", "rendering..");
 //   return (
 //     <div>
@@ -338,11 +326,12 @@ export default async function Home() {
       <UserInfoStoreProvider initialState={{ user: userSession }}>
         <MainHeader />
       </UserInfoStoreProvider>
+      {/* <Test /> */}
       {/* <AdminPage /> */}
       <GigCreationPage />
       {/* <Provider>
         <GetUsers />
-        <Test />
+        
         // <Test2 />
       </Provider> */}
       {/* <GigOverview /> */}
