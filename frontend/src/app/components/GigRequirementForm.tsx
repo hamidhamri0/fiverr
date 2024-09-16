@@ -30,12 +30,14 @@ const GigRequirementForm = ({ onClick }: { onClick: () => void }) => {
   } = useFormContext();
 
   const onSubmit = (data: any) => {
+    console.log("SUBMIT SUCCESS", data);
     onClick();
   };
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <QuestionInput />
+      <button type="submit">Submit</button>
     </form>
   );
 };
@@ -82,7 +84,6 @@ const QuestionInput = () => {
         </p>
         {!isOpen ? (
           <button
-            type="button"
             onClick={() => setIsOpen(true)}
             className="flex items-center gap-2 text-blue-600"
           >
@@ -223,11 +224,11 @@ const QuestionFields = ({
   };
 
   const handleOnSubmit = async () => {
+    console.log("handleOnSubmit 11111111111111111111111111111111111");
     const errors = await trigger([questionName, typeName, optionsName]);
     console.log(questionName, typeName, optionsName);
     console.log(errors);
     if (!errors) return;
-
     onSave({
       question,
       type,
@@ -259,7 +260,6 @@ const QuestionFields = ({
       defaultValue?.type || { genre: "single", multiple: false },
     );
     setValue(optionsName, defaultValue?.options || ["", ""]);
-
     setIsInputOpen(false);
   };
 
@@ -371,6 +371,7 @@ const QuestionFields = ({
       <div className="mt-4 flex justify-end">
         {edit && (
           <button
+            type="button"
             onClick={handleOnDelete}
             className="mr-2 rounded-md px-4 py-2 text-red-500 hover:bg-gray-100"
           >
@@ -379,12 +380,14 @@ const QuestionFields = ({
         )}
         <div className="ml-auto">
           <button
+            type="button"
             onClick={handleCancel}
             className="mr-2 rounded-md bg-gray-200 px-4 py-2 text-gray-800"
           >
             Cancel
           </button>
           <button
+            type="button"
             onClick={handleOnSubmit}
             className="rounded-md bg-black px-4 py-2 text-white"
           >

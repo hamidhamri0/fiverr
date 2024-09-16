@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { FAQ } from './faq.entity';
-import { CreateFaqDTO } from './DTO/create-faq-dto';
+import { FaqDTO } from './DTO/faq-dto';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
@@ -10,7 +10,7 @@ export class FaqService {
     @InjectRepository(FAQ) private readonly faqRepository: Repository<FAQ>,
   ) {}
 
-  async create(faq: CreateFaqDTO) {
+  async saveFaq(faq: FaqDTO) {
     return this.faqRepository.save(faq);
   }
 

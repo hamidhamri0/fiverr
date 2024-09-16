@@ -208,7 +208,7 @@ export default function GigFAQForm() {
     formState: { errors },
   } = useController({
     control,
-    name: "FAQ",
+    name: "faqs",
     defaultValue: [
       {
         id: 598989,

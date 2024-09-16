@@ -37,19 +37,13 @@ import PricingPackageCard from "./components/PricingPackageCard";
 import PackagesTable from "./components/PackagesTable";
 import UserProfile from "./components/UserProfile";
 import LoginCard from "./components/LoginCard";
-import GigCreationPage from "./components/GigCreationPage";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import ProfilePage from "./components/ProfilePage";
 import { create } from "domain";
-import {
-  createStateStore,
-  initCounterStore,
-  State,
-  StateStore,
-} from "./components/zustand";
 import { useStore } from "zustand";
 import UserInfoStoreProvider from "./components/stores/UserInfoStore";
 import Test from "./components/Test";
+import { get } from "@/app/utils/customFetch";
 
 //bg-[url('/bigImages/ProgrammingBanner.webp')
 
@@ -299,36 +293,16 @@ export const reviews = [
 import { cookies } from "next/headers";
 import AdminPage from "./components/AdminPage";
 import GigOverviewCreation from "./components/GigOverviewManager";
+import reshapeDataToDefaultValues, {
+  ReshapeGigData,
+} from "./utils/reshapeDataToDefaultValues";
+import { GigData } from "./components/types/gig.interface";
 
 export default async function Home() {
-  //access cookies in nextjs server component
-  const cookieStore = cookies();
-  const sessionCookie = cookieStore.get("connect.sid");
-  let userSession = null;
-  if (sessionCookie) {
-    try {
-      userSession = await (
-        await fetch("http://localhost:3001/auth/session", {
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-            Cookie: `connect.sid=${sessionCookie.value}`,
-          },
-        })
-      ).json();
-      if (userSession?.error) userSession = null;
-    } catch (err) {
-      console.log(err);
-    }
-  }
   return (
     <div className="text-[#74767e] dark:bg-gray-800 dark:text-gray-200">
-      <UserInfoStoreProvider initialState={{ user: userSession }}>
-        <MainHeader />
-      </UserInfoStoreProvider>
       {/* <Test /> */}
       {/* <AdminPage /> */}
-      <GigCreationPage />
       {/* <Provider>
         <GetUsers />
         

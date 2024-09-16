@@ -1,0 +1,98 @@
+{
+  "title": "how are you doing",
+  "category": "1",
+  "subcategory": "1",
+  "serviceType": "1",
+  "tags": [
+    {
+      "id": 1,
+      "name": "Web Development"
+    }
+  ],
+  "basic": [
+    null,
+    "dfqdzq ",
+    "dfqdzq ",
+    "2 DAYS DELIVERY",
+    "Vue.js",
+    "Sass",
+    true,
+    true,
+    "Jest",
+    "Webpack",
+    "Git",
+    5
+  ],
+  "standard": [
+    null,
+    "dfqdzq Standard",
+    "dfqdzq Standard",
+    "21 DAYS DELIVERY",
+    "Angular",
+    "Sass",
+    true,
+    true,
+    "Jest",
+    "Webpack",
+    "SVN",
+    7
+  ],
+  "premium": [
+    null,
+    "dfqdzq Premium",
+    "dfqdzq Premium",
+    "42 DAYS DELIVERY",
+    "Angular",
+    "Less",
+    false,
+    true,
+    "Chai",
+    "Webpack",
+    "Mercurial",
+    10
+  ],
+  "metadataTag": [null, "1", ["5", "7"]],
+  "editor": "ouah sahbu rak manaytk uah sahbu rak manaytk uah sahbu rak manaytk uah sahbu rak manaytkuah sahbu rak manaytkuah sahbu rak manaytk zdsqdqzd",
+  "editorJson": {
+    "type": "doc",
+    "content": [
+      {
+        "type": "paragraph",
+        "content": [
+          {
+            "type": "text",
+            "text": "ouah sahbu rak manaytk uah sahbu rak manaytk uah sahbu rak manaytk uah sahbu rak manaytkuah sahbu rak manaytkuah sahbu rak manaytk zdsqdqzd"
+          }
+        ]
+      }
+    ]
+  },
+  "FAQ": [
+    {
+      "id": 9986565,
+      "question": "Nta khodra ?",
+      "answer": "jijijijiji",
+      "position": 1
+    },
+    {
+      "id": 8989,
+      "question": "Nta qzdqzdqz ?",
+      "answer": "bbbbbbb",
+      "position": 2
+    },
+    {
+      "question": "zaZSasa",
+      "answer": "dzdqzdqzdqzd",
+      "id": 1726397026286,
+      "position": 2
+    }
+  ],
+  "faqQuestion598989": "How are you sir ?",
+  "faqAnswer598989": "I'm good man",
+  "faqQuestion9986565": "Nta khodra ?",
+  "faqAnswer9986565": "jijijijiji",
+  "faqQuestion8989": "Nta qzdqzdqz ?",
+  "faqAnswer8989": "bbbbbbb",
+  "faqQuestion": "",
+  "faqAnswer": ""
+}

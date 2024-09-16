@@ -3,14 +3,16 @@ import { AppModule } from './app.module';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import { ValidationPipe } from '@nestjs/common';
+import { GlobalExceptionFilter } from './common/filters/GlobalExceptionFilter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const corsOptions = {
     origin: 'http://localhost:3000', // Allow requests from this origin
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   };
+
+  // app.useGlobalFilters(new GlobalExceptionFilter());
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -18,6 +20,7 @@ async function bootstrap() {
       whitelist: true,
     }),
   );
+
   app.enableCors(corsOptions);
 
   app.use(

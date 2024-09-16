@@ -4,8 +4,11 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { Metadata } from '../metadata/metadata.entity';
+import { Gig } from '../gig/gig.entity';
 
 @Entity('metadata_tags')
 export class MetadataTag {
@@ -21,4 +24,6 @@ export class MetadataTag {
   })
   @JoinColumn({ name: 'metadataId' })
   metadata: Metadata;
+  @ManyToMany(() => Gig, (gig) => gig.metadataTags)
+  gigs: Gig[];
 }

@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { MetadataTag } from './metadata-tag.entity';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MetadataService } from '../metadata/metadata.service';
 import { CreateMetadataTagDTO } from './DTO/create-metadata-tag-dto';
@@ -29,6 +29,11 @@ export class MetadataTagService {
     return this.metadataTagRepository.delete({});
   }
 
+  async findByIds(ids: number[]) {
+    return this.metadataTagRepository.findBy({
+      id: In(ids),
+    });
+  }
   async createMetadataTag(metadataTag: CreateMetadataTagDTO) {
     // Fetch the Metadata entity using the metadataId from the DTO
     const metadata = await this.metadataService.findOneById(

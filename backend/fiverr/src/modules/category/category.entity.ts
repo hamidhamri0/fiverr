@@ -1,5 +1,12 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+  ManyToMany,
+} from 'typeorm';
 import { Subcategory } from '../subcategory/subcategory.entity';
+import { Gig } from '../gig/gig.entity';
 
 @Entity('categories')
 export class Category {
@@ -11,6 +18,9 @@ export class Category {
 
   @OneToMany(() => Subcategory, (subcategory) => subcategory.category)
   subcategories?: Subcategory[];
+
+  @OneToMany(() => Gig, (gig) => gig.category)
+  gigs: Gig[];
 }
 
 /*

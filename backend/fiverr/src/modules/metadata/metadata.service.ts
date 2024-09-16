@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { SubcategoryService } from '../subcategory/subcategory.service';
 import { ServiceService } from '../service/service.service';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Metadata } from './metadata.entity';
 import { CreateMetadataDTO } from './DTO/create-metadata.dto';
@@ -64,6 +64,12 @@ export class MetadataService {
     return this.metadataRepository.find({
       where: { service: { id: serviceId } },
       relations: ['metadataTags'],
+    });
+  }
+
+  async findByIds(ids: number[]) {
+    return this.metadataRepository.findBy({
+      id: In(ids),
     });
   }
 

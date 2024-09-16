@@ -16,7 +16,7 @@ export default function GigDescriptionAndFAQCreation({
     onClick();
   }
   return (
-    <form onSubmit={handleSubmit(submit)} className="mx-auto max-w-[800px]">
+    <div className="mx-auto max-w-[800px]">
       <h2 className="mb-4 text-2xl font-semibold">Description</h2>
       <p className="mb-12 border-b border-gray-200"></p>
       <p className="mb-4">Briefly Describe Your Gig</p>
@@ -29,6 +29,6 @@ export default function GigDescriptionAndFAQCreation({
       >
         Save & Continue
       </button>
-    </form>
+    </div>
   );
 }

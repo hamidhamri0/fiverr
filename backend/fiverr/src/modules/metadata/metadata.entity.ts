@@ -5,9 +5,11 @@ import {
   ManyToOne,
   JoinColumn,
   OneToMany,
+  ManyToMany,
 } from 'typeorm';
 import { Service } from '../service/service.entity';
 import { MetadataTag } from '../metadata-tag/metadata-tag.entity';
+import { Gig } from '../gig/gig.entity';
 
 @Entity('metadata')
 export class Metadata {
@@ -32,4 +34,7 @@ export class Metadata {
 
   @OneToMany(() => MetadataTag, (metadataTag) => metadataTag.metadata)
   metadataTags: MetadataTag[];
+
+  @ManyToMany(() => Gig, (gig) => gig.metadata)
+  gigs: Gig[];
 }

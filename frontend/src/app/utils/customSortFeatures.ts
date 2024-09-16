@@ -1,19 +1,9 @@
-type Option = {
-  id: number;
-  value: string;
-};
+import { Features } from "../components/types/gig.interface";
 
-type FeatureType = {
-  id: number;
-  name: string;
-  type: boolean | string;
-  options: Option[];
-}[];
-
-export default function customSortFeatures(features: FeatureType) {
+export default function customSortFeatures(features: Features): Features {
   const customOrder = ["Package Name", "Package Description", "Delivery Time"];
 
-  return features.sort((a, b) => {
+  return features.sort((a, b): number => {
     // Always put 'price' at the end
     if (a.name === "price") return 1;
     if (b.name === "price") return -1;

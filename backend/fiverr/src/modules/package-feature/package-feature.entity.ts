@@ -1,4 +1,11 @@
-import { Entity, Column, ManyToOne, JoinColumn, PrimaryColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  PrimaryColumn,
+  OneToOne,
+} from 'typeorm';
 import { Package } from '../package/package.entity';
 import { Feature } from '../feature/feature.entity';
 
@@ -13,16 +20,13 @@ export class PackageFeature {
   @Column({ nullable: false })
   value: string;
 
-  @Column({ default: true })
-  isIncluded: boolean;
-
   @ManyToOne(() => Package, (package_) => package_.packageFeatures, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'packageId' })
   package: Package;
 
-  @ManyToOne(() => Feature, (feature) => feature.packageFeatures)
-  @JoinColumn({ name: 'featureId' })
+  @OneToOne(() => Feature)
+  @JoinColumn()
   feature: Feature;
 }

@@ -6,10 +6,12 @@ import {
   JoinColumn,
   OneToMany,
   Unique,
+  ManyToMany,
 } from 'typeorm';
 import { Category } from '../category/category.entity';
 import { Service } from '../service/service.entity';
 import { Feature } from '../feature/feature.entity';
+import { Gig } from '../gig/gig.entity';
 
 @Entity('subcategories')
 @Unique(['name', 'category'])
@@ -32,4 +34,7 @@ export class Subcategory {
 
   @OneToMany(() => Feature, (feature) => feature.subcategory)
   features: Feature[];
+
+  @OneToMany(() => Gig, (gig) => gig.subcategory)
+  gigs: Gig[];
 }

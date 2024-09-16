@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Categories from "./Categories";
 import { OpenArrow } from "./Footer";
-import debounce from "./utils/debounce";
+import debounce from "../utils/debounce";
 const categories = [
   {
     name: "Websites",

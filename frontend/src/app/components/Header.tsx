@@ -125,8 +125,6 @@ export default function Header() {
   const toggleLoginMode = useLoginStore((state) => state.toggleLoginMode);
   const user = useUserInfoStore((state) => state.user);
 
-  console.log(user);
-
   return (
     <header className="border-b-0 bg-white px-4 py-5">
       <nav

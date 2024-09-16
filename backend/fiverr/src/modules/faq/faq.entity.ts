@@ -4,7 +4,9 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
 } from 'typeorm';
+import { Gig } from '../gig/gig.entity';
 
 @Entity('faq')
 export class FAQ {
@@ -19,6 +21,11 @@ export class FAQ {
 
   @Column('integer')
   position: number;
+
+  @ManyToOne(() => Gig, (gig) => gig.faqs, {
+    onDelete: 'CASCADE',
+  })
+  gig: Gig;
 
   @CreateDateColumn({
     type: 'timestamp with time zone',

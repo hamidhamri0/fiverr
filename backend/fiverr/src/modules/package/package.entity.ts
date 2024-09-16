@@ -18,12 +18,16 @@ export class Package {
     type: 'enum',
     enum: ['basic', 'standard', 'premium'],
   })
-  name: 'basic' | 'standard' | 'premium';
+  type: 'basic' | 'standard' | 'premium';
 
-  @ManyToOne(() => Gig, (gig) => gig.packages)
+  @ManyToOne(() => Gig, (gig) => gig.packages, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'gigId' })
   gig: Gig;
 
-  @OneToMany(() => PackageFeature, (packageFeature) => packageFeature.package)
+  @OneToMany(() => PackageFeature, (packageFeature) => packageFeature.package, {
+    cascade: true,
+  })
   packageFeatures: PackageFeature[];
 }

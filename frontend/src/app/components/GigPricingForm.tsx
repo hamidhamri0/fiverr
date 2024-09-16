@@ -1,43 +1,25 @@
-import React, { Dispatch, SetStateAction, useEffect } from "react";
+import React, { useEffect } from "react";
 import {
-  FieldErrors,
-  FieldValues,
+  FieldError,
   useController,
   useFormContext,
   useWatch,
 } from "react-hook-form";
 import { MdError } from "react-icons/md";
-import customSortFeatures from "./utils/customSortFeatures";
+import customSortFeatures from "../utils/customSortFeatures";
+import { get } from "../utils/customFetch";
+import { Feature, Features, Option } from "./types/gig.interface";
+import { useGigStore } from "./stores/GigStore";
 
-type Option = {
-  id: number;
-  value: string;
-};
-
-type FeatureType = {
-  id: number;
-  name: string;
-  type: boolean | string;
-  options: Option[];
-}[];
-
-function ErrorMenu({
-  errors,
-  typeOfPackage,
-  featureName,
-}: {
-  errors: FieldErrors<FieldValues>;
-  typeOfPackage: string;
-  featureName: string;
-}) {
+function ErrorMenu({ children }: { children: FieldError }) {
   return (
     <>
-      {errors?.[typeOfPackage]?.[featureName] && (
+      {children && (
         <div>
           <div className="group absolute right-1 top-1">
             <MdError className="cursor-help text-red-500" />
             <div className="absolute bottom-6 z-50 w-[200px] rounded-md bg-gray-600 p-3 text-xs text-white opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              <p>{errors?.[typeOfPackage]?.[featureName]?.message}</p>
+              <p>{children.message}</p>
             </div>
           </div>
         </div>
@@ -50,28 +32,39 @@ function SelectInput({
   feature,
   typeOfPackage,
 }: {
-  feature: FeatureType[number];
+  feature: Feature;
   typeOfPackage: string;
 }) {
   const {
-    register,
+    control,
     formState: { errors },
   } = useFormContext();
+
+  const {
+    field: { value, onChange },
+    fieldState: { error },
+  } = useController({
+    control,
+    name: `${typeOfPackage}.${String(feature.id)}`,
+    rules: {
+      required: {
+        value: feature.name === "Delivery Time" ? true : false,
+        message: "This field is required",
+      },
+    },
+  });
+
   return (
     <td className="h-full border border-gray-200">
       <div className="relative min-h-full">
         <select
-          {...register(`${typeOfPackage}.${feature.name}`, {
-            required: {
-              value: feature.name === "Delivery Time" ? true : false,
-              message: "This field is required",
-            },
-          })}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
           id="countries"
           className="relative w-full rounded-lg px-2 py-4 text-sm text-gray-900 outline-none"
         >
           <option value="">Select</option>
-          {feature.options.map((option) => {
+          {feature.options.map((option: Option) => {
             return (
               <option key={option.id} value={option.value}>
                 {option.value}
@@ -79,28 +72,50 @@ function SelectInput({
             );
           })}
         </select>
-        <ErrorMenu
-          featureName={feature.name}
-          typeOfPackage={typeOfPackage}
-          errors={errors}
-        />
+        {error && <ErrorMenu>{error}</ErrorMenu>}
       </div>
     </td>
   );
 }
 
 function NumberInput({
-  featureName,
+  feature,
   typeOfPackage,
 }: {
-  featureName: string;
+  feature: Feature;
   typeOfPackage: string;
 }) {
+  const { control, getValues } = useFormContext();
+
   const {
-    register,
-    formState: { errors },
-    getValues,
-  } = useFormContext();
+    field: { value, onChange },
+    fieldState: { error },
+  } = useController({
+    control,
+    name: `${typeOfPackage}.${String(feature.id)}`,
+    rules: {
+      required: {
+        value: true,
+        message: "This field is required",
+      },
+      validate(value) {
+        const values = getValues();
+        if (value < 5) {
+          return "Minimum price is $5";
+        }
+        if (typeOfPackage === "standard") {
+          if (values.basic.Price >= values.standard.Price) {
+            return "Standard Price must be higher than basic Price";
+          }
+        } else if (typeOfPackage === "premium") {
+          if (values.standard.Price >= values.premium.Price) {
+            return "Premium Price must be higher than standard Price";
+          }
+        }
+      },
+    },
+  });
+
   return (
     <td className="h-full border border-gray-200">
       <div className="relative">
@@ -108,46 +123,22 @@ function NumberInput({
           $
         </span>
         <input
-          {...register(`${typeOfPackage}.${featureName}`, {
-            valueAsNumber: true,
-            required: {
-              value: true,
-              message: "This field is required",
-            },
-            validate(value) {
-              const values = getValues();
-              if (value < 5) {
-                return "Minimum price is $5";
-              }
-              if (typeOfPackage === "standard") {
-                if (values.basic.Price >= values.standard.Price) {
-                  return "Standard Price must be higher than basic Price";
-                }
-              } else if (typeOfPackage === "premium") {
-                if (values.standard.Price >= values.premium.Price) {
-                  return "Premium Price must be higher than standard Price";
-                }
-              }
-            },
-          })}
+          value={value}
+          onChange={(e) => onChange(String(e.target.value))}
           className="h-[40px] w-full rounded-md border border-gray-200 px-2 pl-6 outline-none"
           type="number"
         />
-        <ErrorMenu
-          featureName={featureName}
-          typeOfPackage={typeOfPackage}
-          errors={errors}
-        />
+        {error && <ErrorMenu>{error}</ErrorMenu>}
       </div>
     </td>
   );
 }
 
 function TextArea({
-  featureName,
+  feature,
   typeOfPackage,
 }: {
-  featureName: string;
+  feature: Feature;
   typeOfPackage: string;
 }) {
   const { control } = useFormContext();
@@ -155,9 +146,10 @@ function TextArea({
   const {
     formState: { errors },
     field: { value, onChange },
+    fieldState: { error },
   } = useController({
     control,
-    name: `${typeOfPackage}.${featureName}`,
+    name: `${typeOfPackage}.${String(feature.id)}`,
     rules: {
       required: {
         value: true,
@@ -168,29 +160,62 @@ function TextArea({
         message: "Minimum length is 5 characters",
       },
     },
+    defaultValue: {},
   });
 
   return (
     <td
       className={`relative border border-gray-200 text-center align-middle ${
-        featureName === "Package Description" ? "border-b-0" : ""
+        feature.name === "Package Description" ? "border-b-0" : ""
       }`}
     >
       <textarea
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={
-          featureName === "packageDescription"
+          feature.name === "packageDescription"
             ? "describe your package"
             : "Name your package"
         }
-        className={`w-full resize-none rounded p-2 text-xs text-gray-700 outline-none ${featureName === "packageDescription" ? "h-40" : "h-24"} `}
+        className={`w-full resize-none rounded p-2 text-xs text-gray-700 outline-none ${feature.name === "packageDescription" ? "h-40" : "h-24"} `}
       />
-      <ErrorMenu
-        featureName={featureName}
-        typeOfPackage={typeOfPackage}
-        errors={errors}
+      {error && <ErrorMenu>{error}</ErrorMenu>}
+    </td>
+  );
+}
+
+function CheckBoxInput({
+  feature,
+  typeOfPackage,
+}: {
+  feature: Feature;
+  typeOfPackage: string;
+}) {
+  const { control } = useFormContext();
+
+  const {
+    field: { value, onChange },
+    fieldState: { error },
+  } = useController({
+    control,
+    name: `${typeOfPackage}.${String(feature.id)}`,
+    rules: {
+      required: {
+        value: true,
+        message: "This field is required",
+      },
+    },
+  });
+
+  return (
+    <td className="border border-gray-200 py-4 text-center align-middle">
+      <input
+        checked={Boolean(value)}
+        onChange={(e) => onChange(e.target.checked)}
+        type="checkbox"
+        className="form-checkbox h-5 w-5 text-blue-600 accent-black"
       />
+      {error && <ErrorMenu>{error}</ErrorMenu>}
     </td>
   );
 }
@@ -199,7 +224,7 @@ function FactoryFeature({
   feature,
   typeOfPackage,
 }: {
-  feature: FeatureType[number];
+  feature: Feature;
   typeOfPackage: string;
 }) {
   const { register } = useFormContext();
@@ -208,58 +233,42 @@ function FactoryFeature({
     case "select":
       return <SelectInput feature={feature} typeOfPackage={typeOfPackage} />;
     case "input":
-      return (
-        <TextArea typeOfPackage={typeOfPackage} featureName={feature.name} />
-      );
+      return <TextArea typeOfPackage={typeOfPackage} feature={feature} />;
 
     case "checkbox":
-      return (
-        <td className="border border-gray-200 py-4 text-center align-middle">
-          <input
-            {...register(`${typeOfPackage}.${feature.name}`)}
-            type="checkbox"
-            className="form-checkbox h-5 w-5 text-blue-600 accent-black"
-          />
-        </td>
-      );
+      return <CheckBoxInput typeOfPackage={typeOfPackage} feature={feature} />;
     case "range":
-      return (
-        <NumberInput typeOfPackage={typeOfPackage} featureName={feature.name} />
-      );
+      return <NumberInput typeOfPackage={typeOfPackage} feature={feature} />;
     default:
       return null;
   }
 }
 
 export default function GigPricingForm({ onClick }: { onClick: () => void }) {
-  const [features, setFeatures] = React.useState<FeatureType>([]);
+  const features = useGigStore((state) => state.features);
+  const setFeatures = useGigStore((state) => state.setFeatures);
   const { handleSubmit } = useFormContext();
+
+  const subcategory = useWatch({ name: "subcategory" });
 
   useEffect(() => {
     async function getAllFeaturesWithOptions() {
       try {
-        const response = await fetch(
-          `http://localhost:3001/feature/getAllFeaturesBySubcategoryId?subcategoryId=${43}`,
-          {
-            method: "GET",
-            credentials: "include",
-          },
+        let data = await get<Features>(
+          `/feature/getAllFeaturesBySubcategoryId?subcategoryId=${subcategory}`,
         );
-        let data = await response.json();
-        if (data.message) throw new Error(data.message);
 
-        data = customSortFeatures(data);
-        setFeatures(data);
-        console.log(data);
+        const featuresData = customSortFeatures(data);
+        setFeatures(featuresData);
       } catch (error) {
         console.log(error);
       }
     }
     getAllFeaturesWithOptions();
-  }, []);
+  }, [subcategory, setFeatures]);
 
   function submit(data: any) {
-    onClick();
+    // onClick();
   }
 
   if (features.length === 0) return null;

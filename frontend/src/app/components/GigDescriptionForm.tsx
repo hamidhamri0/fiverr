@@ -1,9 +1,10 @@
 import { useFormContext, useController } from "react-hook-form";
-import { useEditor, EditorContent, JSONContent } from "@tiptap/react";
+import { useEditor, EditorContent, generateHTML } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
+import DOMPurify from "dompurify";
 
 import Highlight from "@tiptap/extension-highlight";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { FaBold, FaItalic } from "react-icons/fa";
 import { LuHighlighter } from "react-icons/lu";
 import { MdFormatListBulleted } from "react-icons/md";
@@ -53,12 +54,10 @@ function ToolBar({ editor }: { editor: ReturnType<typeof useEditor> }) {
 }
 
 export default function GigDescriptionForm() {
-  const {
-    control,
-    formState: { errors },
-  } = useFormContext();
+  const { control } = useFormContext();
   const {
     field: { onChange, value },
+    fieldState: { error },
   } = useController({
     name: "editor",
     control,
@@ -69,13 +68,18 @@ export default function GigDescriptionForm() {
       maxLength: { value: 1200, message: "Description is too long" },
     },
   });
-
-  // console.log(value);
+  const {
+    field: { onChange: onChangeJson, value: jsonContent },
+  } = useController({
+    name: "editorJson",
+    control,
+    defaultValue: "",
+  });
 
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [StarterKit, Highlight],
-    content: value,
+    content: jsonContent,
     editorProps: {
       attributes: {
         class:
@@ -85,6 +89,7 @@ export default function GigDescriptionForm() {
     onUpdate: ({ editor }) => {
       const text = editor.getText();
       const json = editor.getJSON();
+      onChangeJson(json);
       onChange(text);
       if (text.length > 1200) {
         const overflow = text.length - 1200;
@@ -95,6 +100,8 @@ export default function GigDescriptionForm() {
       }
     },
   });
+
+  console.log("TKKKKK", jsonContent);
 
   return (
     <div>
@@ -107,9 +114,23 @@ export default function GigDescriptionForm() {
         <div className="flex justify-end text-sm">
           <p>{value.length} / 1200 Characters</p>
         </div>
-        {errors.editor && (
-          <p className="mb-4 text-sm text-red-500">{errors.editor.message}</p>
-        )}
+        {error && <p className="mb-4 text-sm text-red-500">{error.message}</p>}
+        <div>
+          {jsonContent && (
+            <div
+              className="json-content"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(
+                  generateHTML(jsonContent, [StarterKit, Highlight]),
+                ),
+              }}
+            ></div>
+            // <div>
+            //   {DOMPurify.sanitize(
+            //     generateHTML(jsonContent, [StarterKit, Highlight]),
+            //   )}
+          )}
+        </div>
       </div>
     </div>
   );

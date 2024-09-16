@@ -4,10 +4,20 @@ import { GigController } from './gig.controller';
 import { Gig } from './gig.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ServiceModule } from '../service/service.module';
+import { MetadataModule } from '../metadata/metadata.module';
+import { MetadataTagModule } from '../metadata-tag/metadata-tag.module';
+import { FaqModule } from '../faq/faq.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Gig]), ServiceModule],
-  providers: [GigService],
+  imports: [
+    TypeOrmModule.forFeature([Gig]),
+    ServiceModule,
+    MetadataModule,
+    MetadataTagModule,
+    FaqModule,
+  ],
   controllers: [GigController],
+  providers: [GigService],
+  exports: [GigService],
 })
 export class GigModule {}

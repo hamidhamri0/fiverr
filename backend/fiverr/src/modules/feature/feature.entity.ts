@@ -33,7 +33,4 @@ export class Feature {
 
   @OneToMany(() => FeatureOption, (featureOption) => featureOption.feature)
   options: FeatureOption[];
-
-  @OneToMany(() => PackageFeature, (packageFeature) => packageFeature.feature)
-  packageFeatures: PackageFeature[];
 }
