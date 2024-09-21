@@ -2,7 +2,7 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   mode: "jit",
-  darkMode: "class",
+  darkMode: ["class", "class"],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -10,38 +10,41 @@ const config: Config = {
   ],
 
   theme: {
-    screens: {
-      "2xl": { max: "1500px" },
-      xl: { max: "1279px" },
-      // => @media (max-width: 1279px) { ... }
-
-      "1150": { max: "1150px" },
-      // => @media (max-width: 1279px) { ... }
-
-      lg: { max: "1023px" },
-      // => @media (max-width: 1023px) { ... }
-
-      md: { max: "824px" },
-      // => @media (max-width: 767px) { ... }
-
-      sm: { max: "680px" },
-      // => @media (max-width: 639px) { ... }
-
-      xs: { max: "550px" },
-      // => @media (max-width: 639px) { ... }
-    },
-    extend: {
-      // backgroundImage: {
-      //   olympic: "url('/images/olympic.webp)",
-      //   "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-      //   "gradient-conic":
-      //     "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      // },
-      width: {
-        "1400": "1400px",
-      },
-    },
+  	screens: {
+  		'2xl': {
+  			max: '1500px'
+  		},
+  		xl: {
+  			max: '1279px'
+  		},
+  		'1150': {
+  			max: '1150px'
+  		},
+  		lg: {
+  			max: '1023px'
+  		},
+  		md: {
+  			max: '824px'
+  		},
+  		sm: {
+  			max: '680px'
+  		},
+  		xs: {
+  			max: '550px'
+  		}
+  	},
+  	extend: {
+  		width: {
+  			'1400': '1400px'
+  		},
+  		borderRadius: {
+  			lg: 'var(--radius)',
+  			md: 'calc(var(--radius) - 2px)',
+  			sm: 'calc(var(--radius) - 4px)'
+  		},
+  		colors: {}
+  	}
   },
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
 };
 export default config;

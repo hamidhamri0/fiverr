@@ -1,14 +1,8 @@
 import React, { useState } from "react";
-import {
-  useFormContext,
-  useController,
-  Controller,
-  useWatch,
-} from "react-hook-form";
+import { useFormContext, useController } from "react-hook-form";
 import { IoMdMenu } from "react-icons/io";
 import { OpenArrow } from "./Footer";
-import { id } from "date-fns/locale";
-import { error } from "console";
+import { post } from "@/lib/utils/customFetch";
 
 type Question = {
   question: string;
@@ -24,21 +18,66 @@ type Questions = {
 };
 
 const GigRequirementForm = ({ onClick }: { onClick: () => void }) => {
-  const {
-    handleSubmit,
-    formState: { errors },
-  } = useFormContext();
+  const { handleSubmit, setValue } = useFormContext();
 
-  const onSubmit = (data: any) => {
+  const onSubmit = async (data: any) => {
     console.log("SUBMIT SUCCESS", data);
-    onClick();
+    const question = data.questions;
+    const gigId = data.gigId;
+    await post(`/question/saveQuestions/${gigId}`, { question });
+    // onClick();
   };
 
+  function fillData() {
+    const data = [
+      {
+        question: "how is your state with db ?",
+        type: {
+          genre: "multiple",
+          multiple: true,
+        },
+        options: ["yes good", "not bad", "bad"],
+        id: null,
+      },
+      {
+        question: "what you is rage",
+        type: {
+          genre: "multiple",
+          multiple: false,
+        },
+        options: ["mid", "bad"],
+        id: null,
+      },
+      {
+        question: "how are you ?",
+        type: {
+          genre: "input",
+          multiple: false,
+        },
+        options: ["", ""],
+        id: null,
+      },
+    ];
+    setValue("questions", data);
+  }
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <div className="mx-auto max-w-[700px]">
       <QuestionInput />
-      <button type="submit">Submit</button>
-    </form>
+      <button
+        type="button"
+        onClick={handleSubmit(onSubmit)}
+        className={`w-full rounded-md bg-green-500 px-4 py-2 text-white transition duration-300 hover:bg-green-600`}
+      >
+        Save & Continue
+      </button>
+      <button
+        className={`mt-2 w-full rounded-md bg-green-500 px-4 py-2 text-white transition duration-300 hover:bg-green-600`}
+        onClick={() => fillData()}
+      >
+        fill with Data
+      </button>
+    </div>
   );
 };
 
@@ -58,7 +97,7 @@ const QuestionInput = () => {
   };
 
   const handleUpdateQuestion = (index: number, question: Question) => {
-    console.log(question, "updated");
+    // console.log(question, "updated");
     const updatedQuestions = [...questions];
     updatedQuestions[index] = question;
     setQuestions(updatedQuestions);
@@ -74,9 +113,15 @@ const QuestionInput = () => {
   console.log("QUESTION", questions);
 
   return (
-    <div className="mx-auto max-w-2xl rounded-lg bg-gray-50 p-4 shadow-md">
+    <div className="mx-auto mb-2 max-w-2xl rounded-lg bg-gray-50 p-4 shadow-md">
       <div className="mb-12">
-        <h2 className="mb-4 text-xl font-semibold">YOUR QUESTIONS</h2>
+        <div className="mb-4 flex w-full items-center gap-1">
+          <span className="h-[1px] w-full bg-gray-200"></span>
+          <h2 className="whitespace-nowrap text-sm font-medium">
+            YOUR QUESTIONS
+          </h2>
+          <span className="h-[1px] w-full bg-gray-200"></span>
+        </div>
         <p className="mb-4 text-gray-600">
           Here&apos;s where you can request any details needed to complete the
           order. There&apos;s no need to repeat any of the general questions
@@ -202,7 +247,6 @@ const QuestionFields = ({
     defaultValue: defaultValue?.options || ["", ""],
     rules: {
       validate: (value) => {
-        console.log(type.genre, value);
         if (type.genre !== "multiple") return true;
         if (value.length < 2) return "fill at least two options";
         let noErr = true;
@@ -224,16 +268,16 @@ const QuestionFields = ({
   };
 
   const handleOnSubmit = async () => {
-    console.log("handleOnSubmit 11111111111111111111111111111111111");
+    // console.log("handleOnSubmit 11111111111111111111111111111111111");
     const errors = await trigger([questionName, typeName, optionsName]);
-    console.log(questionName, typeName, optionsName);
-    console.log(errors);
+    // console.log(questionName, typeName, optionsName);
+    // console.log(errors);
     if (!errors) return;
     onSave({
       question,
       type,
       options,
-      id: defaultValue?.id || Date.now(),
+      id: defaultValue?.id || null,
     });
     if (!edit) {
       ResetState();
@@ -325,7 +369,7 @@ const QuestionFields = ({
       </div>
 
       {type.genre === "multiple" &&
-        options.map((option, idx: number) => (
+        options.map((option: string[], idx: number) => (
           <div key={idx} className="mb-2 flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <input

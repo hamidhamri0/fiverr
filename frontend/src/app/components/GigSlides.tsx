@@ -5,7 +5,7 @@ import { FaStar } from "react-icons/fa";
 import { FaHeart } from "react-icons/fa6";
 import { HiOutlineVideoCamera } from "react-icons/hi2";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import useSlide from "../Hooks/useSlide";
+import useSlide from "../../Hooks/useSlide";
 import { ArrowLeftRight } from "./WelcomeContent";
 // import Categories from "./Categories";
 import { IoCloudyNight } from "react-icons/io5";

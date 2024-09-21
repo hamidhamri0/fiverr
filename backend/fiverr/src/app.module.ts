@@ -32,6 +32,11 @@ import { SeedCommand } from './seeds/seedCommand';
 import { DatabaseSeeder } from './seeds/seed.service';
 import { SeederModule } from './seeds/seed.module';
 import { FaqModule } from './modules/faq/faq.module';
+import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
+import { GlobalExceptionFilter } from './common/filters/GlobalExceptionFilter';
+import { QuestionModule } from './modules/question/question.module';
+import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -46,6 +51,10 @@ import { FaqModule } from './modules/faq/faq.module';
       // entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: true,
     }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
+    PassportModule.register({ session: true }),
     FaqModule,
     SeederModule,
     CommandModule,
@@ -63,10 +72,18 @@ import { FaqModule } from './modules/faq/faq.module';
     PackageModule,
     PackageFeatureModule,
     AuthModule,
-    PassportModule.register({ session: true }),
-    FaqModule,
+    QuestionModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
-  providers: [AppService, SeedCommand, DatabaseSeeder],
+  providers: [
+    AppService,
+    SeedCommand,
+    DatabaseSeeder,
+    {
+      provide: APP_FILTER,
+      useClass: GlobalExceptionFilter,
+    },
+  ],
 })
 export class AppModule {}

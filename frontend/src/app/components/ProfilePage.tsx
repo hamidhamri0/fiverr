@@ -9,7 +9,7 @@ import {
   SortBy,
 } from "./Reviews";
 import { reviews } from "../page";
-import Button from "./smallComponents/Button";
+import Button from "./ui/Button";
 import { FiMessageSquare } from "react-icons/fi";
 import { AddToList } from "./ActionToolbar";
 

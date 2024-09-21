@@ -1,17 +1,11 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { IoMdCheckmark } from "react-icons/io";
-import Button from "./smallComponents/Button";
+import Button from "./ui/Button";
 import { FcGoogle } from "react-icons/fc";
 import { MdOutlineEmail } from "react-icons/md";
 import { FaApple, FaFacebookF } from "react-icons/fa";
 import { twMerge } from "tailwind-merge";
-import useLoginStore from "./stores/loginStore";
+import useLoginStore from "../../stores/loginStore";
 import { FaArrowLeftLong } from "react-icons/fa6";
 import { useGoogleLogin } from "@react-oauth/google";
 import { useRouter } from "next/navigation";

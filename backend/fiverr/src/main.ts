@@ -12,8 +12,6 @@ async function bootstrap() {
     credentials: true,
   };
 
-  // app.useGlobalFilters(new GlobalExceptionFilter());
-
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,

@@ -1,31 +1,43 @@
-import { useForm, FormProvider } from "react-hook-form";
+"use client";
+import React, { useState } from "react";
+import axios from "axios";
 
-import { get } from "../utils/customFetch";
-import reshapeDataToDefaultValues from "../utils/reshapeDataToDefaultValues";
-import { useState } from "react";
-import GigOverviewForm from "../components/GigOverviewManager";
-import GigPricingForm from "../components/GigPricingForm";
-import GigDescriptionAndFAQCreation from "../components/GigDescriptionAndFAQCreation";
-import GigRequirementForm from "../components/GigRequirementForm";
-import { GigData } from "../components/types/gig.interface";
-import GigStoreProvider from "../components/stores/GigStore";
-import FormProviderWrapper from "./FormProvider";
+function FileUpload() {
+  const [progress, setProgress] = useState(0);
 
-export default async function Page() {
-  // useEffect(() => {
-  //   async function getData() {
-  //     let data = (await get(
-  //       "/gig/getOneById/20806635-5d64-4db5-80c5-24bb312ae2b0",
-  //     )) as Data;
-  //     // console.log(data);
-  //     let newData = reshapeDataToDefaultValues(data);
-  //     // console.log(newData);
-  //     reset(newData);
-  //   }
-  //   getData();
-  // }, []);
+  const handleFileUpload = async (event) => {
+    const file = event.target.files[0];
+    const formData = new FormData();
+    formData.append("image", file);
 
-  //   console.log(methods.watch(), "FIRSTTTTTTTTTTTTT");
-  //   return <FormProviderWrapper defaultValues={defaultValues} />;
-  return <div>ahjahah</div>;
+    const xhr = new XMLHttpRequest();
+
+    xhr.open("POST", "http://localhost:3001/cloudinary/image", true);
+
+    xhr.setRequestHeader("Content-Type", "multipart/form-data");
+
+    xhr.upload.onprogress = (progressEvent) => {
+      console.log(progressEvent);
+      const progress = Math.round(
+        (progressEvent.loaded * 100) / progressEvent.total,
+      );
+      setProgress(progress);
+    };
+
+    xhr.onloadend = () => {
+      console.log("Upload complete:", xhr.responseText);
+    };
+
+    xhr.send(formData);
+  };
+
+  return (
+    <div>
+      <input type="file" onChange={handleFileUpload} />
+      <progress value={progress} max="100" />
+      <p>{progress}%</p>
+    </div>
+  );
 }
+
+export default FileUpload;

@@ -19,6 +19,11 @@ export class PackageController {
     return this.packageService.findOneById(id);
   }
 
+  @Get('/getPackageByGigId/:gigId')
+  async getPackageByGigId(@Param('gigId', new ParseUUIDPipe()) id: string) {
+    return this.packageService.findOneByGigId(id);
+  }
+
   @Post('/createPackage/:gigId')
   async createPackage(
     @Param('gigId', new ParseUUIDPipe()) gigId: string,

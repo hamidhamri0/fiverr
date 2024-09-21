@@ -3,17 +3,17 @@ import { FaRegEnvelope } from "react-icons/fa6";
 import { LuHeart } from "react-icons/lu";
 import { MdLanguage, MdOutlineNotifications } from "react-icons/md";
 import React, { ReactNode, useContext, useRef, useState } from "react";
-import IconButton from "./smallComponents/IconButton";
+import IconButton from "./ui/IconButton";
 import { OpenArrow } from "./Footer";
 import Menus, { MenusContext } from "./Menu";
 import HireIcon from "./Icons/HireIcon";
 import Modal from "./Modal";
 import { twMerge } from "tailwind-merge";
-import useLoginStore from "./stores/loginStore";
+import useLoginStore from "../../stores/loginStore";
 import SideNav from "./SideNav";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { SlEnvolope } from "react-icons/sl";
-import { useUserInfoStore } from "./stores/UserInfoStore";
+import { useUserInfoStore } from "../../stores/UserInfoStore";
 
 type FiverrProCardType = {
   icon: ReactNode;

@@ -9,10 +9,10 @@ import {
   useRef,
 } from "react";
 import { createPortal } from "react-dom";
-import { useOutsideClick } from "../Hooks/useOutsideClick";
+import { useOutsideClick } from "../../Hooks/useOutsideClick";
 import { OpenArrow } from "./Footer";
 import { twMerge } from "tailwind-merge";
-import Btn from "./smallComponents/Button";
+import Btn from "./ui/Button";
 
 interface MenusContextType {
   openId: string;

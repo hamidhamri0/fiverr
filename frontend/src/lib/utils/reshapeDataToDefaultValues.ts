@@ -7,15 +7,13 @@ import {
   Metadata,
   Service,
   Subcategory,
-} from "../components/types/gig.interface";
+} from "@/types/gig.interface";
+import { Package } from "@/types/gig.interface";
 
 export default function reshapeDataToDefaultValues(data: GigData) {
   return {
+    gigId: data.id || "",
     title: data?.title || "",
-    aboutGig: data.aboutGig || {
-      type: "",
-      content: [],
-    },
     category: data?.category?.id || "",
     subcategory: data?.subcategory?.id || "",
     serviceType: data?.service?.id || "",
@@ -25,15 +23,15 @@ export default function reshapeDataToDefaultValues(data: GigData) {
     basic:
       (data.packages?.[0] &&
         reshapePackageToDefaultValues(data.packages?.[0])) ||
-      [],
+      {},
     standard:
       (data.packages?.[1] &&
         reshapePackageToDefaultValues(data.packages?.[1])) ||
-      [],
+      {},
     premium:
       (data.packages?.[2] &&
         reshapePackageToDefaultValues(data.packages?.[2])) ||
-      [],
+      {},
     faqs: data.faqs || [],
     editorJson: (data?.aboutGig && data?.aboutGig) || "",
     editor:

@@ -9,7 +9,7 @@ import {
   useCallback,
 } from "react";
 import { createPortal } from "react-dom";
-import { useOutsideClick } from "../Hooks/useOutsideClick";
+import { useOutsideClick } from "../../Hooks/useOutsideClick";
 import { twMerge } from "tailwind-merge";
 
 interface ModalContextProps {

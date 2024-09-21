@@ -21,6 +21,7 @@ export class GigController {
     @Query('gigId') gigId: string,
     @Body() gigDto: GigDTO,
   ): Promise<Gig> {
+    console.log('controller', gigDto);
     try {
       return this.gigService.saveGig(gigId, gigDto);
     } catch (e) {

@@ -5,7 +5,7 @@ interface StepProps {
   label: string;
   isActive: boolean;
   isCompleted: boolean;
-  onClick: (step: number) => void;
+  onClick: (cb: (wizard: number) => number) => void;
 }
 
 const Step: React.FC<StepProps> = ({
@@ -24,7 +24,7 @@ const Step: React.FC<StepProps> = ({
   return (
     <div
       onClick={() => {
-        isCompleted && onClick(number - 1);
+        isCompleted && onClick(() => number - 1);
       }}
       className="flex cursor-pointer items-center whitespace-nowrap"
     >
@@ -44,7 +44,7 @@ const Step: React.FC<StepProps> = ({
 
 interface StepIndicatorProps {
   currentStep: number;
-  onClick: (step: number) => void;
+  onClick: (cb: (wizard: number) => number) => void;
 }
 
 const StepIndicator: React.FC<StepIndicatorProps> = ({

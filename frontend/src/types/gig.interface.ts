@@ -94,3 +94,26 @@ export type Feature = {
 };
 
 export type Features = Feature[];
+
+export type GigInputData = {
+  /*
+"title": "baby firl in the building",
+    "description":"creating the best 3d modelling i history",
+    "metadataIds": [1, 2],
+    "metadataTagIds": [1,5,7],
+    "categoryId":1,
+    "subcategoryId":1,
+    "serviceId":1,
+    "tagIds": [1],
+    "userId": "0fb5e0e7-25ea-400b-b3b8-285b88b6587c",
+  */
+  title: string;
+  description: string;
+  metadataIds: string[];
+  metadataTagIds: string[];
+  categoryId: string;
+  subcategoryId: string;
+  serviceId: string;
+  tagIds: Tags;
+  userId: string;
+};

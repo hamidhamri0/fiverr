@@ -7,32 +7,83 @@ import {
   Control,
   FieldErrors,
 } from "react-hook-form";
-import { useOutsideClick } from "../Hooks/useOutsideClick";
-import debounce from "../utils/debounce";
-import { get } from "@/app/utils/customFetch";
+import { useOutsideClick } from "../../Hooks/useOutsideClick";
+import debounce from "@/lib/utils/debounce";
+import { get, post } from "@/lib/utils/customFetch";
 import {
   Categories,
-  MetadataTag,
   Services,
   Subcategories,
   Tag,
   Service,
   Metadata as MetadataType,
   Category as CategoryType,
-} from "./types/gig.interface";
-import { useGigStore } from "./stores/GigStore";
+  GigData,
+} from "../../types/gig.interface";
+import { useGigStore } from "../../stores/GigStore";
+import { useUserInfoStore } from "../../stores/UserInfoStore";
+import SpinnerCenterWithBlur from "./ui/SpinnerCenterWithBlur";
+import { useRouter, usePathname } from "next/navigation";
 
 export default function GigOverviewForm({ onClick }: { onClick: () => void }) {
+  const user = useUserInfoStore((state) => state.user);
+  const [loading, setLoading] = useState(false);
   const methods = useFormContext();
+  const pathname = usePathname();
+  const router = useRouter();
 
   const {
     formState: { errors },
     watch,
+    getValues,
+    handleSubmit,
+    setError,
   } = methods;
 
-  const onSubmit = () => {
-    get("/");
-    onClick();
+  async function createGig() {
+    const values = getValues();
+    let metadata: { [key: number]: number[] | number } = {};
+    for (const meta in values.metadataTag) {
+      if (typeof values.metadataTag[meta] == "string") {
+        metadata[Number(meta)] = Number(values.metadataTag[meta]);
+      } else {
+        metadata[Number(meta)] = values.metadataTag[meta].map((e: string) =>
+          Number(e),
+        );
+      }
+    }
+    let body = {
+      title: values.title,
+      metadata: metadata,
+      categoryId: +values.category,
+      subcategoryId: +values.subcategory,
+      serviceId: +values.serviceType,
+      tagIds: values.tags.map((e: Tag) => Number(e.id)),
+      userId: user && user.id,
+    };
+    const url = values?.gigId
+      ? `/gig/saveGig?gigId=${values?.gigId}`
+      : "/gig/saveGig";
+    return post(url, body);
+  }
+
+  const onSubmit = async () => {
+    try {
+      setLoading(true);
+      const gig = (await createGig()) as GigData;
+      if (pathname.startsWith("/manage_gigs/new")) {
+        router.push(`/manage_gigs/${gig.id}/edit?wizard=1`);
+      } else {
+        onClick();
+      }
+    } catch (err) {
+      setError("root", {
+        type: "manual",
+        message: err instanceof Error ? err?.message : "Something went wrong",
+      });
+    } finally {
+      setLoading(false);
+    }
   };
   console.log(watch());
 
@@ -46,7 +97,7 @@ export default function GigOverviewForm({ onClick }: { onClick: () => void }) {
         <TagsInput control={methods.control} />
         <button
           type="button"
-          onClick={onSubmit}
+          onClick={handleSubmit(onSubmit)}
           className={`w-full rounded-md bg-green-500 px-4 py-2 text-white transition duration-300 hover:bg-green-600`}
         >
           Save & Continue
@@ -55,6 +106,7 @@ export default function GigOverviewForm({ onClick }: { onClick: () => void }) {
       <p className="mt-1 text-xs text-red-500">
         {errors.root && (errors.root.message as string)}
       </p>
+      {loading && <SpinnerCenterWithBlur />}
     </div>
   );
 }
@@ -62,10 +114,11 @@ export default function GigOverviewForm({ onClick }: { onClick: () => void }) {
 const TitleInput = () => {
   const {
     formState: { errors },
+    setFocus,
   } = useFormContext();
 
   const {
-    field: { value: title, onChange: onChangeTitle },
+    field: { value: title, onChange: onChangeTitle, ref: titleRef },
   } = useController({
     name: "title",
     rules: {
@@ -87,6 +140,10 @@ const TitleInput = () => {
     },
   });
 
+  useEffect(() => {
+    setFocus("title");
+  }, [setFocus]);
+
   return (
     <div className="mb-6 grid grid-cols-[1fr_2fr] items-center gap-4">
       <label
@@ -102,6 +159,7 @@ const TitleInput = () => {
       </label>
       <div>
         <textarea
+          ref={titleRef}
           value={title}
           onChange={(e) => onChangeTitle(e.target.value)}
           id="title"
@@ -269,9 +327,9 @@ function Subcategory() {
       onChange={(e) => {
         setSubcategory(e.target.value);
         setValue("serviceType", "");
-        setValue("basic", "");
-        setValue("standard", "");
-        setValue("premium", "");
+        setValue("basic", {});
+        setValue("standard", {});
+        setValue("premium", {});
       }}
       className={`flex-1 rounded-md border p-2 text-sm ${errors.category ? "border-red-500" : "border-gray-300"}`}
     >
@@ -375,7 +433,6 @@ const ServiceTypeSelect = () => {
 
 const Metadata = () => {
   const {
-    watch,
     control,
     setError,
     formState: { errors },
@@ -387,6 +444,12 @@ const Metadata = () => {
   const setMetadata = useGigStore((state) => state.setMetadata);
 
   const [selectedMetadata, setSelectedMetadata] = useState(0);
+
+  const {} = useController({
+    control,
+    name: "metadataTag",
+    defaultValue: {},
+  });
 
   const service = useWatch({
     name: "serviceType",
@@ -400,9 +463,7 @@ const Metadata = () => {
         const data = await get<MetadataType[]>(
           `/metadata/getMetadataByServiceIdAndTheirTags?serviceId=${service}`,
         );
-        console.log(data);
         setMetadata(data);
-        console.log(data, "meta");
       } catch (err) {
         setError("root", {
           type: "manual",
@@ -414,18 +475,6 @@ const Metadata = () => {
     }
     fetchServiceMetadata();
   }, [service, setError, setMetadata]);
-
-  // useEffect(() => {
-  //   if (ref.current) {
-  //     const values = getValues()?.["metadataTag"] || {};
-  //     for (let key of Object.keys(values)) {
-  //       console.log(key);
-  //       unregister(`metadataTag.${key}`);
-  //     }
-  //   } else {
-  //     ref.current = true;
-  //   }
-  // }, [service, getValues, unregister]);
 
   if (!service || !metadata.length) return null;
   return (
@@ -490,8 +539,6 @@ function MultiSelect({ metadata }: MetadataProps) {
       },
     },
   });
-
-  console.log(metadataTags);
 
   function isDisabled(id: string) {
     if (!metadataTags || metadataTags.length < 3) return false;
@@ -614,7 +661,6 @@ const TagsInput: React.FC<TagInputProps> = ({ control, maxTags = 5 }) => {
       }
     };
     if (inputRef.current) {
-      inputRef.current.focus();
       adjustInputWidth();
     }
   }, [tags, inputValue]);
@@ -626,7 +672,8 @@ const TagsInput: React.FC<TagInputProps> = ({ control, maxTags = 5 }) => {
   const handleInputChange = useCallback(
     debounce(async (value: string) => {
       if (value.length > 0) {
-        let data = get(`/tags/getOneByName?name=${value}`);
+        let data = await get(`/tags/getOneByName?name=${value}`);
+        console.log(data);
         setActiveSuggestions(data);
       } else {
         setActiveSuggestions([]);

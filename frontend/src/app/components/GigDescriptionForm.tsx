@@ -1,5 +1,6 @@
 import { useFormContext, useController } from "react-hook-form";
-import { useEditor, EditorContent, generateHTML } from "@tiptap/react";
+import { generateHTML } from "@tiptap/core";
+import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import DOMPurify from "dompurify";
 
@@ -100,8 +101,6 @@ export default function GigDescriptionForm() {
       }
     },
   });
-
-  console.log("TKKKKK", jsonContent);
 
   return (
     <div>

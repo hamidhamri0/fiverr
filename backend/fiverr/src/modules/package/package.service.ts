@@ -32,9 +32,9 @@ export class PackageService {
       relations: ['packageFeatures.feature'],
     });
   }
-  async findOneByGigId(id: string) {
-    return this.packageRepository.findOne({
-      where: { gig: { id } },
+  async findOneByGigId(gigId: string) {
+    return this.packageRepository.find({
+      where: { gig: { id: gigId } },
     });
   }
   async createPackage(gigId: string, createPackageDTO: createPackageDTO) {
@@ -45,7 +45,7 @@ export class PackageService {
     }
 
     const packageExists = await this.findOneByGigId(gigId);
-    if (packageExists) {
+    if (packageExists.length > 0) {
       throw new BadRequestException(`Package for gig already exists`);
     }
 
@@ -86,7 +86,7 @@ export class PackageService {
           );
           await createPackageWithFeatures('premium', createPackageDTO.premium);
 
-          return { success: true };
+          return this.findOneByGigId(gigId);
         } catch (error) {
           throw new Error('Transaction failed: ' + error.message);
         }
@@ -163,7 +163,7 @@ export class PackageService {
           await updatePackageFeatures('standard', createPackageDTO.standard);
           await updatePackageFeatures('premium', createPackageDTO.premium);
 
-          return { success: true };
+          return this.findOneByGigId(gigId);
         } catch (error) {
           throw new Error('Transaction failed: ' + error.message);
         }

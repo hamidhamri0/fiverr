@@ -7,9 +7,11 @@ import { ServiceModule } from '../service/service.module';
 import { MetadataModule } from '../metadata/metadata.module';
 import { MetadataTagModule } from '../metadata-tag/metadata-tag.module';
 import { FaqModule } from '../faq/faq.module';
+import { SubcategoryModule } from '../subcategory/subcategory.module';
 
 @Module({
   imports: [
+    SubcategoryModule,
     TypeOrmModule.forFeature([Gig]),
     ServiceModule,
     MetadataModule,

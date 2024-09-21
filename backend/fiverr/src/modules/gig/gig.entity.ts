@@ -19,6 +19,7 @@ import { Subcategory } from '../subcategory/subcategory.entity';
 import { Metadata } from '../metadata/metadata.entity';
 import { MetadataTag } from '../metadata-tag/metadata-tag.entity';
 import { FAQ } from '../faq/faq.entity';
+import { Question } from '../question/question.entity';
 
 @Entity('gigs')
 export class Gig {
@@ -32,11 +33,6 @@ export class Gig {
     nullable: true,
   })
   aboutGig?: string;
-
-  @Column('text', {
-    nullable: true,
-  })
-  description?: string;
 
   @Column('boolean', { default: false })
   isPublished?: boolean;
@@ -117,6 +113,11 @@ export class Gig {
     cascade: true,
   })
   faqs: FAQ[];
+
+  @OneToMany(() => Question, (question) => question.gig, {
+    cascade: true,
+  })
+  questions: Question[];
 
   @CreateDateColumn()
   createdAt: Date;

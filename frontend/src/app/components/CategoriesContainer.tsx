@@ -4,7 +4,7 @@ import { HiOutlineComputerDesktop } from "react-icons/hi2";
 import { IoIosMusicalNotes, IoMdBusiness } from "react-icons/io";
 import { LiaDigitalTachographSolid } from "react-icons/lia";
 import { MdGTranslate } from "react-icons/md";
-import useSlide from "../Hooks/useSlide";
+import useSlide from "../../Hooks/useSlide";
 
 function CategoryBox({ icon, title }: { icon: ReactNode; title: string }) {
   return (

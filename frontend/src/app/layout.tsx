@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import MainHeader from "./components/MainHeader";
-import UserInfoStoreProvider, { User } from "./components/stores/UserInfoStore";
-import { cookies } from "next/headers";
-import { get } from "./utils/customFetch";
+import UserInfoStoreProvider, { User } from "../stores/UserInfoStore";
+import { getUser } from "@/lib/auth/getUser";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,14 +17,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  let userSession: User;
-  try {
-    userSession = await get("/auth/session", {
-      isCookie: cookies().toString(),
-    });
-  } catch (err) {
-    console.log(err);
-  }
+  const userSession = await getUser();
   return (
     <html className="max-w-screen" lang="en">
       <body className={inter.className}>

@@ -12,15 +12,12 @@ import {
   IsString,
 } from 'class-validator';
 import { FaqDTO } from 'src/modules/faq/DTO/faq-dto';
+import { isMetadata } from '../validator/metadata.validator';
 
 export class GigDTO {
   @IsString()
   @IsNotEmpty()
   title: string;
-
-  @IsString()
-  @IsNotEmpty()
-  description: string;
 
   @IsNumber()
   @IsNotEmpty()
@@ -30,7 +27,9 @@ export class GigDTO {
   @IsNotEmpty()
   subcategoryId: number;
 
-  @IsObject()
+  @IsObject({
+    message: 'aboutGig must be an object',
+  })
   @IsOptional()
   aboutGig?: string;
 
@@ -43,19 +42,10 @@ export class GigDTO {
   @IsNotEmpty()
   userId: number;
 
-  @IsArray()
-  @ArrayMinSize(1) // Optional: Ensure the array has at least one element
-  @ArrayMaxSize(3) // Optional: Ensure the array has at most 100 elements
-  @Type(() => Number)
-  @IsInt({ each: true })
-  metadataIds: number[];
-
-  @IsArray()
-  @ArrayMinSize(1) // Optional: Ensure the array has at least one element
-  @ArrayMaxSize(3) // Optional: Ensure the array has at most 100 elements
-  @Type(() => Number)
-  @IsInt({ each: true })
-  metadataTagIds: number[];
+  @isMetadata()
+  metadata: {
+    [key: number]: number[] | number;
+  };
 
   @IsArray()
   @ArrayMinSize(1) // Optional: Ensure the array has at least one element

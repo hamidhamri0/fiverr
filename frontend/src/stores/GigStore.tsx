@@ -3,48 +3,51 @@
 import { ReactNode, createContext, useContext, useRef } from "react";
 import { useStore } from "zustand";
 import { createStore } from "zustand/vanilla";
-
-export type User = {
-  name: string;
-  email: string;
-  username: string;
-  country?: string;
-  googleId?: string;
-  appleId?: string;
-  facebookId?: string;
-  isNew: boolean;
-  isVerified: boolean;
-  picture?: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
+import {
+  Categories,
+  Services,
+  Subcategories,
+  Metadata,
+  Feature,
+  GigData,
+} from "../types/gig.interface";
 
 export type State = {
-  user: User;
+  categories: Categories;
+  subcategories: Subcategories;
+  services: Services;
+  metadata: Metadata[];
+  features: Feature[];
+  gig: GigData;
 };
 
 export type StateActions = {
-  setUser: (user: User) => void;
+  setCategories: (categories: Categories) => void;
+  setSubcategories: (subcategories: Subcategories) => void;
+  setServices: (services: Services) => void;
+  setMetadata: (metadata: Metadata[]) => void;
+  setFeatures: (features: Feature[]) => void;
 };
 
 export type StateStore = State & StateActions;
 
 export const defaultInitState: State = {
-  user: {
-    name: "",
-    email: "",
-    username: "",
-    isNew: false,
-    isVerified: false,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
+  categories: [],
+  subcategories: [],
+  services: [],
+  metadata: [],
+  features: [],
+  gig: {} as GigData,
 };
 
 export const createStateStore = (initState: State = defaultInitState) => {
   return createStore<StateStore>()((set) => ({
     ...initState,
-    setUser: (user) => set({ user }),
+    setCategories: (categories) => set({ categories }),
+    setSubcategories: (subcategories) => set({ subcategories }),
+    setServices: (services) => set({ services }),
+    setMetadata: (metadata) => set({ metadata }),
+    setFeatures: (features) => set({ features }),
   }));
 };
 
@@ -52,15 +55,15 @@ type StoreApi = ReturnType<typeof createStateStore>;
 
 const Context = createContext<StoreApi | undefined>(undefined);
 
-interface UserInfoStoreProviderProps {
+interface GigStoreProviderProps {
   children: ReactNode;
   initialState?: State;
 }
 
-export default function UserInfoStoreProvider({
+export default function GigStoreProvider({
   children,
   initialState,
-}: UserInfoStoreProviderProps) {
+}: GigStoreProviderProps) {
   const storeRef = useRef<StoreApi>();
   if (!storeRef.current) {
     storeRef.current = createStateStore(initialState);
@@ -70,7 +73,7 @@ export default function UserInfoStoreProvider({
   );
 }
 
-export const useUserInfoStore = <T,>(selector: (store: StateStore) => T): T => {
+export const useGigStore = <T,>(selector: (store: StateStore) => T): T => {
   const counterStoreContext = useContext(Context);
 
   if (!counterStoreContext) {

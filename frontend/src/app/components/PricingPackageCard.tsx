@@ -4,7 +4,7 @@ import { MdOutlineAccessTime } from "react-icons/md";
 import { twMerge } from "tailwind-merge";
 import { OpenArrow } from "./Footer";
 import { FaCheck } from "react-icons/fa";
-import Button from "./smallComponents/Button";
+import Button from "./ui/Button";
 import { TiArrowRight } from "react-icons/ti";
 
 type Feature = {

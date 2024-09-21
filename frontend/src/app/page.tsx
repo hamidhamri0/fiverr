@@ -31,7 +31,7 @@ import SlideShow from "./components/SlideShow";
 import ReviewsCarousel from "./components/ReviewsCarousel";
 import UserProfileCard from "./components/UserProfileCard";
 import Reviews from "./components/Reviews";
-import RelatedTags from "./components/smallComponents/RelatedTags";
+import RelatedTags from "./components/ui/RelatedTags";
 import ActionToolbar from "./components/ActionToolbar";
 import PricingPackageCard from "./components/PricingPackageCard";
 import PackagesTable from "./components/PackagesTable";
@@ -41,7 +41,7 @@ import { createContext, useContext, useEffect, useRef, useState } from "react";
 import ProfilePage from "./components/ProfilePage";
 import { create } from "domain";
 import { useStore } from "zustand";
-import UserInfoStoreProvider from "./components/stores/UserInfoStore";
+import UserInfoStoreProvider from "../stores/UserInfoStore";
 import Test from "./components/Test";
 import { get } from "@/app/utils/customFetch";
 
@@ -296,7 +296,7 @@ import GigOverviewCreation from "./components/GigOverviewManager";
 import reshapeDataToDefaultValues, {
   ReshapeGigData,
 } from "./utils/reshapeDataToDefaultValues";
-import { GigData } from "./components/types/gig.interface";
+import { GigData } from "../types/gig.interface";
 
 export default async function Home() {
   return (

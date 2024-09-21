@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { IoMdMenu } from "react-icons/io";
-import { useOutsideClick } from "../Hooks/useOutsideClick";
+import { useOutsideClick } from "../../Hooks/useOutsideClick";
 import { OpenArrow } from "./Footer";
 import { twMerge } from "tailwind-merge";
 

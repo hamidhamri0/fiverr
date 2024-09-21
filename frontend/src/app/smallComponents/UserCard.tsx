@@ -1,7 +1,7 @@
 import { MdVerified } from "react-icons/md";
-import ProCard from "./ProCard";
-import RatingStarsCard from "./RatingStarsCard";
-import LevelRatingCard from "./LevelRatingCard";
+import ProCard from "../components/ui/ProCard";
+import RatingStarsCard from "../components/ui/RatingStarsCard";
+import LevelRatingCard from "../components/ui/LevelRatingCard";
 import React, { createContext, useContext } from "react";
 import { twMerge } from "tailwind-merge";
 import { RatingBox } from "../Gig";

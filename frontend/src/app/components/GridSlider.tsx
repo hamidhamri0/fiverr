@@ -6,7 +6,7 @@ import {
   MouseEvent,
   useEffect,
 } from "react";
-import useSlide from "../Hooks/useSlide";
+import useSlide from "../../Hooks/useSlide";
 import { twMerge } from "tailwind-merge";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 

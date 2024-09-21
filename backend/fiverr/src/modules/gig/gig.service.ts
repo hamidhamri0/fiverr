@@ -12,12 +12,14 @@ import { MetadataTag } from '../metadata-tag/metadata-tag.entity';
 import { Tag } from '../tag/tag.entity';
 import { FAQ } from '../faq/faq.entity';
 import { FaqService } from '../faq/faq.service';
+import { SubcategoryService } from '../subcategory/subcategory.service';
 
 @Injectable()
 export class GigService {
   constructor(
     @InjectRepository(Gig)
     private gigRepository: Repository<Gig>,
+    private subcategoryService: SubcategoryService,
   ) {}
 
   async updateGigAbout(gigId: string, aboutGig: string): Promise<Gig> {
@@ -33,9 +35,7 @@ export class GigService {
     try {
       const {
         title,
-        description,
-        metadataIds,
-        metadataTagIds,
+        metadata,
         tagIds,
         categoryId,
         serviceId,
@@ -51,17 +51,40 @@ export class GigService {
       } else {
         gig = await this.findOneById(gigId);
       }
-      console.log(gig);
+      let metadataIds = [] as Metadata[];
+      let metadataTagIds = [] as MetadataTag[];
+      for (const metadataId in metadata) {
+        metadataIds.push({ id: +metadataId } as Metadata);
+        if (typeof metadata[metadataId] == 'number') {
+          metadataTagIds.push({ id: metadata[metadataId] } as MetadataTag);
+        } else {
+          let ids = metadata[metadataId].map((id) => {
+            const meta = { id } as MetadataTag;
+            return meta;
+          });
+          metadataTagIds.push(...ids);
+        }
+      }
       gig.title = title;
-      gig.description = description;
       gig.category = { id: categoryId } as Category;
       gig.service = { id: serviceId } as Service;
+      const existingCategory =
+        await this.subcategoryService.findOneById(subcategoryId);
+      if (gig.subcategory && gig.subcategory.name !== existingCategory.name) {
+        gig.packages = [];
+      }
       gig.subcategory = { id: subcategoryId } as Subcategory;
       gig.user = { id: String(userId) } as User;
-      gig.metadata = metadataIds.map((id) => ({ id })) as Metadata[];
-      gig.metadataTags = metadataTagIds.map((id) => ({ id })) as MetadataTag[];
+      gig.metadata = metadataIds;
+      gig.metadataTags = metadataTagIds;
       gig.tags = tagIds.map((id) => ({ id })) as Tag[];
-      if (faqs.length && aboutGig && gig.step >= 3) {
+      console.log(
+        faqs?.length && aboutGig && gig.step >= 3,
+        faqs?.length,
+        aboutGig,
+        gig.step,
+      );
+      if (faqs?.length && aboutGig && gig.step >= 3) {
         gig.step = 4;
         gig.aboutGig = aboutGig;
         for (const faq of faqs) {
@@ -80,9 +103,12 @@ export class GigService {
         }
       }
 
+      console.log(gig);
+
       return this.gigRepository.save(gig);
     } catch (e) {
-      throw new HttpException(e.message, 404);
+      console.log(e);
+      throw e;
     }
   }
 
@@ -103,6 +129,7 @@ export class GigService {
       .leftJoinAndSelect('gig.packages', 'packages')
       .leftJoinAndSelect('packages.packageFeatures', 'packageFeatures')
       .leftJoinAndSelect('gig.faqs', 'faqs')
+      .orderBy('faqs.position', 'ASC')
       .where('gig.id = :id', { id });
 
     return queryBuilder.getOne();

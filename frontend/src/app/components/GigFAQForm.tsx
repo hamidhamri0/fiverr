@@ -10,7 +10,7 @@ import {
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
 type FaqType = {
-  id: number;
+  id: number | null;
   question: string;
   answer: string;
   position: number;
@@ -99,7 +99,7 @@ const QuestionInput = ({
     onSave({
       question: question,
       answer: answer,
-      id: defaultValue?.id || Date.now(),
+      id: defaultValue?.id || null,
       position: defaultValue?.position || 0,
     });
     if (!edit) {
@@ -239,7 +239,7 @@ export default function GigFAQForm() {
   });
 
   const handleAddFAQ = (newFaq: FaqType) => {
-    setFaqs([...faqs, { ...newFaq, id: Date.now(), position: faqs.length }]);
+    setFaqs([...faqs, { ...newFaq, position: faqs.length }]);
   };
 
   const handleUpdateFAQ = (index: number, updatedFaq: FaqType) => {
@@ -327,8 +327,8 @@ export default function GigFAQForm() {
         </DragDropContext>
       )}
       <p>
-        {errors.FAQ && (
-          <p className="mb-4 text-sm text-red-500">{errors.FAQ.message}</p>
+        {errors.faqs && (
+          <p className="mb-4 text-sm text-red-500">{errors.faqs.message}</p>
         )}
       </p>
     </div>
