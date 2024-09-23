@@ -31,6 +31,15 @@ export class GigService {
     return this.gigRepository.save(gig);
   }
 
+  async makeGigPublic(gigId: string): Promise<Gig> {
+    const gig = await this.findOneById(gigId);
+    if (!gig) {
+      throw new HttpException('Gig not found', 404);
+    }
+    gig.isPublished = true;
+    return this.gigRepository.save(gig);
+  }
+
   async saveGig(gigId: string, gigDto: GigDTO): Promise<Gig> {
     try {
       const {
@@ -72,6 +81,7 @@ export class GigService {
         await this.subcategoryService.findOneById(subcategoryId);
       if (gig.subcategory && gig.subcategory.name !== existingCategory.name) {
         gig.packages = [];
+        gig.isPublished = false;
       }
       gig.subcategory = { id: subcategoryId } as Subcategory;
       gig.user = { id: String(userId) } as User;

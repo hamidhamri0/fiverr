@@ -1,18 +1,56 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateUserGoogleDTO, CreateUserLocalDTO } from './DTO/create-user.dto';
 import { UserLanguage } from '../user-language/user-language.entity';
+import { PhoneVerificationService } from '../phone-verification/phone-verification.service';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly phoneVerificationService: PhoneVerificationService,
   ) {}
 
   async getAllUsers() {
     return this.userRepository.find();
+  }
+
+  async updateEmailToVerified(userId: string) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (user) {
+      user.isVerifiedEmail = true;
+      user.emailVerificationCode = null;
+      await this.phoneVerificationService.deletePhoneVerificationByUserId(
+        userId,
+      );
+      return this.userRepository.save(user);
+    } else {
+      throw new BadRequestException('User not found');
+    }
+  }
+
+  async storeEmailVerificationCode(email: string, verificationCode: string) {
+    const user = await this.findOneByEmail(email);
+    if (user && verificationCode) {
+      user.emailVerificationCode = verificationCode;
+      return this.userRepository.save(user);
+    } else {
+      throw new BadRequestException('User not found');
+    }
+  }
+
+  async updatePhoneNumberToVerified(userId: string, phoneNumber: string) {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (user) {
+      user.isVerifiedPhoneNumber = true;
+      user.phoneNumber = phoneNumber;
+      console.log(user);
+      return this.userRepository.save(user);
+    } else {
+      throw new BadRequestException('User not found');
+    }
   }
 
   async findOneById(id: string) {

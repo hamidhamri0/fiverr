@@ -63,7 +63,7 @@ const CircularProgressBar = ({ progress }: { progress: number }) => {
   );
 };
 
-export default function GigGallery() {
+export default function GigGallery({ onClick }: { onClick: () => void }) {
   const {
     control,
     handleSubmit,
@@ -83,13 +83,22 @@ export default function GigGallery() {
 
     const formData = new FormData();
 
-    if (data.images[0]) {
-      console.log("Appending image:", data.images[0]);
-      formData.append("image", data.images[0][0]);
-    } else {
-      console.error("No images found in data");
-      setIsUploading(false);
-      return;
+    for (let i = 0; i < data.images.length; i++) {
+      const image = data.images[i]?.[0];
+      if (image) {
+        formData.append("files", data.images[i][0]);
+      }
+    }
+
+    if (data.video?.[0]) {
+      formData.append("files", data.video[0]);
+    }
+
+    for (let i = 0; i < data.documents.length; i++) {
+      const pdf = data.documents[i]?.[0];
+      if (pdf) {
+        formData.append("files", data.documents[i][0]);
+      }
     }
 
     const xhr = new XMLHttpRequest();
@@ -109,6 +118,7 @@ export default function GigGallery() {
     xhr.onloadend = () => {
       console.log("Upload complete:", xhr.responseText);
       setIsDataBaseUploading(false);
+      onClick();
     };
 
     xhr.onerror = () => {
@@ -189,9 +199,9 @@ export default function GigGallery() {
               i
             </span>
             <p>
-              To comply with Fiverr's terms of service, make sure to upload only
-              content you either own or you have the permission or license to
-              use.
+              To comply with Fiverr`&apos;`s terms of service, make sure to
+              upload only content you either own or you have the permission or
+              license to use.
             </p>
           </div>
         </CardContent>
@@ -274,7 +284,8 @@ export default function GigGallery() {
         <div className="mb-8">
           <h3 className="mb-1 text-lg font-semibold">Video (one only)</h3>
           <p className="mb-1 text-base text-gray-600">
-            Capture buyers' attention with a video that showcases your service.
+            Capture buyers`&apos;` attention with a video that showcases your
+            service.
           </p>
           <p className="mb-4 text-sm text-gray-500">
             Please choose a video shorter than 75 seconds and smaller than 50MB
@@ -369,16 +380,17 @@ export default function GigGallery() {
                       className="flex h-full w-full cursor-pointer flex-col items-center justify-center"
                     >
                       {previewUrls[`document${index}`] ? (
-                        <div className="relative h-full w-full">
-                          <img
-                            src={previewUrls[`document${index}`]}
-                            alt={`PDF thumbnail ${index + 1}`}
-                            className="h-full w-full object-cover"
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                            <FileIcon className="h-16 w-16 text-white" />
-                          </div>
-                        </div>
+                        <>
+                          <FileIcon className="mb-2 h-12 w-12 text-gray-400" />
+                          <p className="text-sm text-blue-600">
+                            {
+                              previewUrls[`document${index}`]?.split("/")[
+                                previewUrls[`document${index}`]?.split("/")
+                                  .length - 1
+                              ]
+                            }
+                          </p>
+                        </>
                       ) : (
                         <>
                           <FileIcon className="mb-2 h-12 w-12 text-gray-400" />

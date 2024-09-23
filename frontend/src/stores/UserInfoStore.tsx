@@ -9,13 +9,15 @@ export type User = {
   name: string;
   email: string;
   username: string;
-  country?: string;
-  googleId?: string;
-  appleId?: string;
-  facebookId?: string;
+  country: string | null;
+  googleId?: string | null;
+  appleId?: string | null;
+  facebookId?: string | null;
   isNew: boolean;
   isVerified: boolean;
-  picture?: string;
+  isVerifiedPhoneNumber: boolean;
+  isVerifiedEmail: boolean;
+  phoneNumber: string | null;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -36,7 +38,14 @@ export const defaultInitState: State = {
     name: "",
     email: "",
     username: "",
+    country: null,
+    phoneNumber: null,
+    googleId: null,
+    appleId: null,
+    facebookId: null,
     isNew: false,
+    isVerifiedPhoneNumber: false,
+    isVerifiedEmail: false,
     isVerified: false,
     createdAt: new Date(),
     updatedAt: new Date(),

@@ -1,9 +1,18 @@
-export default function Spinner() {
+export default function Spinner({
+  width,
+  height,
+  color,
+}: {
+  width: number;
+  height: number;
+  color: string;
+}) {
+  // color must be fill-green-500 example;
   return (
     <div role="status">
       <svg
         aria-hidden="true"
-        className="inline h-8 w-8 animate-spin fill-green-500 text-gray-200 dark:text-gray-600"
+        className={`inline h-${height} w--${width} animate-spin ${color} text-gray-200 dark:text-gray-600`}
         viewBox="0 0 100 101"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"

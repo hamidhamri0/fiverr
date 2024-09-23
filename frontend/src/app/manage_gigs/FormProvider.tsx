@@ -10,6 +10,7 @@ import StepIndicator from "../components/StepsIndecator";
 import { useWizardQuery } from "@/Hooks/useWizardQuery";
 import { ReshapeGigData } from "@/lib/utils/reshapeDataToDefaultValues";
 import GigGallery from "../components/GigGallery";
+import Publish from "../components/Publish";
 
 const renderStepContent = (
   step: number,
@@ -30,6 +31,8 @@ const renderStepContent = (
       return <GigRequirementForm onClick={() => onClick((prev) => prev + 1)} />;
     case 4:
       return <GigGallery onClick={() => onClick((prev) => prev + 1)} />;
+    case 5:
+      return <Publish onClick={() => onClick((prev) => prev + 1)} />;
     default:
       return null;
   }
@@ -45,10 +48,6 @@ export default function FormProviderWrapper({
   });
   const { wizard, updateQuery } = useWizardQuery(0);
   console.log(methods.watch());
-
-  useEffect(() => {
-    console.log("MOUNTED", defaultValues);
-  }, []);
 
   return (
     <FormProvider {...methods}>

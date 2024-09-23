@@ -6,11 +6,11 @@ import {
   UpdateDateColumn,
   OneToMany,
   JoinTable,
-  JoinColumn,
   ManyToMany,
 } from 'typeorm';
 import { UserLanguage } from '../user-language/user-language.entity';
 import { Gig } from '../gig/gig.entity';
+import { PhoneVerification } from '../phone-verification/phone-verification.entity';
 
 @Entity('users')
 export class User {
@@ -28,6 +28,18 @@ export class User {
 
   @Column({ nullable: true })
   country?: string;
+
+  @Column({ nullable: true })
+  phoneNumber?: string;
+
+  @Column({ nullable: true })
+  emailVerificationCode?: string;
+
+  @Column({ nullable: true, default: false })
+  isVerifiedPhoneNumber?: boolean;
+
+  @Column({ nullable: true, default: false })
+  isVerifiedEmail?: boolean;
 
   @Column({ unique: true, nullable: true })
   username?: string;
@@ -72,4 +84,10 @@ export class User {
 
   @OneToMany(() => Gig, (gig) => gig.user)
   gigs?: Gig[];
+
+  @OneToMany(
+    () => PhoneVerification,
+    (phoneVerification) => phoneVerification.user,
+  )
+  phoneVerifications: PhoneVerification[];
 }

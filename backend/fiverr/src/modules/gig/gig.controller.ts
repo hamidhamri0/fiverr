@@ -30,6 +30,15 @@ export class GigController {
     }
   }
 
+  @Post('/publish/:gigId')
+  async publishGig(@Param('gigId') gigId: string): Promise<Gig> {
+    try {
+      return this.gigService.makeGigPublic(gigId);
+    } catch (e) {
+      throw new HttpException(e.message, 404);
+    }
+  }
+
   // @Post('/updateGig/:id')
   // async updateGig(
   //   @Param('id', new ParseUUIDPipe()) id: string,

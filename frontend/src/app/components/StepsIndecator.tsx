@@ -26,7 +26,7 @@ const Step: React.FC<StepProps> = ({
       onClick={() => {
         isCompleted && onClick(() => number - 1);
       }}
-      className="flex cursor-pointer items-center whitespace-nowrap"
+      className="flex w-full cursor-pointer items-center whitespace-nowrap"
     >
       <div
         className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-medium ${circleClasses}`}
@@ -67,22 +67,22 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
           <Step
             onClick={onClick}
             number={index + 1}
-            label={step}
+            label={step + (index < steps.length - 1 ? " >" : "")} // Remove this line
             isActive={index === currentStep}
             isCompleted={index < currentStep}
           />
           {index < steps.length - 1 && (
-            <div className="mx-2 h-px flex-grow bg-gray-200" />
+            <div className="mx-2 h-px flex-grow bg-transparent" />
           )}
         </React.Fragment>
       ))}
       <div className="ml-auto flex space-x-2">
-        <button className="rounded px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100">
+        {/* <button className="rounded px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100">
           Save
         </button>
         <button className="whitespace-nowrap rounded bg-green-500 px-4 py-2 text-sm font-medium text-white hover:bg-green-600">
           Save & Preview
-        </button>
+        </button> */}
       </div>
     </nav>
   );

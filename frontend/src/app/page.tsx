@@ -1,3 +1,4 @@
+"use client";
 import WelcomeContent from "./components/WelcomeContent";
 import GigSlides from "./components/GigSlides";
 import SavedGigsForYou from "./components/SavedGigsForYou";
@@ -297,19 +298,41 @@ import reshapeDataToDefaultValues, {
   ReshapeGigData,
 } from "./utils/reshapeDataToDefaultValues";
 import { GigData } from "../types/gig.interface";
+import Verification from "./components/VerificationCode";
+import PhoneNumber from "./components/PhoneNumber";
+import VerificationCode from "./components/VerificationCode";
 
-export default async function Home() {
-  return (
-    <div className="text-[#74767e] dark:bg-gray-800 dark:text-gray-200">
-      {/* <Test /> */}
-      {/* <AdminPage /> */}
-      {/* <Provider>
+export default function Home() {
+  return null;
+  // <VerificationCode
+  //   description=""
+  //   phoneNumber=""
+  //   setStep={() => {}}
+  //   title=""
+  // />
+  // <div className="text-[#74767e] dark:bg-gray-800 dark:text-gray-200">
+  {
+    /* <Verification /> */
+  }
+
+  {
+    /* <Test /> */
+  }
+  {
+    /* <AdminPage /> */
+  }
+  {
+    /* <Provider>
         <GetUsers />
         
         // <Test2 />
-      </Provider> */}
-      {/* <GigOverview /> */}
-      {/* <SlideShow
+      </Provider> */
+  }
+  {
+    /* <GigOverview /> */
+  }
+  {
+    /* <SlideShow
         images={[
           "/images/KITCHEN VIEW 02 copy 2.webp",
           "/images/KITCHEN VIEW 02 copy 3.webp",
@@ -326,12 +349,22 @@ export default async function Home() {
           "/images/E1.webp",
           "/images/E1.webp",
         ]}
-      /> */}
-      {/* <ReviewsCarousel /> */}
-      {/* <UserProfileCard /> */}
-      {/* <ProfilePage /> */}
-      {/* <LoginCard isModal={false} /> */}
-      {/* <Reviews
+      /> */
+  }
+  {
+    /* <ReviewsCarousel /> */
+  }
+  {
+    /* <UserProfileCard /> */
+  }
+  {
+    /* <ProfilePage /> */
+  }
+  {
+    /* <LoginCard isModal={false} /> */
+  }
+  {
+    /* <Reviews
         allRatings={600}
         eachRating={{
           "1": 150,
@@ -341,18 +374,40 @@ export default async function Home() {
           "5": 300,
         }}
         reviews={reviews}
-      /> */}
-      {/* <RelatedTags /> */}
-      {/* <ActionToolbar /> */}
-      {/* <PricingPackageCard /> */}
-      {/* <PackagesTable /> */}
-      {/* <UserProfile /> */}
-      {/* <RoundedCategoryCarousel /> */}
-      {/* <FiltersComponent /> */}
-      {/* <SelectedFilters /> */}
-      {/* <Test /> */}
-      {/* <SearchResults /> */}
-      {/* <CategoryBanner
+      /> */
+  }
+  {
+    /* <RelatedTags /> */
+  }
+  {
+    /* <ActionToolbar /> */
+  }
+  {
+    /* <PricingPackageCard /> */
+  }
+  {
+    /* <PackagesTable /> */
+  }
+  {
+    /* <UserProfile /> */
+  }
+  {
+    /* <RoundedCategoryCarousel /> */
+  }
+  {
+    /* <FiltersComponent /> */
+  }
+  {
+    /* <SelectedFilters /> */
+  }
+  {
+    /* <Test /> */
+  }
+  {
+    /* <SearchResults /> */
+  }
+  {
+    /* <CategoryBanner
         // className="min-h-[500px] from-green-700 to-green-900 bg-cover bg-no-repeat xl:h-[400px] lg:bg-gradient-to-tl"
         // bgImage="bg-[url('/bigImages/hero.webp')]"
         bgImage="bg-[url('/bigImages/ProgrammingBanner.webp')]"
@@ -361,22 +416,52 @@ export default async function Home() {
         <CategoryBannerContent
           category="Programming & Tech"
           description="You think it. A programmer develops it."
-        /> */}
-      {/* <HeroBanner /> */}
-      {/* </CategoryBanner> */}
-      {/* <CategoryGrid /> */}
-      {/* <DrowDownFAQ /> */}
-      {/* <CategoryCarouselCard /> */}
-      {/* <CategoriesContainer /> */}
-      {/* <Services /> */}
-      {/* <ServicesOverview /> */}
-      {/* <WelcomeContent /> */}
-      {/* <GigSlides /> */}
-      {/* <SavedGigsForYou /> */}
-      {/* <VerifiedProServices /> */}
-      {/* <GalleryLayout /> */}
-      {/* <LoginCard isModal={false} /> */}
-      {/* <Footer /> */}
-    </div>
-  );
+        /> */
+  }
+  {
+    /* <HeroBanner /> */
+  }
+  {
+    /* </CategoryBanner> */
+  }
+  {
+    /* <CategoryGrid /> */
+  }
+  {
+    /* <DrowDownFAQ /> */
+  }
+  {
+    /* <CategoryCarouselCard /> */
+  }
+  {
+    /* <CategoriesContainer /> */
+  }
+  {
+    /* <Services /> */
+  }
+  {
+    /* <ServicesOverview /> */
+  }
+  {
+    /* <WelcomeContent /> */
+  }
+  {
+    /* <GigSlides /> */
+  }
+  {
+    /* <SavedGigsForYou /> */
+  }
+  {
+    /* <VerifiedProServices /> */
+  }
+  {
+    /* <GalleryLayout /> */
+  }
+  {
+    /* <LoginCard isModal={false} /> */
+  }
+  {
+    /* <Footer /> */
+  }
+  // </div>
 }

@@ -33,7 +33,7 @@ export class CloudinaryConfig {
         },
         (error, result) => {
           if (error) reject(error);
-          if (!result.public_id) reject('File failed to upload');
+          if (!result?.public_id) reject('File failed to upload');
           const transformedUrl = cloudinary.url(result.public_id, {
             transformation: transformations,
             secure: true,

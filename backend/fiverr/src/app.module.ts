@@ -37,6 +37,9 @@ import { APP_FILTER } from '@nestjs/core';
 import { GlobalExceptionFilter } from './common/filters/GlobalExceptionFilter';
 import { QuestionModule } from './modules/question/question.module';
 import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
+import { TwilioModule } from './modules/twilio/twilio.module';
+import { MailerModule } from './modules/mailer/mailer.module';
+import { PhoneVerificationModule } from './modules/phone-verification/phone-verification.module';
 
 @Module({
   imports: [
@@ -54,6 +57,9 @@ import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    MailerModule,
+    PhoneVerificationModule,
+    TwilioModule,
     PassportModule.register({ session: true }),
     FaqModule,
     SeederModule,
@@ -74,6 +80,7 @@ import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
     AuthModule,
     QuestionModule,
     CloudinaryModule,
+    TwilioModule,
   ],
   controllers: [AppController],
   providers: [
