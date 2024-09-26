@@ -1,10 +1,11 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import RichTextEditor from "./GigDescriptionForm";
 import { useFormContext } from "react-hook-form";
 import GigFAQCreation from "./GigFAQForm";
 import { Tag } from "@/types/gig.interface";
 import { useUserInfoStore } from "@/stores/UserInfoStore";
 import { post } from "@/lib/utils/customFetch";
+import toast from "react-hot-toast";
 
 export default function GigDescriptionAndFAQCreation({
   onClick,
@@ -15,46 +16,220 @@ export default function GigDescriptionAndFAQCreation({
     handleSubmit,
     getValues,
     formState: { errors },
+    setValue,
   } = useFormContext();
+  const [loading, setLoading] = useState(false);
   const user = useUserInfoStore((state) => state.user);
   console.log(errors);
 
   async function submit(data: any) {
-    const values = getValues();
+    const gig = getValues();
+    setLoading(true);
     let metadata: { [key: number]: number[] | number } = {};
-    for (const meta in values.metadataTag) {
-      if (typeof values.metadataTag[meta] == "string") {
-        metadata[Number(meta)] = Number(values.metadataTag[meta]);
+    for (const meta in gig.metadataTag) {
+      if (typeof gig.metadataTag[meta] == "string") {
+        metadata[Number(meta)] = Number(gig.metadataTag[meta]);
       } else {
-        metadata[Number(meta)] = values.metadataTag[meta].map((e: string) =>
+        metadata[Number(meta)] = gig.metadataTag[meta].map((e: string) =>
           Number(e),
         );
       }
     }
-    const faqs = values.faqs.map((item: any, index: number) => {
+    const faqs = gig.faqs.map((item: any, index: number) => {
       return {
         ...item,
         position: index,
       };
     });
     let body = {
-      title: values.title,
+      title: gig.title,
       metadata: metadata,
-      categoryId: +values.category,
-      subcategoryId: +values.subcategory,
-      serviceId: +values.serviceType,
-      tagIds: values.tags.map((e: Tag) => Number(e.id)),
+      categoryId: +gig.category,
+      subcategoryId: +gig.subcategory,
+      serviceId: +gig.serviceType,
+      tagIds: gig.tags.map((e: Tag) => Number(e.id)),
       userId: user && user.id,
       faqs,
-      aboutGig: values.editorJson,
+      aboutGig: gig.editorJson,
     };
 
     try {
-      await post(`/gig/saveGig?gigId=${values.gigId}`, body);
+      await post(`/gig/saveGig?gigId=${gig.id}`, body);
+      toast.success("Gig Description and FAQ saved successfully");
       onClick();
     } catch (err) {
-      console.log(err);
+      toast.success(err.message);
+      // console.log(err);
+    } finally {
+      setLoading(false);
     }
+  }
+
+  function fillWithData() {
+    setValue("faqs", [
+      {
+        question: "what do you need to know about me",
+        answer: "nothing thb",
+        id: null,
+        position: 0,
+      },
+      {
+        question: "how is your brother",
+        answer: "good man",
+        id: null,
+        position: 1,
+      },
+    ]);
+    setValue(
+      "editor",
+      "how are you doing sir :\n\n\n\n\n\nim good\n\n\n\nim hungry\n\n\n\nim mad\n\n\n\nim bad\n\n\n\nim popo\n\n\n\nim techa\n\nas i said everything is good baby girl\n\nyes sirrrrrrrrrrrrrrrrrrrrrrrrrrr",
+    );
+    setValue("editorJson", {
+      type: "doc",
+      content: [
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              text: "how are you doing sir :",
+            },
+          ],
+        },
+        {
+          type: "orderedList",
+          attrs: {
+            start: 1,
+          },
+          content: [
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      text: "im good",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      text: "im hungry",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      text: "im mad",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      text: "im bad ",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      text: "im popo",
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: "listItem",
+              content: [
+                {
+                  type: "paragraph",
+                  content: [
+                    {
+                      type: "text",
+                      text: "im techa",
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              marks: [
+                {
+                  type: "bold",
+                },
+                {
+                  type: "italic",
+                },
+              ],
+              text: "as i said everything is good baby girl",
+            },
+          ],
+        },
+        {
+          type: "paragraph",
+          content: [
+            {
+              type: "text",
+              marks: [
+                {
+                  type: "italic",
+                },
+                {
+                  type: "highlight",
+                },
+              ],
+              text: "yes sirrrrrrrrrrrrrrrrrrrrrrrrrrr",
+            },
+          ],
+        },
+        {
+          type: "paragraph",
+        },
+        {
+          type: "paragraph",
+        },
+      ],
+    });
   }
   return (
     <div className="mx-auto max-w-[800px]">
@@ -69,6 +244,12 @@ export default function GigDescriptionAndFAQCreation({
         className="mt-4 w-full rounded-lg bg-green-500 py-2 text-white"
       >
         Save & Continue
+      </button>
+      <button
+        onClick={fillWithData}
+        className="mt-4 w-full rounded-lg bg-green-500 py-2 text-white"
+      >
+        fill With Data
       </button>
     </div>
   );

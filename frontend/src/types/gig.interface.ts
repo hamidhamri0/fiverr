@@ -79,6 +79,20 @@ export type GigData = {
   tags: Tag[];
   packages: Package[];
   faqs: Faq[];
+  clicks: number;
+  orders: number;
+  impressions: number;
+  cancellations: number;
+  questions: Questions;
+  imageUrls: File[] | undefined[];
+  imageUrlsPreview: string[];
+  videoUrl: File;
+  videoUrlPreview: {
+    videoUrl: string;
+    thumbnail: string;
+  };
+  pdfUrls: File[] | undefined[];
+  pdfUrlsPreview: string[];
 };
 
 export type Option = {
@@ -117,3 +131,15 @@ export type GigInputData = {
   tagIds: Tags;
   userId: string;
 };
+
+export type Question = {
+  id: number;
+  question: string;
+  options: string[];
+  type: {
+    genre: "input" | "multiple";
+    multiple: boolean;
+  };
+};
+
+export type Questions = Question[];

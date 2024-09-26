@@ -4,8 +4,9 @@ import { useState, useRef, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
 import Spinner from "./ui/Spinner";
 import { post } from "@/lib/utils/customFetch";
-import { Dialog, DialogContent } from "@/ShadComponents/ui/dialog";
+import { Dialog, DialogContent } from "@/app/components/dialog";
 import { createPortal } from "react-dom";
+import { useRouter } from "next/navigation";
 
 export default function VerificationCode({
   title,
@@ -23,6 +24,7 @@ export default function VerificationCode({
   const [isLoading, setIsLoading] = useState(false);
   const [focusedIndex, setFocusedIndex] = useState<number | null>(null);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const router = useRouter();
 
   title = "Sign up for Fiverr";
   description = "Enter the 6-digit code sent to your phone number ";
@@ -73,6 +75,7 @@ export default function VerificationCode({
         verificationCode: fullCode as string,
         phoneNumber,
       });
+      router.refresh();
     } catch (err) {
       throw err;
     } finally {

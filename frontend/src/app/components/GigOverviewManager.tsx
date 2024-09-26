@@ -25,8 +25,13 @@ import { useUserInfoStore } from "../../stores/UserInfoStore";
 import SpinnerCenterWithBlur from "./ui/SpinnerCenterWithBlur";
 import { useRouter, usePathname } from "next/navigation";
 
-export default function GigOverviewForm({ onClick }: { onClick: () => void }) {
+export default function GigOverviewForm({
+  onClick,
+}: {
+  onClick: (cb: (wizard: number) => number, b: boolean) => void;
+}) {
   const user = useUserInfoStore((state) => state.user);
+
   const [loading, setLoading] = useState(false);
   const methods = useFormContext();
   const pathname = usePathname();
@@ -38,6 +43,7 @@ export default function GigOverviewForm({ onClick }: { onClick: () => void }) {
     getValues,
     handleSubmit,
     setError,
+    setValue,
   } = methods;
 
   async function createGig() {
@@ -61,20 +67,30 @@ export default function GigOverviewForm({ onClick }: { onClick: () => void }) {
       tagIds: values.tags.map((e: Tag) => Number(e.id)),
       userId: user && user.id,
     };
-    const url = values?.gigId
-      ? `/gig/saveGig?gigId=${values?.gigId}`
+    const url = values?.id
+      ? `/gig/saveGig?gigId=${values?.id}`
       : "/gig/saveGig";
     return post(url, body);
   }
 
   const onSubmit = async () => {
+    const values = getValues();
+
     try {
+      if (
+        values.initialSubcategory !== values.subcategory &&
+        values.initialSubcategory
+      ) {
+        onClick((p) => p + 1, false);
+        return;
+      }
       setLoading(true);
       const gig = (await createGig()) as GigData;
+      setValue("id", gig.id);
       if (pathname.startsWith("/manage_gigs/new")) {
         router.push(`/manage_gigs/${gig.id}/edit?wizard=1`);
       } else {
-        onClick();
+        onClick((p) => p + 1, true);
       }
     } catch (err) {
       setError("root", {
@@ -86,6 +102,15 @@ export default function GigOverviewForm({ onClick }: { onClick: () => void }) {
     }
   };
   console.log(watch());
+
+  function fillwithData() {
+    methods.setValue("title", "I will do something I'm really good at");
+    methods.setValue("category", "1");
+    methods.setValue("subcategory", "1");
+    methods.setValue("serviceType", "1");
+    methods.setValue("metadataTag", { 1: "1", 2: ["5", "7"] });
+    methods.setValue("tags", [{ id: 1, name: "Web Development" }]);
+  }
 
   return (
     <div className="mx-auto max-w-[800px] rounded-lg border border-gray-300 bg-white p-6 shadow-md">
@@ -101,6 +126,13 @@ export default function GigOverviewForm({ onClick }: { onClick: () => void }) {
           className={`w-full rounded-md bg-green-500 px-4 py-2 text-white transition duration-300 hover:bg-green-600`}
         >
           Save & Continue
+        </button>
+        <button
+          type="button"
+          onClick={fillwithData}
+          className={`mt-2 w-full rounded-md bg-green-500 px-4 py-2 text-white transition duration-300 hover:bg-green-600`}
+        >
+          fill with data
         </button>
       </div>
       <p className="mt-1 text-xs text-red-500">
@@ -272,13 +304,15 @@ function Subcategory() {
   // const [subCategories, setSubCategories] = useState<Subcategories>([]);
   const subcategories = useGigStore((state) => state.subcategories);
   const setSubcategories = useGigStore((state) => state.setSubcategories);
+  const setFeatures = useGigStore((state) => state.setFeatures);
 
   const {
     setValue,
     setError,
     formState: { errors },
     control,
-    unregister,
+    getValues,
+    reset,
   } = useFormContext();
 
   const {
@@ -325,11 +359,16 @@ function Subcategory() {
       ref={subcategoryRef}
       value={subcategory}
       onChange={(e) => {
-        setSubcategory(e.target.value);
-        setValue("serviceType", "");
-        setValue("basic", {});
-        setValue("standard", {});
-        setValue("premium", {});
+        const values = getValues();
+        setFeatures([]);
+        reset({
+          ...values,
+          basic: {},
+          standard: {},
+          premium: {},
+          serviceType: "",
+          subcategory: e.target.value,
+        });
       }}
       className={`flex-1 rounded-md border p-2 text-sm ${errors.category ? "border-red-500" : "border-gray-300"}`}
     >
@@ -672,7 +711,7 @@ const TagsInput: React.FC<TagInputProps> = ({ control, maxTags = 5 }) => {
   const handleInputChange = useCallback(
     debounce(async (value: string) => {
       if (value.length > 0) {
-        let data = await get(`/tags/getOneByName?name=${value}`);
+        let data = await get<TagsType[]>(`/tags/getOneByName?name=${value}`);
         console.log(data);
         setActiveSuggestions(data);
       } else {

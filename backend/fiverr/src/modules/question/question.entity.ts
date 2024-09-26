@@ -11,8 +11,10 @@ export class Question {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  questionText: string;
+  @Column({
+    name: 'question',
+  })
+  question: string;
 
   @Column('jsonb')
   options: string[];
@@ -20,6 +22,8 @@ export class Question {
   @Column('jsonb')
   type: Type;
 
-  @ManyToOne(() => Gig, (gig) => gig.questions)
+  @ManyToOne(() => Gig, (gig) => gig.questions, {
+    onDelete: 'CASCADE',
+  })
   gig: Gig;
 }

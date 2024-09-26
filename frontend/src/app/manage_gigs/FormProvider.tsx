@@ -47,7 +47,7 @@ export default function FormProviderWrapper({
     defaultValues: defaultValues || {},
   });
   const { wizard, updateQuery } = useWizardQuery(0);
-  console.log(methods.watch());
+  console.log(typeof window !== "undefined" && methods.watch());
 
   return (
     <FormProvider {...methods}>

@@ -6,10 +6,10 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/ShadComponents/ui/dialog";
-import { Input } from "@/ShadComponents/ui/input";
-import { Button } from "@/ShadComponents/ui/button";
-import { Label } from "@/ShadComponents/ui/label";
+} from "@/app/components/dialog";
+import { Input } from "@/app/components/input";
+import { Button } from "@/app/components/button";
+import { Label } from "@/app/components/label";
 import Link from "next/link";
 import Spinner from "./ui/Spinner";
 import { countriesWithPhoneCode } from "@/lib/utils/countriesWithPhoneCode";

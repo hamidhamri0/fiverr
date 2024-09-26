@@ -33,6 +33,7 @@ export default async function page({ params }: Props) {
   if (!isNew) {
     try {
       let data = await get<GigData>(`/gig/getOneById/${gigId}`);
+      // console.log(data, "data");
       defaultValues = reshapeDataToDefaultValues(data);
       const categories = await get<Categories>("/category/getAllCategories", {
         isCookie: cookies().toString(),

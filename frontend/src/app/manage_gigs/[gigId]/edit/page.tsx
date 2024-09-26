@@ -86,17 +86,16 @@ export default async function page({
       features,
       gig,
     };
-    console.log("page/edit");
-    console.log(defaultValues.basic);
+    console.log("page/edit", defaultValues.imageUrlsPreview);
   } catch (err) {
     console.log(err);
     return redirect("/");
   }
-
+  // key={Date.now()}
   return (
     <>
       <GigStoreProvider initialState={initialState}>
-        <FormProviderWrapper key={Date.now()} defaultValues={defaultValues} />
+        <FormProviderWrapper defaultValues={defaultValues} />
       </GigStoreProvider>
     </>
   );

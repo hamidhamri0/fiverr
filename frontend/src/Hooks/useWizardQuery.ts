@@ -11,10 +11,13 @@ export function useWizardQuery(currentStep?: number) {
       ? Number(searchParams.get("wizard"))
       : currentStep;
   const updateQuery = useCallback(
-    (cb: (wizard: number) => number) => {
+    (cb: (wizard: number) => number, refresh = true) => {
       const params = new URLSearchParams(searchParams.toString());
       params.set("wizard", String(cb(wizard || 0)));
-      router.refresh();
+
+      // if (refresh) {
+      //   router.refresh();
+      // }
       router.push(pathname + "?" + params.toString());
       return;
     },

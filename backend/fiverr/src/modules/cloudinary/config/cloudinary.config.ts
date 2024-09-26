@@ -20,6 +20,8 @@ export class CloudinaryConfig {
     transformations: any = {},
   ): Promise<any> {
     return new Promise((resolve, reject) => {
+      const originalName = file.originalname.split('.')[0];
+      console.log(originalName);
       cloudinary.uploader.multi;
       const uploadStream = cloudinary.uploader.upload_stream(
         {
@@ -30,17 +32,30 @@ export class CloudinaryConfig {
               : resourceType === 'video'
                 ? 'mp4'
                 : 'pdf',
+          public_id: originalName.trim().replace(/[^a-zA-Z0-9_]/g, ''),
         },
         (error, result) => {
-          if (error) reject(error);
-          if (!result?.public_id) reject('File failed to upload');
+          if (error) return reject(error.message);
           const transformedUrl = cloudinary.url(result.public_id, {
             transformation: transformations,
             secure: true,
           });
+          let thumbnailUrl = null;
+          if (resourceType === 'video') {
+            thumbnailUrl = cloudinary.url(result.public_id, {
+              transformation: [
+                { width: 300, height: 300, crop: 'thumb', gravity: 'auto' },
+              ],
+              format: 'webp',
+              resource_type: 'video',
+              secure: true,
+              start_offset: 'auto',
+            });
+          }
           resolve({
             ...result,
             transformed_url: transformedUrl,
+            thumbnailUrl,
           });
         },
       );

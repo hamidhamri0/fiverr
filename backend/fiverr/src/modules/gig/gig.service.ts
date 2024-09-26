@@ -1,7 +1,13 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import {
+  forwardRef,
+  HttpException,
+  HttpStatus,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { Gig } from './gig.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { GigDTO } from './DTO/gig.dto';
 import { Category } from '../category/category.entity';
 import { Service } from '../service/service.entity';
@@ -13,13 +19,16 @@ import { Tag } from '../tag/tag.entity';
 import { FAQ } from '../faq/faq.entity';
 import { FaqService } from '../faq/faq.service';
 import { SubcategoryService } from '../subcategory/subcategory.service';
+import { SaveGigWithPackagesDTO } from './DTO/save-gig-with-packages.dto';
+import { PackageService } from '../package/package.service';
 
 @Injectable()
 export class GigService {
   constructor(
     @InjectRepository(Gig)
     private gigRepository: Repository<Gig>,
-    private subcategoryService: SubcategoryService,
+    @Inject(forwardRef(() => PackageService))
+    private packageService: PackageService,
   ) {}
 
   async updateGigAbout(gigId: string, aboutGig: string): Promise<Gig> {
@@ -28,6 +37,27 @@ export class GigService {
       throw new HttpException('Gig not found', 404);
     }
     gig.aboutGig = aboutGig;
+    return this.gigRepository.save(gig);
+  }
+
+  async updateFiles(
+    files: {
+      imageUrls: string[];
+      pdfUrls: string[];
+      videoUrl: {
+        videoUrl: string;
+        thumbnail: string;
+      };
+    },
+    gigId: string,
+  ): Promise<Gig> {
+    const gig = await this.findOneById(gigId);
+    if (!gig) {
+      throw new HttpException('Gig not found', 404);
+    }
+    gig.imageUrls = files.imageUrls;
+    gig.pdfUrls = files.pdfUrls;
+    gig.videoUrl = files.videoUrl;
     return this.gigRepository.save(gig);
   }
 
@@ -40,7 +70,86 @@ export class GigService {
     return this.gigRepository.save(gig);
   }
 
-  async saveGig(gigId: string, gigDto: GigDTO): Promise<Gig> {
+  async getAllGigsByUserId(userId: string): Promise<Gig[]> {
+    return this.gigRepository.find({
+      where: { user: { id: userId } },
+    });
+  }
+
+  async deleteGig(gigId: string) {
+    await this.gigRepository.delete({ id: gigId });
+    return HttpStatus.NOT_MODIFIED;
+  }
+
+  // async saveFiles(gigId: string, type: string, url: string) {
+  //   const gig = await this.findOneById(gigId);
+  //   if (!gig) {
+  //     throw new HttpException('Gig not found', 404);
+  //   }
+  //   if (type === 'image') {
+  //     gig.imageUrls.push(url);
+  //   } else if (type === 'video') {
+  //     gig.videoUrl = url;
+  //   } else if (type === 'pdf') {
+  //     gig.pdfUrls.push(url);
+  //   }
+  //   return this.gigRepository.save(gig);
+  // }
+
+  async saveGigWithPackages(
+    gigId: string,
+    gigDto: SaveGigWithPackagesDTO,
+  ): Promise<Gig> {
+    // run transaction
+    return await this.gigRepository.manager.transaction(
+      async (transactionalEntityManager) => {
+        const { basic, standard, premium, ...gig } = gigDto;
+        await this.saveGig(gigId, gig, transactionalEntityManager);
+        const isEditMode =
+          await this.packageService.findOneByPackageTypeAndGigId(
+            'basic',
+            gigId,
+          );
+        try {
+          const createPackageWithFeatures = async () => {
+            if (isEditMode) {
+              await this.packageService.updatePackage(
+                gigId,
+                {
+                  basic,
+                  standard,
+                  premium,
+                },
+                transactionalEntityManager,
+              );
+            } else {
+              await this.packageService.createPackage(
+                gigId,
+                {
+                  basic,
+                  standard,
+                  premium,
+                },
+                transactionalEntityManager,
+              );
+            }
+          };
+
+          await createPackageWithFeatures();
+
+          return this.findOneById(gigId);
+        } catch (error) {
+          throw new Error('Transaction failed: ' + error.message);
+        }
+      },
+    );
+  }
+
+  async saveGig(
+    gigId: string,
+    gigDto: GigDTO,
+    transactionalEntityManager?: EntityManager,
+  ): Promise<Gig> {
     try {
       const {
         title,
@@ -77,24 +186,23 @@ export class GigService {
       gig.title = title;
       gig.category = { id: categoryId } as Category;
       gig.service = { id: serviceId } as Service;
-      const existingCategory =
-        await this.subcategoryService.findOneById(subcategoryId);
-      if (gig.subcategory && gig.subcategory.name !== existingCategory.name) {
-        gig.packages = [];
-        gig.isPublished = false;
-      }
+      // const existingCategory =
+      //   await this.subcategoryService.findOneById(subcategoryId);
+      // if (gig.subcategory && gig.subcategory.name !== existingCategory.name) {
+      //   gig.packages = [];
+      //   gig.isPublished = false;
+      // }
       gig.subcategory = { id: subcategoryId } as Subcategory;
       gig.user = { id: String(userId) } as User;
       gig.metadata = metadataIds;
       gig.metadataTags = metadataTagIds;
       gig.tags = tagIds.map((id) => ({ id })) as Tag[];
-      console.log(
-        faqs?.length && aboutGig && gig.step >= 3,
-        faqs?.length,
-        aboutGig,
-        gig.step,
-      );
       if (faqs?.length && aboutGig && gig.step >= 3) {
+        for (const faq of gig.faqs) {
+          if (!faqs.find((f) => f.id === faq.id)) {
+            gig.faqs = gig.faqs.filter((f) => f.id !== faq.id);
+          }
+        }
         gig.step = 4;
         gig.aboutGig = aboutGig;
         for (const faq of faqs) {
@@ -112,10 +220,11 @@ export class GigService {
           }
         }
       }
-
-      console.log(gig);
-
-      return this.gigRepository.save(gig);
+      if (transactionalEntityManager) {
+        return await transactionalEntityManager.save(gig);
+      } else {
+        return await this.gigRepository.save(gig);
+      }
     } catch (e) {
       console.log(e);
       throw e;
@@ -140,7 +249,8 @@ export class GigService {
       .leftJoinAndSelect('packages.packageFeatures', 'packageFeatures')
       .leftJoinAndSelect('gig.faqs', 'faqs')
       .orderBy('faqs.position', 'ASC')
-      .where('gig.id = :id', { id });
+      .where('gig.id = :id', { id })
+      .leftJoinAndSelect('gig.questions', 'question');
 
     return queryBuilder.getOne();
   }

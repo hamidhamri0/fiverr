@@ -4,6 +4,7 @@ import "./globals.css";
 import MainHeader from "./components/MainHeader";
 import UserInfoStoreProvider, { User } from "../stores/UserInfoStore";
 import { getUser } from "@/lib/auth/getUser";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,12 +19,14 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const userSession = await getUser();
+  console.log("LAYOUT");
   return (
     <html className="max-w-screen" lang="en">
       <body className={inter.className}>
         <UserInfoStoreProvider initialState={{ user: userSession }}>
           <MainHeader />
           {children}
+          <Toaster />
         </UserInfoStoreProvider>
       </body>
     </html>

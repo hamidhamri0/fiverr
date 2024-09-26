@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Package } from './package.entity';
 import { PackageController } from './package.controller';
@@ -7,7 +7,11 @@ import { FeatureModule } from '../feature/feature.module';
 import { GigModule } from '../gig/gig.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([Package]), FeatureModule, GigModule],
+  imports: [
+    TypeOrmModule.forFeature([Package]),
+    FeatureModule,
+    forwardRef(() => GigModule),
+  ],
   controllers: [PackageController],
   providers: [PackageService],
   exports: [PackageService],

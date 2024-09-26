@@ -3,29 +3,37 @@ import { useFormContext, useController } from "react-hook-form";
 import { IoMdMenu } from "react-icons/io";
 import { OpenArrow } from "./Footer";
 import { post } from "@/lib/utils/customFetch";
-
-type Question = {
-  question: string;
-  type: {
-    genre: string;
-    multiple: boolean;
-  };
-  options: string[];
-};
-
-type Questions = {
-  questions: Question[];
-};
+import { Question } from "@/types/gig.interface";
+import toast from "react-hot-toast";
+import SpinnerCenterWithBlur from "./ui/SpinnerCenterWithBlur";
 
 const GigRequirementForm = ({ onClick }: { onClick: () => void }) => {
-  const { handleSubmit, setValue } = useFormContext();
+  const {
+    handleSubmit,
+    setValue,
+    getValues,
+    formState: { errors },
+  } = useFormContext();
+
+  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data: any) => {
-    console.log("SUBMIT SUCCESS", data);
-    const question = data.questions;
-    const gigId = data.gigId;
-    await post(`/question/saveQuestions/${gigId}`, { question });
-    // onClick();
+    try {
+      setLoading(true);
+      const question = data.questions?.map((el: Question) => {
+        return typeof el.id == "string" ? { ...el, id: null } : el;
+      });
+      const gigId = data.id;
+      await post(`/question/saveQuestions/${gigId}`, { question });
+      setValue("initialSubcategory", getValues("subcategory"));
+      toast.success("Questions saved successfully");
+      onClick();
+    } catch (err) {
+      // console.log(err);
+      toast.error(err.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   function fillData() {
@@ -37,7 +45,7 @@ const GigRequirementForm = ({ onClick }: { onClick: () => void }) => {
           multiple: true,
         },
         options: ["yes good", "not bad", "bad"],
-        id: null,
+        id: String(Math.floor(Math.random() * 100000000)),
       },
       {
         question: "what you is rage",
@@ -46,7 +54,7 @@ const GigRequirementForm = ({ onClick }: { onClick: () => void }) => {
           multiple: false,
         },
         options: ["mid", "bad"],
-        id: null,
+        id: String(Math.floor(Math.random() * 100000000)),
       },
       {
         question: "how are you ?",
@@ -55,7 +63,7 @@ const GigRequirementForm = ({ onClick }: { onClick: () => void }) => {
           multiple: false,
         },
         options: ["", ""],
-        id: null,
+        id: String(Math.floor(Math.random() * 100000000)),
       },
     ];
     setValue("questions", data);
@@ -63,7 +71,13 @@ const GigRequirementForm = ({ onClick }: { onClick: () => void }) => {
 
   return (
     <div className="mx-auto max-w-[700px]">
+      {loading && <SpinnerCenterWithBlur />}
       <QuestionInput />
+      {errors["root"]?.message && (
+        <p className="my-2 mt-2 text-sm text-red-500">
+          {errors["root"]?.message}
+        </p>
+      )}
       <button
         type="button"
         onClick={handleSubmit(onSubmit)}
@@ -210,6 +224,8 @@ const QuestionFields = ({
     clearErrors,
     formState: { errors },
     setValue,
+    getValues,
+    setError,
   } = useFormContext();
 
   const questionName = defaultValue ? `question${defaultValue.id}` : "question";
@@ -237,7 +253,7 @@ const QuestionFields = ({
   } = useController({
     control,
     name: typeName,
-    defaultValue: defaultValue?.type || { genre: "single", multiple: false },
+    defaultValue: defaultValue?.type || { genre: "input", multiple: false },
   });
   const {
     field: { onChange: setOptions, value: options },
@@ -261,23 +277,19 @@ const QuestionFields = ({
     },
   });
 
-  console.log(question, type, options, errors);
-
   const addOption = () => {
     setOptions([...options, ""]);
   };
 
   const handleOnSubmit = async () => {
-    // console.log("handleOnSubmit 11111111111111111111111111111111111");
     const errors = await trigger([questionName, typeName, optionsName]);
-    // console.log(questionName, typeName, optionsName);
-    // console.log(errors);
+    clearErrors("deleteQuestions");
     if (!errors) return;
     onSave({
       question,
       type,
       options,
-      id: defaultValue?.id || null,
+      id: defaultValue?.id || String(Math.floor(Math.random() * 100000000)),
     });
     if (!edit) {
       ResetState();
@@ -287,21 +299,29 @@ const QuestionFields = ({
 
   function ResetState() {
     setValue(questionName, "");
-    setValue(typeName, { genre: "single", multiple: false });
+    setValue(typeName, { genre: "input", multiple: false });
     setValue(optionsName, ["", ""]);
   }
 
   const handleOnDelete = () => {
-    onDelete?.();
-    ResetState();
-    setIsInputOpen(false);
+    const values = getValues();
+    if (values.questions?.length > 2) {
+      onDelete?.();
+      ResetState();
+      setIsInputOpen(false);
+    } else {
+      setError("deleteQuestions", {
+        message: "cant delete less than two questions",
+      });
+    }
   };
 
   const handleCancel = () => {
+    clearErrors("deleteQuestions");
     setValue(questionName, defaultValue?.question || "");
     setValue(
       typeName,
-      defaultValue?.type || { genre: "single", multiple: false },
+      defaultValue?.type || { genre: "input", multiple: false },
     );
     setValue(optionsName, defaultValue?.options || ["", ""]);
     setIsInputOpen(false);
@@ -348,7 +368,6 @@ const QuestionFields = ({
           >
             <option value="input">Free text</option>
             <option value="multiple">Multiple choice</option>
-            <option value="single">Single choice</option>
           </select>
           {type.genre === "multiple" && (
             <div className="flex items-center gap-2">
@@ -399,6 +418,12 @@ const QuestionFields = ({
       {errors[optionsName] && (
         <p className="mt-2 text-sm text-red-500">
           {errors[optionsName]?.message}
+        </p>
+      )}
+
+      {errors["deleteQuestions"] && (
+        <p className="mt-2 text-sm text-red-500">
+          {errors["deleteQuestions"]?.message}
         </p>
       )}
 

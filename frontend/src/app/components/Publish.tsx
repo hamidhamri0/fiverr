@@ -1,28 +1,37 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/ShadComponents/ui/button";
+import { Button } from "@/app/components/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@/ShadComponents/ui/card";
+} from "@/app/components/card";
 import { useState } from "react";
 import PhoneNumber from "./PhoneNumber";
 import VerificationPhoneNumber from "./VerificationPhoneNumber";
 import { useUserInfoStore } from "@/stores/UserInfoStore";
 import { post } from "@/lib/utils/customFetch";
 import { useFormContext } from "react-hook-form";
+import { useRouter } from "next/navigation";
 
 export default function Publish({ onClick }: { onClick: () => void }) {
   const [isOpen, setIsOpen] = useState(false);
   const user = useUserInfoStore((state) => state.user);
-  const { getValues } = useFormContext();
+  const {
+    getValues,
+    formState: { errors },
+  } = useFormContext();
+  const router = useRouter();
+
+  console.log(errors);
 
   async function handlePublishGig() {
     const values = getValues();
     try {
-      await post(`gig/publish/${values.gigId}`, {});
+      await post(`/gig/publish/${values.id}`, {});
+      router.prefetch("/manage_gigs");
+      router.push("/manage_gigs");
     } catch (err) {
       console.log(err);
     }

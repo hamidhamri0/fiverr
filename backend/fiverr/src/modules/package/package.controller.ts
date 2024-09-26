@@ -24,19 +24,19 @@ export class PackageController {
     return this.packageService.findOneByGigId(id);
   }
 
-  @Post('/createPackage/:gigId')
-  async createPackage(
-    @Param('gigId', new ParseUUIDPipe()) gigId: string,
-    @Body() createPackageDTO: createPackageDTO,
-  ) {
-    return this.packageService.createPackage(gigId, createPackageDTO);
-  }
+  // @Post('/createPackage/:gigId')
+  // async createPackage(
+  //   @Param('gigId', new ParseUUIDPipe()) gigId: string,
+  //   @Body() createPackageDTO: createPackageDTO,
+  // ) {
+  //   return this.packageService.createPackage(gigId, createPackageDTO);
+  // }
 
-  @Post('/updatePackage/:gigId')
-  async updatePackage(
-    @Param('gigId', new ParseUUIDPipe()) gigId: string,
-    @Body() updatePackageDTO: updatePackageDTO,
-  ) {
-    return this.packageService.updatePackage(gigId, updatePackageDTO);
-  }
+  // @Post('/updatePackage/:gigId')
+  // async updatePackage(
+  //   @Param('gigId', new ParseUUIDPipe()) gigId: string,
+  //   @Body() updatePackageDTO: updatePackageDTO,
+  // ) {
+  //   return this.packageService.updatePackage(gigId, updatePackageDTO);
+  // }
 }

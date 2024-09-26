@@ -20,6 +20,13 @@ import { Metadata } from '../metadata/metadata.entity';
 import { MetadataTag } from '../metadata-tag/metadata-tag.entity';
 import { FAQ } from '../faq/faq.entity';
 import { Question } from '../question/question.entity';
+export enum GigStatus {
+  ACTIVE = 'active',
+  PENDING = 'pending',
+  DENIED = 'denied',
+  PAUSED = 'paused',
+  DRAFT = 'draft',
+}
 
 @Entity('gigs')
 export class Gig {
@@ -67,6 +74,34 @@ export class Gig {
   })
   @JoinColumn({ name: 'serviceId' })
   service: Service;
+
+  @Column('jsonb', { default: () => "'[]'" })
+  imageUrls: string[];
+
+  @Column('jsonb', { default: () => "'{}'" })
+  videoUrl: { videoUrl: string; thumbnail: string };
+
+  @Column('jsonb', { default: () => "'[]'" })
+  pdfUrls: string[];
+
+  @Column('numeric', { default: 0 })
+  clicks: number;
+
+  @Column('numeric', { default: 0 })
+  impressions: number;
+
+  @Column('numeric', { default: 0 })
+  orders: number;
+
+  @Column('numeric', { default: 0 })
+  cancellations: number;
+
+  @Column({
+    type: 'enum',
+    enum: GigStatus,
+    default: GigStatus.DRAFT,
+  })
+  status: GigStatus;
 
   @ManyToMany(() => Metadata)
   @JoinTable({

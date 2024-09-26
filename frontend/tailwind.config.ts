@@ -11,14 +11,14 @@ const config: Config = {
 
   theme: {
   	screens: {
+  		'1150': {
+  			max: '1150px'
+  		},
   		'2xl': {
   			max: '1500px'
   		},
   		xl: {
   			max: '1279px'
-  		},
-  		'1150': {
-  			max: '1150px'
   		},
   		lg: {
   			max: '1023px'

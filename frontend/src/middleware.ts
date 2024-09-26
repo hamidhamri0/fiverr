@@ -11,18 +11,16 @@ export async function middleware(request: NextRequest) {
       isCookie: cookie,
     });
 
-    // if (user) {
-    //   return NextResponse.redirect(new URL("/login", request.url));
-    // }
+    console.log(user, "MIDDLEWARE");
 
     return NextResponse.next();
   } catch (error) {
     console.error("Error checking session:", error);
-    return NextResponse.next();
+    return NextResponse.redirect(new URL("/", request.url));
   }
 }
 
 // See "Matching Paths" below to learn more
-// export const config = {
-//   matcher: ["/manage_gigs/:path*", "*"],
-// };
+export const config = {
+  matcher: ["/manage_gigs/:path*"],
+};

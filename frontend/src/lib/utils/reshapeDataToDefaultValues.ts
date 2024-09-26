@@ -7,16 +7,25 @@ import {
   Metadata,
   Service,
   Subcategory,
+  Questions,
 } from "@/types/gig.interface";
 import { Package } from "@/types/gig.interface";
+import { Images } from "lucide-react";
 
 export default function reshapeDataToDefaultValues(data: GigData) {
   return {
-    gigId: data.id || "",
+    id: data.id || "",
     title: data?.title || "",
     category: data?.category?.id || "",
     subcategory: data?.subcategory?.id || "",
     serviceType: data?.service?.id || "",
+    imageUrls: [],
+    videoUrl: [],
+    pdfUrls: [],
+    imageUrlsPreview: data?.imageUrls || [],
+    videoUrlPreview: data?.videoUrl || {},
+    pdfUrlsPreview: data?.pdfUrls || [],
+    initialSubcategory: data?.subcategory?.id || "",
     metadataTag:
       (data.metadata && reshapeMetadataTagToDefaultValues(data.metadata)) || {},
     tags: data.tags || [],
@@ -33,6 +42,7 @@ export default function reshapeDataToDefaultValues(data: GigData) {
         reshapePackageToDefaultValues(data.packages?.[2])) ||
       {},
     faqs: data.faqs || [],
+    questions: data.questions || [],
     editorJson: (data?.aboutGig && data?.aboutGig) || "",
     editor:
       (data?.aboutGig &&

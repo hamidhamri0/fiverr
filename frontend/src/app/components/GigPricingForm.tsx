@@ -8,10 +8,19 @@ import {
 import { MdError } from "react-icons/md";
 import customSortFeatures from "@/lib/utils/customSortFeatures";
 import { get, post } from "@/lib/utils/customFetch";
-import { Feature, Features, Option, Package } from "../../types/gig.interface";
+import {
+  Feature,
+  Features,
+  Option,
+  Package,
+  Tag,
+} from "../../types/gig.interface";
 import { useGigStore } from "../../stores/GigStore";
 import SpinnerCenterWithBlur from "./ui/SpinnerCenterWithBlur";
 import { useRouter } from "next/navigation";
+import { useUserInfoStore } from "@/stores/UserInfoStore";
+import { createGig } from "./GigOverviewManager";
+import toast from "react-hot-toast";
 
 function ErrorMenu({ children }: { children: FieldError }) {
   return (
@@ -100,16 +109,16 @@ function NumberInput({
         message: "This field is required",
       },
       validate(value) {
-        const values = getValues();
+        const gig = getValues();
         if (value < 5) {
           return "Minimum price is $5";
         }
         if (typeOfPackage === "standard") {
-          if (values.basic.Price >= values.standard.Price) {
+          if (gig.basic.Price >= gig.standard.Price) {
             return "Standard Price must be higher than basic Price";
           }
         } else if (typeOfPackage === "premium") {
-          if (values.standard.Price >= values.premium.Price) {
+          if (gig.standard.Price >= gig.premium.Price) {
             return "Premium Price must be higher than standard Price";
           }
         }
@@ -243,12 +252,11 @@ export default function GigPricingForm({ onClick }: { onClick: () => void }) {
   const features = useGigStore((state) => state.features);
   const setFeatures = useGigStore((state) => state.setFeatures);
 
-  // console.log(gig, "PRICING");
-
   const [loading, setLoading] = useState(false);
 
-  const { handleSubmit, getValues } = useFormContext();
+  const { handleSubmit, getValues, setValue } = useFormContext();
   const subcategory = useWatch({ name: "subcategory" });
+  const user = useUserInfoStore((state) => state.user);
 
   useEffect(() => {
     async function getAllFeaturesWithOptions() {
@@ -267,36 +275,94 @@ export default function GigPricingForm({ onClick }: { onClick: () => void }) {
   }, [subcategory, setFeatures]);
 
   async function submit() {
-    // e.preventDefault();
-    const values = getValues();
+    const gig = getValues();
     setLoading(true);
+    const values = getValues();
+    let metadata: { [key: number]: number[] | number } = {};
+    for (const meta in values.metadataTag) {
+      if (typeof values.metadataTag[meta] == "string") {
+        metadata[Number(meta)] = Number(values.metadataTag[meta]);
+      } else {
+        metadata[Number(meta)] = values.metadataTag[meta].map((e: string) =>
+          Number(e),
+        );
+      }
+    }
+    let body = {
+      title: values.title,
+      metadata: metadata,
+      categoryId: +values.category,
+      subcategoryId: +values.subcategory,
+      serviceId: +values.serviceType,
+      tagIds: values.tags.map((e: Tag) => Number(e.id)),
+      userId: user && user.id,
+    };
     try {
       const packages = await get<Package[]>(
-        `/package/getPackageByGigId/${values.gigId}`,
+        `/package/getPackageByGigId/${gig.id}`,
       );
-      if (!packages.length) {
-        await post(`/package/createPackage/${values.gigId}`, {
-          basic: values.basic,
-          standard: values.standard,
-          premium: values.premium,
-        });
-      } else {
-        await post(`/package/updatePackage/${values.gigId}`, {
-          basic: values.basic,
-          standard: values.standard,
-          premium: values.premium,
-        });
-      }
-      router.refresh();
+      await post(`/gig/saveGigWithPackages?gigId=${gig.id}`, {
+        ...body,
+        id: packages,
+        basic: gig.basic,
+        standard: gig.standard,
+        premium: gig.premium,
+      });
+      toast.success("packages saved successfully");
       onClick();
     } catch (err) {
+      toast.error(err.message);
       console.log(err);
     } finally {
       setLoading(false);
     }
   }
 
+  console.log("FEATURES", features);
   if (features.length === 0) return null;
+
+  function fillWithData() {
+    setValue("basic", {
+      "1": "basic package",
+      "2": "basic package desc",
+      "3": "91 DAYS DELIVERY",
+      "4": "Vue.js",
+      "5": "Sass",
+      "6": "",
+      "7": "",
+      "8": "",
+      "9": "Webpack",
+      "10": "Mercurial",
+      "11": "5",
+    });
+
+    setValue("standard", {
+      "1": "standard package",
+      "2": "standard package desc",
+      "3": "77 DAYS DELIVERY",
+      "4": "Angular",
+      "5": "Less",
+      "6": "true",
+      "7": "true",
+      "8": "",
+      "9": "Webpack",
+      "10": "Git",
+      "11": "7",
+    });
+    setValue("premium", {
+      "1": "premium package",
+      "2": "premium package desc",
+      "3": "63 DAYS DELIVERY",
+      "4": "React",
+      "5": "Sass",
+      "6": "true",
+      "7": "true",
+      "8": "",
+      "9": "Webpack",
+      "10": "Git",
+      "11": "9",
+    });
+  }
 
   return (
     <>
@@ -402,6 +468,13 @@ export default function GigPricingForm({ onClick }: { onClick: () => void }) {
             className="mt-4 block w-full rounded-md bg-green-500 px-4 py-2 text-white"
           >
             Save & Continue
+          </button>
+          <button
+            type="button"
+            onClick={fillWithData}
+            className="mt-4 block w-full rounded-md bg-green-500 px-4 py-2 text-white"
+          >
+            fill with data
           </button>
         </form>
       </div>

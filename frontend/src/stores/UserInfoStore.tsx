@@ -73,9 +73,7 @@ export default function UserInfoStoreProvider({
   initialState,
 }: UserInfoStoreProviderProps) {
   const storeRef = useRef<StoreApi>();
-  if (!storeRef.current) {
-    storeRef.current = createStateStore(initialState);
-  }
+  storeRef.current = createStateStore(initialState);
   return (
     <Context.Provider value={storeRef.current}>{children}</Context.Provider>
   );

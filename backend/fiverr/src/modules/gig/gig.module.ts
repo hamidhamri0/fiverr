@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { GigService } from './gig.service';
 import { GigController } from './gig.controller';
 import { Gig } from './gig.entity';
@@ -8,6 +8,7 @@ import { MetadataModule } from '../metadata/metadata.module';
 import { MetadataTagModule } from '../metadata-tag/metadata-tag.module';
 import { FaqModule } from '../faq/faq.module';
 import { SubcategoryModule } from '../subcategory/subcategory.module';
+import { PackageModule } from '../package/package.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { SubcategoryModule } from '../subcategory/subcategory.module';
     MetadataModule,
     MetadataTagModule,
     FaqModule,
+    forwardRef(() => PackageModule),
   ],
   controllers: [GigController],
   providers: [GigService],

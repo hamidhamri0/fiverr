@@ -27,7 +27,7 @@ class QuestionType {
   multiple: boolean;
 }
 
-class Question {
+export class Question {
   @IsOptional()
   @IsNumber()
   id?: number;
@@ -52,7 +52,9 @@ export class SaveQuestionDto {
   @IsArray()
   @ValidateNested()
   @Type(() => Question)
-  @ArrayMinSize(2)
+  @ArrayMinSize(2, {
+    message: 'at least two questions',
+  })
   @ArrayMaxSize(5)
   question: Question[];
 }

@@ -29,7 +29,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
   private isValidationError(exception: unknown): boolean {
     return (
       Array.isArray(exception) &&
-      exception.every((item) => item instanceof ValidationError)
+      exception.every((item) => typeof item == 'string')
     );
   }
 
@@ -38,21 +38,21 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse<Response>();
     const request = ctx.getRequest<Request>();
 
-    // console.log('Exception caught by global filter:', exception);
-
     let status = HttpStatus.INTERNAL_SERVER_ERROR;
     let message = 'Internal server error';
     let details: any = null;
     let stack = exception.toString();
 
+    console.log(exception);
+
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       message = exception.message;
       details = exception.getResponse();
-    } else if (this.isValidationError(exception)) {
-      status = HttpStatus.BAD_REQUEST;
-      message = 'Validation failed';
-      details = this.handleValidationErrors(exception as ValidationError[]);
+      if (this.isValidationError(details.message)) {
+        const validationErrors = (details as any).message;
+        message = validationErrors;
+      }
     } else {
       status = HttpStatus.INTERNAL_SERVER_ERROR;
       message =

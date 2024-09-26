@@ -1,43 +1,26 @@
-"use client";
-import React, { useState } from "react";
-import axios from "axios";
+import React from "react";
+import ManageGigs from "../components/ManageGigs";
+import { get } from "@/lib/utils/customFetch";
+import { getUser } from "@/lib/auth/getUser";
+import { GigData } from "@/types/gig.interface";
+import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 
-function FileUpload() {
-  const [progress, setProgress] = useState(0);
-
-  const handleFileUpload = async (event) => {
-    const file = event.target.files[0];
-    const formData = new FormData();
-    formData.append("image", file);
-
-    const xhr = new XMLHttpRequest();
-
-    xhr.open("POST", "http://localhost:3001/cloudinary/image", true);
-
-    xhr.setRequestHeader("Content-Type", "multipart/form-data");
-
-    xhr.upload.onprogress = (progressEvent) => {
-      console.log(progressEvent);
-      const progress = Math.round(
-        (progressEvent.loaded * 100) / progressEvent.total,
-      );
-      setProgress(progress);
-    };
-
-    xhr.onloadend = () => {
-      console.log("Upload complete:", xhr.responseText);
-    };
-
-    xhr.send(formData);
-  };
-
+async function page() {
+  let gigs = [] as GigData[];
+  try {
+    const userSession = await getUser();
+    gigs = await get<GigData[]>(`/gig/getAllGigsByUserId/${userSession?.id}`, {
+      isCookie: cookies().toString(),
+    });
+  } catch (err) {
+    redirect("/");
+  }
   return (
     <div>
-      <input type="file" onChange={handleFileUpload} />
-      <progress value={progress} max="100" />
-      <p>{progress}%</p>
+      <ManageGigs gigs={gigs} />
     </div>
   );
 }
 
-export default FileUpload;
+export default page;

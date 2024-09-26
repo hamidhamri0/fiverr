@@ -29,13 +29,20 @@ const request = async <T>(
 
   const response = await fetch(`${URL_PREFIX}${endpoint}`, options);
 
-  if (response.headers.get("content-length") === "0") {
+  if (
+    !response.headers.get("content-length") ||
+    response.headers.get("content-length") === "0"
+  ) {
     return null as T;
   }
 
   const data = await response.json();
   if (!response.ok) {
-    throw new Error(data?.message || "Something went wrong");
+    if (data?.message && Array.isArray(data?.message)) {
+      throw new Error(data?.message.join(","));
+    } else {
+      throw new Error(data?.message || "Something went wrong");
+    }
   }
   return data as T;
 };
@@ -53,6 +60,7 @@ export const post = <B, T = object>(
   body: B,
   options: FetchOptions = {},
 ): Promise<T> => {
+  console.log("body", body);
   options.method = "POST";
   options.body = JSON.stringify(body);
   return request<T>(endpoint, options);

@@ -18,6 +18,7 @@ export class QuestionController {
     @Param('gigId', new ParseUUIDPipe()) gigId: string,
     @Body() saveQuestionDto: SaveQuestionDto,
   ) {
+    console.log(saveQuestionDto);
     return this.questionService.saveQuestions(gigId, saveQuestionDto);
   }
 

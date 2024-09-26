@@ -5,23 +5,21 @@ import { MulterOptions } from '@nestjs/platform-express/multer/interfaces/multer
 const MAX_FILE_SIZES = {
   image: 5 * 1024 * 1024, // 5MB for images
   video: 20 * 1024 * 1024, // 20MB for videos
-  pdf: 3 * 1024 * 1024, // 3MB for PDFs
+  application: 3 * 1024 * 1024, // 3MB for PDFs
 };
 
 export const multerOptions = (): MulterOptions => ({
   storage: multer.memoryStorage(),
   fileFilter: (req: any, file: Express.Multer.File, callback: any) => {
-    const fileType = req.query.fileType || req.body.fileType;
-
-    // Check file type
     if (
-      (fileType === 'image' && !file.mimetype.startsWith('image')) ||
-      (fileType === 'video' && !file.mimetype.startsWith('video')) ||
-      (fileType === 'pdf' && file.mimetype !== 'application/pdf')
+      !file.mimetype.startsWith('image') &&
+      !file.mimetype.startsWith('video') &&
+      file.mimetype !== 'application/pdf'
     ) {
       return callback(new BadRequestException('Invalid file type'), false);
     }
-    const fileMaxSize = MAX_FILE_SIZES[fileType];
+    const type = file.mimetype.split('/')[0];
+    const fileMaxSize = MAX_FILE_SIZES[type];
 
     if (file.size > fileMaxSize) {
       return callback(

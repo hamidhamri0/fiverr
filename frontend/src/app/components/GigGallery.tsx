@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
-import { useForm, Controller, useFormContext } from "react-hook-form";
-import axios from "axios";
-import { Button } from "@/ShadComponents/ui/button";
-import { Card, CardContent } from "@/ShadComponents/ui/card";
-import { Input } from "@/ShadComponents/ui/input";
-import { Label } from "@/ShadComponents/ui/label";
-import { ImageIcon, VideoIcon, FileIcon } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Controller, useFormContext } from "react-hook-form";
+import { Button } from "@/app/components/button";
+import { Card, CardContent } from "@/app/components/card";
+import { Input } from "@/app/components/input";
+import { Label } from "@/app/components/label";
+import { ImageIcon, VideoIcon, FileIcon, XCircleIcon } from "lucide-react";
 import SpinnerCenterWithBlur from "./ui/SpinnerCenterWithBlur";
+import { GigData } from "@/types/gig.interface";
+import { toast } from "react-hot-toast";
 
 type FormData = {
   images: FileList[];
@@ -66,38 +67,82 @@ const CircularProgressBar = ({ progress }: { progress: number }) => {
 export default function GigGallery({ onClick }: { onClick: () => void }) {
   const {
     control,
-    handleSubmit,
     getValues,
     formState: { errors },
-  } = useFormContext<FormData>();
-  const [previewUrls, setPreviewUrls] = useState<{ [key: string]: string }>({});
-  const [uploadProgress, setUploadProgress] = useState(0);
+    handleSubmit,
+    setValue,
+  } = useFormContext<GigData>();
 
+  const gig = getValues();
+
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [isDatabaseUploading, setIsDataBaseUploading] = useState(false);
 
+  console.log(errors, "ERRORS");
+
+  const generateThumbnail = (url: string) => {
+    const videoElement = document.createElement("video");
+    videoElement.src = url;
+    videoElement.crossOrigin = "anonymous";
+    videoElement.onloadedmetadata = () => {
+      videoElement.currentTime = 1;
+    };
+    videoElement.onseeked = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = videoElement.videoWidth;
+      canvas.height = videoElement.videoHeight;
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        const imageUrl = canvas.toDataURL("image/png");
+        setValue("videoUrlPreview", {
+          videoUrl: url,
+          thumbnail: imageUrl,
+        });
+      }
+    };
+  };
+
+  const handleVideoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const videoUrl = URL.createObjectURL(file);
+      generateThumbnail(videoUrl);
+    }
+  };
+
   const onSubmit = async () => {
-    const data = getValues() as FormData;
     setIsUploading(true);
     setUploadProgress(0);
 
     const formData = new FormData();
 
-    for (let i = 0; i < data.images.length; i++) {
-      const image = data.images[i]?.[0];
-      if (image) {
-        formData.append("files", data.images[i][0]);
+    for (let i = 0; i < gig.imageUrls.length; i++) {
+      let image = gig.imageUrls?.[i];
+      let imageUrl = gig.imageUrlsPreview?.[i];
+
+      if (image instanceof File) {
+        formData.append(`image${i}`, image);
+      } else if (imageUrl) {
+        formData.append(`image${i}Url`, imageUrl);
       }
     }
 
-    if (data.video?.[0]) {
-      formData.append("files", data.video[0]);
+    if (gig.videoUrl instanceof File) {
+      formData.append("video", gig.videoUrl);
+    } else if (gig.videoUrlPreview) {
+      formData.append("videoUrl", JSON.stringify(gig.videoUrlPreview));
     }
 
-    for (let i = 0; i < data.documents.length; i++) {
-      const pdf = data.documents[i]?.[0];
-      if (pdf) {
-        formData.append("files", data.documents[i][0]);
+    for (let i = 0; i < gig.pdfUrls.length; i++) {
+      const pdf = gig.pdfUrls[i];
+      const pdfUrl = gig.pdfUrlsPreview[i];
+
+      if (pdf instanceof File) {
+        formData.append(`pdf${i}`, pdf);
+      } else if (pdfUrl) {
+        formData.append(`pdf${i}Url`, pdfUrl);
       }
     }
 
@@ -116,72 +161,66 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
     };
 
     xhr.onloadend = () => {
-      console.log("Upload complete:", xhr.responseText);
-      setIsDataBaseUploading(false);
-      onClick();
+      if (xhr.status >= 200 && xhr.status < 300) {
+        toast.success("files uploaded successfully");
+        setIsDataBaseUploading(false);
+        onClick();
+      } else {
+        let error = JSON.parse(xhr.responseText).message;
+        toast.error(error);
+        setIsDataBaseUploading(false);
+        setIsUploading(false);
+        setUploadProgress(0);
+      }
     };
 
-    xhr.onerror = () => {
-      console.error("Upload failed:", xhr.responseText);
-      setIsDataBaseUploading(false);
-      setIsUploading(false);
-      setUploadProgress(0);
-    };
-
-    xhr.open("POST", "http://localhost:3001/cloudinary/image", true);
+    xhr.open("POST", `http://localhost:3001/cloudinary/files/${gig.id}`, true);
     xhr.send(formData);
   };
+
+  function disabledUnusedInputs(
+    type: "imageUrlsPreview" | "pdfUrlsPreview",
+    index: number,
+  ) {
+    return gig[type]?.[Math.max(0, index - 1)] == undefined && index !== 0;
+  }
 
   const handleFileChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
     field: any,
-    type: string,
+    type: "imageUrlsPreview" | "videoUrlPreview" | "pdfUrlsPreview",
     index?: number,
   ) => {
     if (e.target.files && e.target.files.length > 0) {
-      field.onChange(e.target.files);
       const file = e.target.files[0];
-      if (type === "image" || type === "video") {
-        if (type === "video") {
-          const url = URL.createObjectURL(file);
-          const videoElement = document.createElement("video");
-          videoElement.src = url;
-          videoElement.crossOrigin = "anonymous";
-          videoElement.onloadedmetadata = () => {
-            videoElement.currentTime = 1;
-          };
-          videoElement.onseeked = () => {
-            const canvas = document.createElement("canvas");
-            canvas.width = videoElement.videoWidth;
-            canvas.height = videoElement.videoHeight;
-            const ctx = canvas.getContext("2d");
-            if (ctx) {
-              ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
-              const imageUrl = canvas.toDataURL("image/png");
-              setPreviewUrls((prevUrls) => ({
-                ...prevUrls,
-                video: imageUrl,
-              }));
-            }
-          };
-          videoElement.onerror = (error) => {
-            console.error("Error loading video:", error);
-          };
+      field.onChange(file);
+      console.log(field, file);
+      if (type === "imageUrlsPreview" || type === "videoUrlPreview") {
+        if (type === "videoUrlPreview") {
+          handleVideoUpload(e);
         } else {
           const newPreviewUrl = URL.createObjectURL(file);
-          setPreviewUrls((prevUrls) => ({
-            ...prevUrls,
-            [`${type}${index !== undefined ? index : ""}`]: newPreviewUrl,
-          }));
+          setValue("imageUrlsPreview", {
+            ...getValues("imageUrlsPreview"), // Preserve existing values
+            [index as number]: newPreviewUrl, // Set key 1 to "hamid"
+          });
         }
       } else {
-        setPreviewUrls((prevUrls) => ({
-          ...prevUrls,
-          [`${type}${index !== undefined ? index : ""}`]: file.name,
-        }));
+        setValue("pdfUrlsPreview", {
+          ...getValues("pdfUrlsPreview"),
+          [index as number]: file.name,
+        });
       }
     }
   };
+
+  function handleDeleteImage(index: number) {
+    setValue(
+      `imageUrlsPreview`,
+      gig[`imageUrlsPreview`]?.filter((_, i) => i !== index),
+    );
+    setValue(`imageUrls.${index}`, undefined);
+  }
 
   return (
     <div className="container mx-auto max-w-4xl p-6">
@@ -221,23 +260,44 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
             {[0, 1, 2].map((index) => (
               <div
                 key={index}
-                className="flex aspect-square flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 p-4 text-center"
+                className="relative flex aspect-square flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 p-4 text-center"
               >
+                {gig[`imageUrlsPreview`]?.[index] &&
+                  !disabledUnusedInputs("imageUrlsPreview", index) && (
+                    <button
+                      onClick={() => handleDeleteImage(index)}
+                      className="absolute right-2 top-2 z-10 rounded-full bg-white p-1 text-gray-500 hover:text-red-500 focus:outline-none"
+                      aria-label={`Delete image ${index + 1}`}
+                    >
+                      <XCircleIcon className="h-5 w-5" />
+                    </button>
+                  )}
                 <Controller
-                  name={`images.${index}` as any}
+                  name={`imageUrls.${index}`}
                   control={control}
                   rules={{
-                    required:
-                      index === 0 ? "At least one image is required" : false,
+                    required: !gig[`imageUrlsPreview`][0]
+                      ? "At least one image is required"
+                      : false,
                     validate: {
-                      fileSize: (file) =>
-                        !file ||
-                        file[0]?.size <= MAX_FILE_SIZE ||
-                        "File size must be less than 5MB",
-                      fileType: (file) =>
-                        !file ||
-                        ACCEPTED_IMAGE_TYPES.includes(file[0]?.type) ||
-                        "Unsupported file type",
+                      fileSize: (file) => {
+                        return (
+                          (!file ||
+                            file?.size <= MAX_FILE_SIZE ||
+                            gig[`imageUrlsPreview`][index] ||
+                            "File size must be less than 5MB") === true ||
+                          "File size must be less than 5MB"
+                        );
+                      },
+                      fileType: (file) => {
+                        return (
+                          (!file ||
+                            ACCEPTED_IMAGE_TYPES.includes(file?.type) ||
+                            gig[`imageUrlsPreview`][index] ||
+                            "Unsupported file type") === true ||
+                          "Unsupported file type"
+                        );
+                      },
                     },
                   }}
                   render={({ field }) => (
@@ -245,35 +305,39 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
                       htmlFor={`image-${index}`}
                       className="flex h-full w-full cursor-pointer flex-col items-center justify-center"
                     >
-                      {previewUrls[`image${index}`] ? (
+                      {gig[`imageUrlsPreview`]?.[index] ? (
                         <img
-                          src={previewUrls[`image${index}`]}
+                          src={gig[`imageUrlsPreview`][index]}
                           alt={`Preview ${index + 1}`}
                           className="h-full w-full object-cover"
                         />
-                      ) : (
+                      ) : !disabledUnusedInputs("imageUrlsPreview", index) ? (
                         <>
                           <ImageIcon className="mb-2 h-12 w-12 text-gray-400" />
                           <p className="text-sm text-blue-600">
                             Drag & drop a Photo or Browse
                           </p>
                         </>
-                      )}
+                      ) : null}
                       <Input
                         id={`image-${index}`}
                         type="file"
                         className="hidden"
+                        disabled={disabledUnusedInputs(
+                          "imageUrlsPreview",
+                          index,
+                        )}
                         accept={ACCEPTED_IMAGE_TYPES.join(",")}
                         onChange={(e) => {
-                          handleFileChange(e, field, "image", index);
+                          handleFileChange(e, field, "imageUrlsPreview", index);
                         }}
                       />
                     </Label>
                   )}
                 />
-                {errors.images && errors.images[index] && (
+                {errors.imageUrls && errors.imageUrls?.[index] && (
                   <p className="mt-2 text-xs text-red-500">
-                    {errors.images[index]?.message}
+                    {errors.imageUrls[index]?.message}
                   </p>
                 )}
               </div>
@@ -292,18 +356,26 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
           </p>
           <div className="flex aspect-video flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 p-4 text-center">
             <Controller
-              name="video"
+              name="videoUrl"
               control={control}
               rules={{
                 validate: {
-                  fileSize: (file) =>
-                    !file ||
-                    file[0]?.size <= 50 * 1024 * 1024 ||
-                    "File size must be less than 50MB",
-                  fileType: (file) =>
-                    !file ||
-                    ACCEPTED_VIDEO_TYPES.includes(file[0]?.type) ||
-                    "Unsupported file type",
+                  fileSize: (file) => {
+                    console.log(file instanceof File);
+                    if (!(file instanceof File)) return true;
+                    return (
+                      file?.size <= 50 * 1024 * 1024 ||
+                      "File size must be less than 50MB"
+                    );
+                  },
+                  fileType: (file) => {
+                    if (!(file instanceof File)) return true;
+                    return (
+                      !file ||
+                      ACCEPTED_VIDEO_TYPES.includes(file?.type) ||
+                      "Unsupported file type"
+                    );
+                  },
                 },
               }}
               render={({ field }) => (
@@ -311,16 +383,20 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
                   htmlFor="video"
                   className="flex h-full w-full cursor-pointer flex-col items-center justify-center"
                 >
-                  {previewUrls["video"] ? (
+                  {gig["videoUrlPreview"]?.thumbnail ? (
                     <div className="relative h-full w-full">
-                      <img
-                        src={previewUrls["video"]}
-                        alt="Video thumbnail"
-                        className="h-full w-full object-cover"
-                      />
-                      <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
-                        <VideoIcon className="h-16 w-16 text-white" />
-                      </div>
+                      <>
+                        <img
+                          src={gig["videoUrlPreview"].thumbnail}
+                          alt="Video thumbnail"
+                          className="h-full w-full object-cover"
+                        />
+                      </>
+                      {!gig["videoUrlPreview"]?.thumbnail && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                          <VideoIcon className="h-16 w-16 text-white" />
+                        </div>
+                      )}
                     </div>
                   ) : (
                     <>
@@ -335,14 +411,16 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
                     type="file"
                     className="hidden"
                     accept={ACCEPTED_VIDEO_TYPES.join(",")}
-                    onChange={(e) => handleFileChange(e, field, "video")}
+                    onChange={(e) =>
+                      handleFileChange(e, field, "videoUrlPreview")
+                    }
                   />
                 </Label>
               )}
             />
-            {errors.video && (
+            {errors.videoUrl && (
               <p className="mt-2 text-xs text-red-500">
-                {errors.video.message}
+                {errors.videoUrl.message}
               </p>
             )}
           </div>
@@ -360,17 +438,17 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
                 className="flex aspect-square flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 p-4 text-center"
               >
                 <Controller
-                  name={`documents.${index}` as any}
+                  name={`pdfUrls.${index}` as any}
                   control={control}
                   rules={{
                     validate: {
                       fileSize: (file) =>
                         !file ||
-                        file[0]?.size <= MAX_FILE_SIZE ||
+                        file?.size <= MAX_FILE_SIZE ||
                         "File size must be less than 5MB",
                       fileType: (file) =>
                         !file ||
-                        file[0]?.type === "application/pdf" ||
+                        file?.type === "application/pdf" ||
                         "Only PDF files are allowed",
                     },
                   }}
@@ -379,41 +457,42 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
                       htmlFor={`document-${index}`}
                       className="flex h-full w-full cursor-pointer flex-col items-center justify-center"
                     >
-                      {previewUrls[`document${index}`] ? (
+                      {gig[`pdfUrlsPreview`] && gig[`pdfUrlsPreview`][index] ? (
                         <>
                           <FileIcon className="mb-2 h-12 w-12 text-gray-400" />
                           <p className="text-sm text-blue-600">
                             {
-                              previewUrls[`document${index}`]?.split("/")[
-                                previewUrls[`document${index}`]?.split("/")
-                                  .length - 1
-                              ]
+                              gig[`pdfUrlsPreview`][index]
+                                .split("/")
+                                .pop()
+                                ?.split("?")[0]
                             }
                           </p>
                         </>
-                      ) : (
+                      ) : !disabledUnusedInputs("pdfUrlsPreview", index) ? (
                         <>
                           <FileIcon className="mb-2 h-12 w-12 text-gray-400" />
                           <p className="text-sm text-blue-600">
                             Drag & drop a PDF or Browse
                           </p>
                         </>
-                      )}
+                      ) : null}
                       <Input
                         id={`document-${index}`}
                         type="file"
                         className="hidden"
                         accept=".pdf"
+                        disabled={disabledUnusedInputs("pdfUrlsPreview", index)}
                         onChange={(e) =>
-                          handleFileChange(e, field, "document", index)
+                          handleFileChange(e, field, "pdfUrlsPreview", index)
                         }
                       />
                     </Label>
                   )}
                 />
-                {errors.documents && errors.documents[index] && (
+                {errors.pdfUrls && errors.pdfUrls[index] && (
                   <p className="mt-2 text-xs text-red-500">
-                    {errors.documents[index]?.message}
+                    {errors.pdfUrls[index]?.message}
                   </p>
                 )}
               </div>
@@ -427,7 +506,7 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
           </Button>
           <Button
             type="button"
-            onClick={() => onSubmit()}
+            onClick={handleSubmit(onSubmit)}
             className="bg-gray-900 text-white"
             disabled={isUploading}
           >
