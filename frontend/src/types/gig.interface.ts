@@ -63,7 +63,7 @@ export type Faq = {
   position: number;
 };
 
-export interface SharedGigProperties {
+export type GigFromFetch = {
   id: string;
   title: string;
   aboutGig: AboutGig;
@@ -84,19 +84,19 @@ export interface SharedGigProperties {
   questions: Questions;
   createdAt: string;
   updatedAt: string;
-}
+};
 
-export type GigFromFetch = {
+export type GigRefactored = {
   id: string;
   title: string;
   aboutGig: AboutGig;
   description: string;
   isPublished: boolean;
   step: number;
-  category: Category;
-  subcategory: Subcategory;
-  service: Service;
-  metadata: Metadata[];
+  category: string;
+  subcategory: string;
+  service: string;
+  metadataTag: Metadata[];
   tags: Tag[];
   packages: Package[];
   faqs: Faq[];

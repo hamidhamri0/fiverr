@@ -69,7 +69,11 @@ export default function GigSlides() {
           {/* <GridSlider.Container>
             <GridSlider.Grid>
               <Gigs
-                // data={}
+                data={[
+                  { id: 1, name: "Gig 1" },
+                  { id: 2, name: "Gig 2" },
+                  { id: 3, name: "Gig 3" },
+                ]}
               />
             </GridSlider.Grid>
           </GridSlider.Container> */}
