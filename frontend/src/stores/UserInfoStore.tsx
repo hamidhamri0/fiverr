@@ -1,6 +1,6 @@
 // src/stores/counter-store.ts
 "use client";
-import { ReactNode, createContext, useContext, useRef } from "react";
+import { ReactNode, createContext, useContext, useEffect, useRef } from "react";
 import { useStore } from "zustand";
 import { createStore } from "zustand/vanilla";
 

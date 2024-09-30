@@ -1,6 +1,6 @@
 import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { IoMdCheckmark } from "react-icons/io";
-import Button from "./ui/Button";
+import Button from "./ui/Btn";
 import { FcGoogle } from "react-icons/fc";
 import { MdOutlineEmail } from "react-icons/md";
 import { FaApple, FaFacebookF } from "react-icons/fa";

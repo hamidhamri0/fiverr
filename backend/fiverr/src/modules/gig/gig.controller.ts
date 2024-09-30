@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { GigService } from './gig.service';
 import { GigDTO } from './DTO/gig.dto';
-import { Gig } from './gig.entity';
+import { Gig, GigStatus } from './gig.entity';
 import { SaveGigWithPackagesDTO } from './DTO/save-gig-with-packages.dto';
 // import { UpdateGigDTO } from './DTO/update-gig-dto';
 
@@ -37,7 +37,6 @@ export class GigController {
     @Body() gigDto: SaveGigWithPackagesDTO,
   ): Promise<Gig> {
     try {
-      console.log(gigDto);
       return await this.gigService.saveGigWithPackages(gigId, gigDto);
     } catch (e) {
       console.log('error', e);
@@ -54,17 +53,10 @@ export class GigController {
     }
   }
 
-  // @Post('/updateGig/:id')
-  // async updateGig(
-  //   @Param('id', new ParseUUIDPipe()) id: string,
-  //   @Body() updateGigDto: UpdateGigDTO,
-  // ): Promise<Gig> {
-  //   try {
-  //     return this.gigService.updateGig(id, updateGigDto);
-  //   } catch (e) {
-  //     throw new HttpException(e.message, 404);
-  //   }
-  // }
+  @Get('getAllGigs')
+  async getAllGigs(): Promise<Gig[]> {
+    return await this.gigService.getAllGigs();
+  }
 
   @Get('getOneById/:id')
   async getGig(@Param('id') id: string): Promise<Gig> {
@@ -76,21 +68,19 @@ export class GigController {
     }
   }
   @Get('getAllGigsByUserId/:userId')
-  async getAllGigsByUserId(@Param('userId') id: string): Promise<Gig[]> {
-    try {
-      return this.gigService.getAllGigsByUserId(id);
-    } catch (err) {
-      console.log('first error', err);
-      throw new HttpException('Gig not found', 404);
-    }
+  async getAllGigsByUserId(
+    @Param('userId') id: string,
+    @Query('status') status: GigStatus,
+  ): Promise<Gig[]> {
+    return await this.gigService.getAllGigsByUserId(id, status);
   }
-  @Post('deleteGig/:gigId')
-  async deleteGig(@Param('gigId') id: string) {
-    try {
-      return this.gigService.deleteGig(id);
-    } catch (err) {
-      console.log('first error', err);
-      throw new HttpException('Gig not found', 404);
-    }
+  @Post('deleteGig')
+  async deleteGig(@Body('gigIds') gigIds: string[]) {
+    return this.gigService.deleteGig(gigIds);
+  }
+
+  @Post('pauseGig/:gigId')
+  async pauseGig(@Param('gigId') id: string) {
+    return this.gigService.pauseGig(id);
   }
 }

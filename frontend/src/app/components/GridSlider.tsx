@@ -1,25 +1,27 @@
+"use client";
+
+import useSlide from "@/Hooks/useSlide";
 import {
+  Fragment,
   createContext,
-  useContext,
-  useState,
   ReactNode,
-  MouseEvent,
+  useContext,
   useEffect,
+  useState,
 } from "react";
-import useSlide from "../../Hooks/useSlide";
+import { FaChevronLeft, FaChevronRight } from "react-icons/fa6";
 import { twMerge } from "tailwind-merge";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 type GridSliderContextType = {
   isFirstElementVisible: boolean;
   isLastElementVisible: boolean;
   scrollRef: React.RefObject<HTMLDivElement>;
-  scrollLeftHandler: (e: MouseEvent) => void;
-  scrollRightHandler: (e: MouseEvent) => void;
-  onMouseDown: (e: MouseEvent) => void;
-  onMouseMove: (e: MouseEvent) => void;
-  onMouseUp: (e: MouseEvent) => void;
-  onMouseLeave: (e: MouseEvent) => void;
+  scrollLeftHandler: (e: React.MouseEvent) => void;
+  scrollRightHandler: (e: React.MouseEvent) => void;
+  onMouseDown: (e: React.MouseEvent) => void;
+  onMouseMove: (e: React.MouseEvent) => void;
+  onMouseUp: (e: React.MouseEvent) => void;
+  onMouseLeave: (e: React.MouseEvent) => void;
 };
 
 export const GridSliderContext = createContext<
@@ -126,7 +128,7 @@ function SlidersArrows() {
   } = context;
 
   return (
-    <>
+    <Fragment>
       {!isFirstElementVisible && (
         <button
           onClick={scrollLeftHandler}
@@ -149,7 +151,7 @@ function SlidersArrows() {
           />
         </button>
       )}
-    </>
+    </Fragment>
   );
 }
 
@@ -222,32 +224,32 @@ interface ButtonProps {
   onClick?: () => void;
 }
 
-function Button({ children, icon, onClick }: ButtonProps) {
-  const context = useContext(GridSliderContext);
-  if (!context) {
-    throw new Error("Button must be used within a GridSlider");
-  }
-  const { close } = context;
+// function Button({ children, icon, onClick }: ButtonProps) {
+//   const context = useContext(GridSliderContext);
+//   if (!context) {
+//     throw new Error("Button must be used within a GridSlider");
+//   }
+//   const { close } = context;
 
-  function handleClick() {
-    onClick?.();
-    close();
-  }
+//   function handleClick() {
+//     onClick?.();
+//     close();
+//   }
 
-  return (
-    <li>
-      <div onClick={handleClick}>
-        {icon}
-        <span>{children}</span>
-      </div>
-    </li>
-  );
-}
+//   return (
+//     <li>
+//       <div onClick={handleClick}>
+//         {icon}
+//         <span>{children}</span>
+//       </div>
+//     </li>
+//   );
+// }
 
 GridSlider.Container = Container;
 GridSlider.Grid = Grid;
 GridSlider.SlidersArrows = SlidersArrows;
 GridSlider.SlidersNav = SlidersNav;
-GridSlider.Button = Button;
+// GridSlider.Button = Button;
 
 export default GridSlider;

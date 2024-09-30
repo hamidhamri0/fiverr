@@ -1,18 +1,12 @@
-import {
-  BadRequestException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { Package } from './package.entity';
 import { EntityManager, Feature, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PackageFeature } from '../package-feature/package-feature.entity';
 import { createPackageDTO } from './DTO/createPackageDto';
 import { FeatureService } from '../feature/feature.service';
-import { PackageFeatureService } from '../package-feature/package-feature.service';
 import { Gig } from '../gig/gig.entity';
 import { GigService } from '../gig/gig.service';
-import { updatePackageDTO } from './DTO/updatePackageDto';
 
 @Injectable()
 export class PackageService {
@@ -44,8 +38,9 @@ export class PackageService {
     transactionalEntityManager: EntityManager,
   ) {
     const gig = await this.gigService.findOneById(gigId);
-    console.log(gig, gigId);
-    gig.step = 3;
+    if (gig.step < 3) {
+      gig.step = 3;
+    }
     if (!gig) {
       throw new Error(`Gig with id ${gigId} not found`);
     }
@@ -162,6 +157,13 @@ export class PackageService {
       await updatePackageFeatures('basic', createPackageDTO.basic);
       await updatePackageFeatures('standard', createPackageDTO.standard);
       await updatePackageFeatures('premium', createPackageDTO.premium);
+      if (gig.step < 3) {
+        await transactionalEntityManager.update(
+          Gig,
+          { id: gigId },
+          { step: 3 },
+        );
+      }
 
       return this.findOneByGigId(gigId);
     } catch (error) {

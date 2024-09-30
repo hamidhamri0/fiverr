@@ -9,8 +9,6 @@ export async function getUser(): Promise<User | null> {
     });
     return userSession;
   } catch (error) {
-    console.error("Error fetching user:", error);
-    // throw new Error("Error fetching user");
     return null;
   }
 }

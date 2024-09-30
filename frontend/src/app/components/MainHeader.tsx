@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useEffect } from "react";
 import Header from "./Header";
 import Categories from "./Categories";
 import Modal from "./Modal";
@@ -7,9 +7,10 @@ import LoginCard from "./LoginCard";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 
 const MainHeader: React.FC = () => {
+  useEffect(() => console.log("MainHeader"), []);
   return (
     <Modal>
-      <div className="mb-12 h-[130px]">
+      <div className="h-[130px]">
         <div className="fixed left-0 top-0 z-50 w-full">
           <Header />
           <Categories />

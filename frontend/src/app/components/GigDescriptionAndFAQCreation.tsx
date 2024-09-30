@@ -6,11 +6,13 @@ import { Tag } from "@/types/gig.interface";
 import { useUserInfoStore } from "@/stores/UserInfoStore";
 import { post } from "@/lib/utils/customFetch";
 import toast from "react-hot-toast";
+import SpinnerCenterWithBlur from "./ui/SpinnerCenterWithBlur";
+import Spinner from "./ui/Spinner";
 
 export default function GigDescriptionAndFAQCreation({
   onClick,
 }: {
-  onClick: () => void;
+  onClick: (cb: (wizard: number) => number) => void;
 }) {
   const {
     handleSubmit,
@@ -24,6 +26,10 @@ export default function GigDescriptionAndFAQCreation({
 
   async function submit(data: any) {
     const gig = getValues();
+    if (gig.step <= 2) {
+      onClick(() => gig.step);
+      return;
+    }
     setLoading(true);
     let metadata: { [key: number]: number[] | number } = {};
     for (const meta in gig.metadataTag) {
@@ -56,7 +62,10 @@ export default function GigDescriptionAndFAQCreation({
     try {
       await post(`/gig/saveGig?gigId=${gig.id}`, body);
       toast.success("Gig Description and FAQ saved successfully");
-      onClick();
+      if (gig.step < 4) {
+        setValue("step", 4);
+      }
+      onClick((p) => p + 1);
     } catch (err) {
       toast.success(err.message);
       // console.log(err);
@@ -239,11 +248,16 @@ export default function GigDescriptionAndFAQCreation({
       <RichTextEditor />
       <p className="mb-12 border-b border-gray-200"></p>
       <GigFAQCreation />
+      {loading && <SpinnerCenterWithBlur />}
       <button
         onClick={handleSubmit(submit)}
         className="mt-4 w-full rounded-lg bg-green-500 py-2 text-white"
       >
-        Save & Continue
+        {loading ? (
+          <Spinner height={10} width={10} color="fill-green-500" />
+        ) : (
+          "Save & Continue"
+        )}
       </button>
       <button
         onClick={fillWithData}

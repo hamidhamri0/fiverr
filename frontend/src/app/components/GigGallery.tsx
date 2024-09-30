@@ -1,21 +1,15 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { Button } from "@/app/components/button";
 import { Card, CardContent } from "@/app/components/card";
-import { Input } from "@/app/components/input";
 import { Label } from "@/app/components/label";
 import { ImageIcon, VideoIcon, FileIcon, XCircleIcon } from "lucide-react";
 import SpinnerCenterWithBlur from "./ui/SpinnerCenterWithBlur";
 import { GigData } from "@/types/gig.interface";
 import { toast } from "react-hot-toast";
-
-type FormData = {
-  images: FileList[];
-  video: FileList;
-  documents: FileList[];
-};
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_IMAGE_TYPES = [
@@ -64,7 +58,11 @@ const CircularProgressBar = ({ progress }: { progress: number }) => {
   );
 };
 
-export default function GigGallery({ onClick }: { onClick: () => void }) {
+export default function GigGallery({
+  onClick,
+}: {
+  onClick: (cb: (wizard: number) => number) => void;
+}) {
   const {
     control,
     getValues,
@@ -78,8 +76,6 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [isDatabaseUploading, setIsDataBaseUploading] = useState(false);
-
-  console.log(errors, "ERRORS");
 
   const generateThumbnail = (url: string) => {
     const videoElement = document.createElement("video");
@@ -113,6 +109,10 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
   };
 
   const onSubmit = async () => {
+    if (gig.step < 5) {
+      onClick(() => gig.step);
+      return;
+    }
     setIsUploading(true);
     setUploadProgress(0);
 
@@ -162,12 +162,26 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
 
     xhr.onloadend = () => {
       if (xhr.status >= 200 && xhr.status < 300) {
+        const response: {
+          imageUrls: string[];
+          videoUrl: { videoUrl: string; thumbnail: string };
+          pdfUrls: string[];
+        } = JSON.parse(xhr.responseText);
+        if (typeof response === "object" && response !== null) {
+          setValue("imageUrls", []);
+          setValue("videoUrl", undefined);
+          setValue("pdfUrls", []);
+          setValue("imageUrlsPreview", response.imageUrls);
+          setValue("videoUrlPreview", response.videoUrl);
+          setValue("pdfUrlsPreview", response.pdfUrls);
+        }
         toast.success("files uploaded successfully");
         setIsDataBaseUploading(false);
-        onClick();
+        onClick((p) => p + 1);
+        setValue("step", 6);
       } else {
-        let error = JSON.parse(xhr.responseText).message;
-        toast.error(error);
+        // let error = JSON.parse(xhr.responseText).message;
+        toast.error(xhr.responseText);
         setIsDataBaseUploading(false);
         setIsUploading(false);
         setUploadProgress(0);
@@ -200,16 +214,14 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
           handleVideoUpload(e);
         } else {
           const newPreviewUrl = URL.createObjectURL(file);
-          setValue("imageUrlsPreview", {
-            ...getValues("imageUrlsPreview"), // Preserve existing values
-            [index as number]: newPreviewUrl, // Set key 1 to "hamid"
-          });
+          const newPdfUrls = [...getValues("imageUrlsPreview")];
+          newPdfUrls[index as number] = newPreviewUrl;
+          setValue("imageUrlsPreview", newPdfUrls);
         }
       } else {
-        setValue("pdfUrlsPreview", {
-          ...getValues("pdfUrlsPreview"),
-          [index as number]: file.name,
-        });
+        const newPdfUrls = [...getValues("pdfUrlsPreview")];
+        newPdfUrls[index as number] = file.name;
+        setValue("pdfUrlsPreview", newPdfUrls);
       }
     }
   };
@@ -220,6 +232,19 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
       gig[`imageUrlsPreview`]?.filter((_, i) => i !== index),
     );
     setValue(`imageUrls.${index}`, undefined);
+  }
+
+  function handleDeleteVideo() {
+    setValue("videoUrlPreview", {});
+    setValue("videoUrl", undefined);
+  }
+
+  function handleDeletePdf(index: number) {
+    setValue(
+      `pdfUrlsPreview`,
+      gig[`pdfUrlsPreview`]?.filter((_, i) => i !== index),
+    );
+    setValue(`pdfUrls.${index}`, undefined);
   }
 
   return (
@@ -312,12 +337,12 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
                           className="h-full w-full object-cover"
                         />
                       ) : !disabledUnusedInputs("imageUrlsPreview", index) ? (
-                        <>
+                        <Fragment>
                           <ImageIcon className="mb-2 h-12 w-12 text-gray-400" />
                           <p className="text-sm text-blue-600">
                             Drag & drop a Photo or Browse
                           </p>
-                        </>
+                        </Fragment>
                       ) : null}
                       <Input
                         id={`image-${index}`}
@@ -354,7 +379,16 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
           <p className="mb-4 text-sm text-gray-500">
             Please choose a video shorter than 75 seconds and smaller than 50MB
           </p>
-          <div className="flex aspect-video flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 p-4 text-center">
+          <div className="relative flex aspect-video flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 p-4 text-center">
+            {gig[`videoUrlPreview`]?.thumbnail && (
+              <button
+                onClick={() => handleDeleteVideo()}
+                className="absolute right-2 top-2 z-10 rounded-full bg-white p-1 text-gray-500 hover:text-red-500 focus:outline-none"
+                aria-label={`Delete vide `}
+              >
+                <XCircleIcon className="h-5 w-5" />
+              </button>
+            )}
             <Controller
               name="videoUrl"
               control={control}
@@ -383,28 +417,28 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
                   htmlFor="video"
                   className="flex h-full w-full cursor-pointer flex-col items-center justify-center"
                 >
-                  {gig["videoUrlPreview"]?.thumbnail ? (
+                  {gig?.videoUrlPreview?.thumbnail ? (
                     <div className="relative h-full w-full">
-                      <>
+                      <Fragment>
                         <img
                           src={gig["videoUrlPreview"].thumbnail}
                           alt="Video thumbnail"
                           className="h-full w-full object-cover"
                         />
-                      </>
-                      {!gig["videoUrlPreview"]?.thumbnail && (
+                      </Fragment>
+                      {!gig.videoUrlPreview?.thumbnail && (
                         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
                           <VideoIcon className="h-16 w-16 text-white" />
                         </div>
                       )}
                     </div>
                   ) : (
-                    <>
+                    <Fragment>
                       <VideoIcon className="mb-2 h-12 w-12 text-gray-400" />
                       <p className="text-sm text-blue-600">
                         Drag & drop a Video or Browse
                       </p>
-                    </>
+                    </Fragment>
                   )}
                   <Input
                     id="video"
@@ -435,8 +469,18 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
             {[0, 1].map((index) => (
               <div
                 key={index}
-                className="flex aspect-square flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 p-4 text-center"
+                className="relative flex aspect-square flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 p-4 text-center"
               >
+                {gig?.pdfUrlsPreview?.[index] &&
+                  !disabledUnusedInputs("pdfUrlsPreview", index) && (
+                    <button
+                      onClick={() => handleDeletePdf(index)}
+                      className="absolute right-2 top-2 z-10 rounded-full bg-white p-1 text-gray-500 hover:text-red-500 focus:outline-none"
+                      aria-label={`Delete pdf ${index + 1}`}
+                    >
+                      <XCircleIcon className="h-5 w-5" />
+                    </button>
+                  )}
                 <Controller
                   name={`pdfUrls.${index}` as any}
                   control={control}
@@ -458,7 +502,7 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
                       className="flex h-full w-full cursor-pointer flex-col items-center justify-center"
                     >
                       {gig[`pdfUrlsPreview`] && gig[`pdfUrlsPreview`][index] ? (
-                        <>
+                        <Fragment>
                           <FileIcon className="mb-2 h-12 w-12 text-gray-400" />
                           <p className="text-sm text-blue-600">
                             {
@@ -468,14 +512,14 @@ export default function GigGallery({ onClick }: { onClick: () => void }) {
                                 ?.split("?")[0]
                             }
                           </p>
-                        </>
+                        </Fragment>
                       ) : !disabledUnusedInputs("pdfUrlsPreview", index) ? (
-                        <>
+                        <Fragment>
                           <FileIcon className="mb-2 h-12 w-12 text-gray-400" />
                           <p className="text-sm text-blue-600">
                             Drag & drop a PDF or Browse
                           </p>
-                        </>
+                        </Fragment>
                       ) : null}
                       <Input
                         id={`document-${index}`}

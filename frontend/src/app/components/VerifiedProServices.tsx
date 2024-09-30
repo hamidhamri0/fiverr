@@ -3,7 +3,7 @@ import { Gigs } from "./GigSlides";
 
 export default function VerifiedProServices() {
   return (
-    <div className="mx-auto mb-8 max-w-[1450px] overflow-hidden bg-gray-100 bg-opacity-50 px-3 pb-12 pt-8">
+    <div className="mb-8 overflow-hidden bg-gray-100 bg-opacity-50 px-6 pb-12 pt-8">
       <h3 className="px-4 py-2 text-2xl font-bold text-gray-900 sm:text-xl">
         Verified Pro services in Logo Design
       </h3>

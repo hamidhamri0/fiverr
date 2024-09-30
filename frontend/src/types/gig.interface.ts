@@ -63,15 +63,13 @@ export type Faq = {
   position: number;
 };
 
-export type GigData = {
+export interface SharedGigProperties {
   id: string;
   title: string;
   aboutGig: AboutGig;
   description: string;
   isPublished: boolean;
-  step: string;
-  createdAt: string;
-  updatedAt: string;
+  step: number;
   category: Category;
   subcategory: Subcategory;
   service: Service;
@@ -84,12 +82,68 @@ export type GigData = {
   impressions: number;
   cancellations: number;
   questions: Questions;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export type GigFromFetch = {
+  id: string;
+  title: string;
+  aboutGig: AboutGig;
+  description: string;
+  isPublished: boolean;
+  step: number;
+  category: Category;
+  subcategory: Subcategory;
+  service: Service;
+  metadata: Metadata[];
+  tags: Tag[];
+  packages: Package[];
+  faqs: Faq[];
+  clicks: number;
+  orders: number;
+  impressions: number;
+  cancellations: number;
+  questions: Questions;
+  createdAt: string;
+  updatedAt: string;
+};
+
+export type ResultMetadata = {
+  [key: string]: string | string[];
+};
+
+export type ResultPackageFeature = {
+  [key: string]: string;
+};
+
+export type GigData = {
+  id: string;
+  title: string;
+  aboutGig: AboutGig;
+  description: string;
+  isPublished: boolean;
+  step: number;
+  createdAt: string;
+  updatedAt: string;
+  category: Category;
+  subcategory: Subcategory;
+  service: Service;
+  metadataTag: ResultMetadata[];
+  tags: Tag[];
+  packages: Package[];
+  faqs: Faq[];
+  clicks: number;
+  orders: number;
+  impressions: number;
+  cancellations: number;
+  questions: Questions;
   imageUrls: File[] | undefined[];
   imageUrlsPreview: string[];
-  videoUrl: File;
+  videoUrl: File | undefined;
   videoUrlPreview: {
-    videoUrl: string;
-    thumbnail: string;
+    videoUrl?: string;
+    thumbnail?: string;
   };
   pdfUrls: File[] | undefined[];
   pdfUrlsPreview: string[];

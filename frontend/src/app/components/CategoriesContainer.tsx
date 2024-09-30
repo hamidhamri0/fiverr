@@ -1,3 +1,4 @@
+"use client";
 import React, { ReactNode, useEffect, useState, useRef } from "react";
 import { FaChevronLeft, FaChevronRight, FaVideo } from "react-icons/fa";
 import { HiOutlineComputerDesktop } from "react-icons/hi2";
@@ -5,39 +6,49 @@ import { IoIosMusicalNotes, IoMdBusiness } from "react-icons/io";
 import { LiaDigitalTachographSolid } from "react-icons/lia";
 import { MdGTranslate } from "react-icons/md";
 import useSlide from "../../Hooks/useSlide";
+import { Button } from "@/components/ui/button";
+import { OpenArrow } from "./Footer";
 
 function CategoryBox({ icon, title }: { icon: ReactNode; title: string }) {
   return (
-    <div className="flex h-full cursor-pointer flex-col items-start gap-4 rounded-xl border border-gray-200 bg-white px-2 py-6 font-semibold text-gray-900 shadow-md hover:bg-green-400 hover:bg-opacity-20">
+    <div className="flex min-h-[144px] basis-32 cursor-pointer flex-col items-start gap-4 rounded-xl border border-gray-200 bg-white px-2 py-6 font-semibold text-gray-900 shadow-md hover:bg-green-400 hover:bg-opacity-20">
       <div>{icon}</div>
       <p>{title}</p>
     </div>
   );
 }
-
+const categories = [
+  "Programming & Tech",
+  "Digital Marketing",
+  "Video & Animation",
+  "Writing & Translation",
+  "Music & Audio",
+  "Business",
+  "Consulting",
+  "Dev",
+  "JavaScript",
+  "Business",
+];
 export default function CategoriesContainer() {
-  const {
-    isFirstElementVisible,
-    isLastElementVisible,
-    scrollRef,
-    scrollLeftHandler,
-    scrollRightHandler,
-    onMouseDown,
-    onMouseMove,
-    onMouseUp,
-    onMouseLeave,
-  } = useSlide();
-
-  const [showMore, setShowMore] = useState(false);
-  const [rows, setRows] = useState(1);
+  const [showAll, setShowAll] = useState(false);
+  const [visibleItems, setVisibleItems] = useState(categories.length);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const calculateRows = () => {
       if (containerRef.current) {
-        const containerHeight = containerRef.current.scrollHeight;
-        const itemHeight = containerRef.current.firstChild?.clientHeight || 0;
-        setRows(Math.ceil(containerHeight / itemHeight));
+        const containerWidth = containerRef.current.clientWidth;
+        const itemWidth = containerRef.current.children[0].clientWidth + 12;
+        const itemsPerRow = Math.floor(containerWidth / itemWidth);
+        setVisibleItems(itemsPerRow);
+        setShowAll(itemsPerRow >= categories.length);
+        console.log(
+          itemsPerRow >= categories.length,
+          itemsPerRow,
+          categories.length,
+          containerWidth,
+          itemWidth,
+        );
       }
     };
 
@@ -47,54 +58,20 @@ export default function CategoriesContainer() {
   }, []);
 
   return (
-    <div className="relative mx-auto max-w-[1450px] px-4">
-      <div
-        onMouseDown={onMouseDown}
-        onMouseMove={onMouseMove}
-        onMouseUp={onMouseUp}
-        onMouseLeave={onMouseLeave}
-        ref={scrollRef}
-        className="overflow-hidden"
-      >
-        <div
-          ref={containerRef}
-          className={`mb-16 grid auto-cols-[123px] grid-flow-col auto-rows-[140px] gap-4 p-2 lg:grid-flow-row lg:grid-cols-[repeat(auto-fill,_minmax(123px,_1fr))] ${
-            showMore ? "" : "max-h-[calc((2*140px)+24px)] overflow-hidden"
-          }`}
-        >
-          <CategoryBox
-            icon={<HiOutlineComputerDesktop size={30} />}
-            title="Programming & Tech"
-          />
-          <CategoryBox
-            icon={<LiaDigitalTachographSolid size={30} />}
-            title="Digital Marketing"
-          />
-          <CategoryBox icon={<FaVideo size={30} />} title="Video & Animation" />
-          <CategoryBox
-            icon={<MdGTranslate size={30} />}
-            title="Writing & Translation"
-          />
-          <CategoryBox
-            icon={<IoIosMusicalNotes size={30} />}
-            title="Music & Audio"
-          />
-          <CategoryBox icon={<IoMdBusiness size={30} />} title="Business" />
-          <CategoryBox
-            icon={<HiOutlineComputerDesktop size={30} />}
-            title="Consulting"
-          />
-          <CategoryBox
-            icon={<HiOutlineComputerDesktop size={30} />}
-            title="Dev"
-          />
-          <CategoryBox
-            icon={<HiOutlineComputerDesktop size={30} />}
-            title="JavaScript"
-          />
-          <CategoryBox icon={<IoMdBusiness size={30} />} title="Business" />
+    <div className="relative mx-auto mb-12 max-w-[1450px] px-4">
+      <div className="overflow-hidden">
+        <div ref={containerRef} className={`mb-4 flex flex-wrap gap-3 p-2`}>
+          {categories
+            .slice(0, showAll ? categories.length : visibleItems)
+            .map((category, index) => (
+              <CategoryBox
+                key={index}
+                icon={<HiOutlineComputerDesktop size={30} />}
+                title={category}
+              />
+            ))}
         </div>
-        {!isFirstElementVisible && (
+        {/* {!isFirstElementVisible && (
           <button
             onClick={scrollLeftHandler}
             className={`absolute left-0 top-1/2 z-50 -translate-x-1/2 -translate-y-1/2 cursor-pointer rounded-full bg-white p-6 shadow-md xs:hidden`}
@@ -115,15 +92,21 @@ export default function CategoriesContainer() {
               className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
             />
           </button>
-        )}
+        )} */}
       </div>
-      {rows > 2 && (
-        <button
-          onClick={() => setShowMore(!showMore)}
-          className="mx-auto mt-4 block rounded bg-blue-500 px-4 py-2 text-white"
-        >
-          {showMore ? "Show Less" : "Show More"}
-        </button>
+      {visibleItems < categories.length && (
+        <div>
+          <div className="mb-2 flex h-[1px] w-full justify-center bg-gray-200"></div>
+          <div
+            onClick={() => setShowAll(!showAll)}
+            className="mb-2 flex w-full cursor-pointer items-center justify-center rounded-md p-2 hover:bg-gray-100"
+          >
+            <div className="flex items-center gap-4">
+              <span>{showAll ? "Show less" : "Show more"}</span>
+              <OpenArrow className="block" isOpen={showAll} />
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

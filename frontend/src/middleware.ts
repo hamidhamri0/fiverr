@@ -7,11 +7,13 @@ import { User } from "./stores/UserInfoStore";
 export async function middleware(request: NextRequest) {
   const cookie = cookies().toString();
   try {
-    const user = await get<User>("/auth/session", {
-      isCookie: cookie,
-    });
+    // const user = await get<User>("/auth/session", {
+    //   isCookie: cookie,
+    // });
 
-    console.log(user, "MIDDLEWARE");
+    // if (user.isNew) {
+    //   return NextResponse.redirect(new URL("/", request.url));
+    // }
 
     return NextResponse.next();
   } catch (error) {

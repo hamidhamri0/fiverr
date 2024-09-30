@@ -5,9 +5,9 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common';
-import { Gig } from './gig.entity';
+import { Gig, GigStatus } from './gig.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { EntityManager, Repository } from 'typeorm';
+import { EntityManager, In, Repository } from 'typeorm';
 import { GigDTO } from './DTO/gig.dto';
 import { Category } from '../category/category.entity';
 import { Service } from '../service/service.entity';
@@ -17,7 +17,6 @@ import { Metadata } from '../metadata/metadata.entity';
 import { MetadataTag } from '../metadata-tag/metadata-tag.entity';
 import { Tag } from '../tag/tag.entity';
 import { FAQ } from '../faq/faq.entity';
-import { FaqService } from '../faq/faq.service';
 import { SubcategoryService } from '../subcategory/subcategory.service';
 import { SaveGigWithPackagesDTO } from './DTO/save-gig-with-packages.dto';
 import { PackageService } from '../package/package.service';
@@ -29,6 +28,7 @@ export class GigService {
     private gigRepository: Repository<Gig>,
     @Inject(forwardRef(() => PackageService))
     private packageService: PackageService,
+    private subcategoryService: SubcategoryService,
   ) {}
 
   async updateGigAbout(gigId: string, aboutGig: string): Promise<Gig> {
@@ -58,6 +58,9 @@ export class GigService {
     gig.imageUrls = files.imageUrls;
     gig.pdfUrls = files.pdfUrls;
     gig.videoUrl = files.videoUrl;
+    if (gig.step < 6) {
+      gig.step = 6;
+    }
     return this.gigRepository.save(gig);
   }
 
@@ -67,40 +70,55 @@ export class GigService {
       throw new HttpException('Gig not found', 404);
     }
     gig.isPublished = true;
+    gig.step = 7;
     return this.gigRepository.save(gig);
   }
 
-  async getAllGigsByUserId(userId: string): Promise<Gig[]> {
+  async getAllGigsByUserId(userId: string, status: GigStatus): Promise<Gig[]> {
     return this.gigRepository.find({
-      where: { user: { id: userId } },
+      where: {
+        user: { id: userId },
+        status: status ? status : GigStatus.ACTIVE,
+      },
+      select: [
+        'id',
+        'title',
+        'status',
+        'imageUrls',
+        'clicks',
+        'impressions',
+        'cancellations',
+        'orders',
+      ],
     });
   }
 
-  async deleteGig(gigId: string) {
-    await this.gigRepository.delete({ id: gigId });
+  async deleteGig(gigIds: string[]) {
+    try {
+      this.gigRepository.delete({
+        id: In(gigIds),
+      });
+    } catch (err) {
+      //handle error of json parse
+      throw new HttpException(err.message, 404);
+    }
     return HttpStatus.NOT_MODIFIED;
   }
 
-  // async saveFiles(gigId: string, type: string, url: string) {
-  //   const gig = await this.findOneById(gigId);
-  //   if (!gig) {
-  //     throw new HttpException('Gig not found', 404);
-  //   }
-  //   if (type === 'image') {
-  //     gig.imageUrls.push(url);
-  //   } else if (type === 'video') {
-  //     gig.videoUrl = url;
-  //   } else if (type === 'pdf') {
-  //     gig.pdfUrls.push(url);
-  //   }
-  //   return this.gigRepository.save(gig);
-  // }
+  async pauseGig(gigId: string) {
+    const gig = await this.findOneById(gigId);
+    if (!gig) {
+      throw new HttpException('Gig not found', 404);
+    }
+    gig.status = GigStatus.PAUSED;
+    await this.gigRepository.save(gig);
+    return HttpStatus.NOT_MODIFIED;
+  }
 
   async saveGigWithPackages(
     gigId: string,
     gigDto: SaveGigWithPackagesDTO,
   ): Promise<Gig> {
-    // run transaction
     return await this.gigRepository.manager.transaction(
       async (transactionalEntityManager) => {
         const { basic, standard, premium, ...gig } = gigDto;
@@ -186,12 +204,11 @@ export class GigService {
       gig.title = title;
       gig.category = { id: categoryId } as Category;
       gig.service = { id: serviceId } as Service;
-      // const existingCategory =
-      //   await this.subcategoryService.findOneById(subcategoryId);
-      // if (gig.subcategory && gig.subcategory.name !== existingCategory.name) {
-      //   gig.packages = [];
-      //   gig.isPublished = false;
-      // }
+      const existingCategory =
+        await this.subcategoryService.findOneById(subcategoryId);
+      if (gig.subcategory && gig.subcategory.name !== existingCategory.name) {
+        gig.packages = [];
+      }
       gig.subcategory = { id: subcategoryId } as Subcategory;
       gig.user = { id: String(userId) } as User;
       gig.metadata = metadataIds;
@@ -203,7 +220,9 @@ export class GigService {
             gig.faqs = gig.faqs.filter((f) => f.id !== faq.id);
           }
         }
-        gig.step = 4;
+        if (gig.step < 4) {
+          gig.step = 4;
+        }
         gig.aboutGig = aboutGig;
         for (const faq of faqs) {
           if (!faq?.id) {
@@ -229,6 +248,32 @@ export class GigService {
       console.log(e);
       throw e;
     }
+  }
+
+  async getAllGigsQuery() {
+    const queryBuilder = this.gigRepository
+      .createQueryBuilder('gig')
+
+      .leftJoinAndSelect('gig.category', 'category')
+      .leftJoinAndSelect('gig.subcategory', 'subcategory')
+      .leftJoinAndSelect('gig.service', 'service')
+      .leftJoinAndSelect('gig.metadata', 'metadata')
+      .leftJoinAndSelect(
+        'metadata.metadataTags',
+        'metadata_tags',
+        'metadata_tags.id IN (SELECT gmt."metadataTagId" FROM gig_metadata_tags gmt WHERE gmt."gigId" = gig.id)',
+      )
+      .leftJoinAndSelect('gig.tags', 'tags')
+      .leftJoinAndSelect('gig.packages', 'packages')
+      .leftJoinAndSelect('packages.packageFeatures', 'packageFeatures')
+      .leftJoinAndSelect('gig.faqs', 'faqs')
+      .orderBy('faqs.position', 'ASC')
+      .leftJoinAndSelect('gig.questions', 'question');
+    return queryBuilder;
+  }
+
+  async getAllGigs() {
+    return (await this.getAllGigsQuery()).getMany();
   }
 
   async getGigWithAllRelations(id: string): Promise<Gig> {

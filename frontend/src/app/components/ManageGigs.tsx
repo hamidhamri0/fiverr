@@ -1,7 +1,7 @@
 "use client";
-import React from "react";
+import React, { useTransition } from "react";
 import { ChevronDown, Plus, Pencil, Trash, Pause } from "lucide-react";
-import { Button } from "@/app/components/button";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardHeader,
@@ -22,62 +22,130 @@ import {
   TableHeader,
   TableRow,
 } from "@/app/components/table";
-import { Checkbox } from "@/app/components/checkbox";
+import { Checkbox } from "@/components/ui/checkbox";
 import { GigData } from "@/types/gig.interface";
 import { toast } from "react-hot-toast";
 import { deleteGig } from "@/lib/gig/actionDeleteGig";
 import { useFormState } from "react-dom";
 import { useRouter } from "next/navigation";
+import { pauseGig } from "@/lib/gig/actionPauseGig";
+import { getGigs } from "@/lib/gig/actionGetGigs";
+import SpinnerCenterWithBlur from "./ui/SpinnerCenterWithBlur";
 
 const tabs = [
-  "ACTIVE",
-  "PENDING APPROVAL",
-  "REQUIRES MODIFICATION",
-  "DRAFT",
-  "DENIED",
-  "PAUSED",
-];
+  "active",
+  "pending approval",
+  "draft",
+  "denied",
+  "paused",
+] as const;
 
-export default function Component({ gigs }: { gigs: GigData[] }) {
+const TabStatus = {
+  active: "active",
+  "pending approval": "pending",
+  draft: "draft",
+  denied: "denied",
+  paused: "paused",
+} as const;
+
+export default function Component({
+  initialState: gigs,
+  status,
+}: {
+  initialState: GigData[];
+  status: string;
+}) {
   const router = useRouter();
-  const [activeTab, setActiveTab] = React.useState("DRAFT");
+
   const [timeFilter, setTimeFilter] = React.useState("LAST 30 DAYS");
-  const [state, formAction] = useFormState(deleteGig, {
+  const [selectedGigs, setSelectedGigs] = React.useState<string[]>([]);
+  const [isPending, startTransition] = useTransition();
+
+  const [stateDelete, handleDeleteAction] = useFormState(deleteGig, {
     success: false,
     message: "",
   });
 
-  const handleDelete = (gigId: string) => {
+  const [statePause, handlePauseAction] = useFormState(pauseGig, {
+    success: false,
+    message: "",
+  });
+
+  const handleDelete = (...gigIds: string[]) => {
     const formData = new FormData();
-    formData.append("gigId", gigId);
-    formAction(formData);
+    gigIds.forEach((el) => {
+      formData.append("gigIds", el);
+    });
+    startTransition(() => {
+      handleDeleteAction(formData);
+    });
   };
 
-  React.useEffect(() => {
-    if (state.success) {
-      toast.success("Gig deleted successfully");
-    } else if (state.message) {
-      toast.error(state.message || "Something went wrong");
+  const handlePause = (gigId: string) => {
+    const formData = new FormData();
+    formData.append("gigId", gigId);
+    startTransition(() => {
+      handlePauseAction(formData);
+    });
+  };
+
+  function handleChangeTab(tabIndex: number) {
+    const tab = TabStatus[tabs[tabIndex]];
+    startTransition(() => {
+      router.push(`/manage_gigs?status=${tab}`);
+    });
+  }
+
+  function handleSelectedGig(...indexes: string[]) {
+    if (indexes.length === 1) {
+      const alreadyExist = selectedGigs.includes(indexes[0]);
+      if (alreadyExist) {
+        const selected = selectedGigs.filter((id) => id !== indexes[0]);
+        setSelectedGigs(selected);
+        return;
+      }
+    } else {
+      const allSelected = indexes.every((id) => selectedGigs.includes(id));
+      if (allSelected) {
+        const selected = selectedGigs.filter((id) => !indexes.includes(id));
+        setSelectedGigs(selected);
+        return;
+      }
     }
-  }, [state]);
+    const selected = [...selectedGigs, ...indexes];
+    setSelectedGigs(selected);
+  }
+
+  React.useEffect(() => {
+    if (stateDelete?.success) {
+      toast.success("Gig deleted successfully");
+    } else if (stateDelete?.message) {
+      toast.error(stateDelete?.message || "Something went wrong");
+    } else if (statePause?.success) {
+      toast.success("Gig paused successfully");
+    } else if (statePause?.message) {
+      toast.error(statePause.message || "Something went wrong");
+    }
+  }, [stateDelete, statePause]);
 
   return (
     <div className="container mx-auto max-w-[1450px] p-4">
+      {isPending && <SpinnerCenterWithBlur />}
       <Card className="rounded-lg border border-gray-200">
         <CardContent className="p-6">
           <div className="mb-6 flex flex-wrap items-center justify-between">
             <div className="mb-2 flex flex-wrap gap-2 sm:mb-0">
-              {tabs.map((tab) => (
+              {tabs.map((tab, index) => (
                 <Button
                   key={tab}
-                  variant={activeTab === tab ? "default" : "secondary"}
-                  onClick={() => setActiveTab(tab)}
+                  variant={status === TabStatus[tab] ? "default" : "secondary"}
+                  onClick={() => handleChangeTab(index)}
                   className="text-sm"
                 >
-                  {tab}
-                  {tab === "DRAFT" && (
+                  {tab.toUpperCase()}
+                  {status === TabStatus[tab] && (
                     <span className="ml-1 rounded-full bg-green-500 px-2 py-1 text-xs text-white">
-                      7
+                      {gigs.length}
                     </span>
                   )}
                 </Button>
@@ -119,6 +187,14 @@ export default function Component({ gigs }: { gigs: GigData[] }) {
               <Table>
                 <TableHeader>
                   <TableRow>
+                    <TableHead className="w-[300px]">
+                      <Checkbox
+                        onClick={() =>
+                          handleSelectedGig(...gigs.map((gig) => gig.id))
+                        }
+                        id={`all-gigs`}
+                      />
+                    </TableHead>
                     <TableHead className="w-[300px]">GIG</TableHead>
                     <TableHead>IMPRESSIONS</TableHead>
                     <TableHead>CLICKS</TableHead>
@@ -128,13 +204,23 @@ export default function Component({ gigs }: { gigs: GigData[] }) {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {gigs.map((gig) => (
+                  {gigs.map((gig, index: number) => (
                     <TableRow key={gig.id}>
                       <TableCell className="font-medium">
                         <div className="flex items-center space-x-2">
-                          <Checkbox id={`gig-${gig.id}`} />
+                          <Checkbox
+                            checked={selectedGigs.includes(gig.id)}
+                            onClick={() => handleSelectedGig(gig.id)}
+                            id={`gig-${gig.id}`}
+                          />
                           <div className="max-w-16">
-                            <img src="/images/D1.webp" />
+                            <img
+                              src={
+                                gig.imageUrls.length > 0
+                                  ? gig.imageUrls[0]
+                                  : "https://static.vecteezy.com/system/resources/thumbnails/022/014/063/small_2x/missing-picture-page-for-website-design-or-mobile-app-design-no-image-available-icon-vector.jpg"
+                              }
+                            />
                           </div>
                           <label htmlFor={`gig-${gig.id}`}>{gig.title}</label>
                         </div>
@@ -168,7 +254,9 @@ export default function Component({ gigs }: { gigs: GigData[] }) {
                               <Trash className="mr-2 h-4 w-4" />
                               <span>Delete</span>
                             </DropdownMenuItem>
-                            <DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handlePause(gig.id)}
+                            >
                               <Pause className="mr-2 h-4 w-4" />
                               <span>Pause</span>
                             </DropdownMenuItem>

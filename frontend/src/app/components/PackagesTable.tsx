@@ -1,6 +1,6 @@
 import React from "react";
 import { FaCheck } from "react-icons/fa";
-import Button from "./ui/Button";
+import Button from "./ui/Btn";
 
 type Feature = {
   name: string;

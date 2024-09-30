@@ -3,6 +3,8 @@ import { UserLanguage } from './user-language.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { AdminGuard } from 'src/common/guards/admin.guard';
+import { createLanguageDto } from './DTO/create-language.dto';
+import { User } from '../user/user.entity';
 
 @Injectable()
 @UseGuards(new AdminGuard())
@@ -24,8 +26,12 @@ export class UserLanguageService {
     return this.userLanguageRepository.findOne({ where: { language } });
   }
 
-  async createLanguage(language: string) {
-    let newLanguage = this.userLanguageRepository.create({ language });
+  async createLanguage(id: string, createLanguageDto: createLanguageDto) {
+    if (!id) {
+      throw new NotFoundException('User not found');
+    }
+    let newLanguage = this.userLanguageRepository.create(createLanguageDto);
+    newLanguage.user = { id } as User;
     return this.userLanguageRepository.save(newLanguage);
   }
 

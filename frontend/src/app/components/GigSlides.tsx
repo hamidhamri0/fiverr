@@ -1,64 +1,42 @@
 "use client";
-import React, { useState } from "react";
-import { MdVerified } from "react-icons/md";
-import { FaStar } from "react-icons/fa";
-import { FaHeart } from "react-icons/fa6";
-import { HiOutlineVideoCamera } from "react-icons/hi2";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import useSlide from "../../Hooks/useSlide";
-import { ArrowLeftRight } from "./WelcomeContent";
-// import Categories from "./Categories";
+import React from "react";
 import { IoCloudyNight } from "react-icons/io5";
 import GridSlider from "./GridSlider";
 import { twMerge } from "tailwind-merge";
 import Gig from "./Gig";
 
-type GigParam = {
-  profileImage: string;
-  gigImages: string[];
-  username: string;
-  description: string;
-  hasVideo: boolean;
-  startingPrice: number;
-  rating: number;
-  pro: boolean;
+// type GigParam = {
+//   profileImage: string;
+//   gigImages: string[];
+//   username: string;
+//   description: string;
+//   hasVideo: boolean;
+//   startingPrice: number;
+//   rating: number;
+//   pro: boolean;
+// };
+
+type GigsProps<T> = {
+  items: T[];
+  render: (item: T, index: number) => React.ReactNode;
+  className?: string;
 };
 
-export function Gigs({
-  maxLength,
-  className = "",
-}: {
-  maxLength: number;
-  className?: string;
-}) {
-  let data = Array.from({ length: maxLength || 10 });
+export function Gigs<T>({ items, render, className = "" }: GigsProps<T>) {
   className = twMerge(
-    "flex gap-6 before:absolute before:right-0 before:z-10 before:h-full before:w-16 before:bg-[linear-gradient(90deg,hsla(0,0%,100%,0),#ffffff)] before:content-['']",
+    "flex gap-5 px-3 before:absolute before:right-0 before:z-10 before:h-full before:w-16 before:bg-[linear-gradient(90deg,hsla(0,0%,100%,0),#ffffff)] before:content-['']",
     className,
   );
+
   return (
     <div className={className}>
-      {data.map((_, index) => {
-        return (
-          <Gig
-            className="min-w-[270px]"
-            key={index}
-            profileImage={"/images/yacine.png"}
-            gigImages={["/images/olympic.webp", "/images/paywatch.webp"]}
-            username={"Abdul Rehman"}
-            description={
-              "I will do professional modern minimalist business logo design"
-            }
-            hasVideo={true}
-            pro={Boolean(index % 2)}
-            rating={4.8}
-            startingPrice={100}
-          />
-        );
+      {items.map((item, index) => {
+        return render(item, index);
       })}
     </div>
   );
 }
+
 export default function GigSlides() {
   return (
     <GridSlider>
@@ -88,11 +66,13 @@ export default function GigSlides() {
               })}
           </div>
 
-          <GridSlider.Container>
+          {/* <GridSlider.Container>
             <GridSlider.Grid>
-              <Gigs maxLength={10} />
+              <Gigs
+                // data={}
+              />
             </GridSlider.Grid>
-          </GridSlider.Container>
+          </GridSlider.Container> */}
         </div>
       </div>
     </GridSlider>

@@ -12,7 +12,7 @@ import { createPortal } from "react-dom";
 import { useOutsideClick } from "../../Hooks/useOutsideClick";
 import { OpenArrow } from "./Footer";
 import { twMerge } from "tailwind-merge";
-import Btn from "./ui/Button";
+import Btn from "./ui/Btn";
 
 interface MenusContextType {
   openId: string;

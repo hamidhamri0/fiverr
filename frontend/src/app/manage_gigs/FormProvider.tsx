@@ -17,22 +17,18 @@ const renderStepContent = (
   onClick: (cb: (wizard: number) => number) => void,
 ) => {
   switch (step) {
-    case 0:
-      return <GigOverviewForm onClick={() => onClick((prev) => prev + 1)} />;
     case 1:
-      return <GigPricingForm onClick={() => onClick((prev) => prev + 1)} />;
+      return <GigOverviewForm onClick={onClick} />;
     case 2:
-      return (
-        <GigDescriptionAndFAQCreation
-          onClick={() => onClick((prev) => prev + 1)}
-        />
-      );
+      return <GigPricingForm onClick={onClick} />;
     case 3:
-      return <GigRequirementForm onClick={() => onClick((prev) => prev + 1)} />;
+      return <GigDescriptionAndFAQCreation onClick={onClick} />;
     case 4:
-      return <GigGallery onClick={() => onClick((prev) => prev + 1)} />;
+      return <GigRequirementForm onClick={onClick} />;
     case 5:
-      return <Publish onClick={() => onClick((prev) => prev + 1)} />;
+      return <GigGallery onClick={onClick} />;
+    case 6:
+      return <Publish onClick={onClick} />;
     default:
       return null;
   }
@@ -46,7 +42,7 @@ export default function FormProviderWrapper({
   const methods = useForm<GigData | {}>({
     defaultValues: defaultValues || {},
   });
-  const { wizard, updateQuery } = useWizardQuery(0);
+  const { wizard, updateQuery } = useWizardQuery(1);
   console.log(typeof window !== "undefined" && methods.watch());
 
   return (

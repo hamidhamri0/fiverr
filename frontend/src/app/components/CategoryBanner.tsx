@@ -38,7 +38,7 @@ export default function CategoryBanner({
   className = "",
 }: CategoryBannerProps) {
   className = twMerge(
-    `${bgImage} bg-cover mx-auto mb-10 mt-10 flex max-h-[294px] min-h-[240px] max-w-[1450px] flex-col items-center justify-center gap-12 rounded-2xl bg-no-repeat px-4 `,
+    `${bgImage} bg-cover mx-auto flex max-h-[294px] min-h-[240px] max-w-[1450px] flex-col items-center justify-center gap-12 rounded-2xl bg-no-repeat px-4 `,
     className,
     mobileBgImage,
   );

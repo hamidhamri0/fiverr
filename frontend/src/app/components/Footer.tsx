@@ -1,8 +1,8 @@
+"use client";
 import React, { useState } from "react";
 import { FaFacebook, FaInstagram, FaLinkedin, FaTiktok } from "react-icons/fa";
 import IconButton from "./ui/IconButton";
 import { RiTwitterXFill } from "react-icons/ri";
-import { IoArrowDownSharp } from "react-icons/io5";
 import { twMerge } from "tailwind-merge";
 const categories = [
   "Graphics & Design",

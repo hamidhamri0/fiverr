@@ -1,8 +1,9 @@
+import { ChevronRight } from "lucide-react";
 import React from "react";
 
 interface StepProps {
   number: number;
-  label: string;
+  label: React.ReactNode;
   isActive: boolean;
   isCompleted: boolean;
   onClick: (cb: (wizard: number) => number) => void;
@@ -24,7 +25,7 @@ const Step: React.FC<StepProps> = ({
   return (
     <div
       onClick={() => {
-        isCompleted && onClick(() => number - 1);
+        isCompleted && onClick(() => number);
       }}
       className="flex w-full cursor-pointer items-center whitespace-nowrap"
     >
@@ -67,11 +68,16 @@ const StepIndicator: React.FC<StepIndicatorProps> = ({
           <Step
             onClick={onClick}
             number={index + 1}
-            label={step + (index < steps.length - 1 ? " >" : "")} // Remove this line
-            isActive={index === currentStep}
-            isCompleted={index < currentStep}
+            label={
+              <div className="flex items-center gap-2">
+                <span>{step}</span>
+                {index < steps.length - 1 ? <ChevronRight /> : null}
+              </div>
+            } // Remove this line
+            isActive={index === currentStep - 1}
+            isCompleted={index < currentStep - 1}
           />
-          {index < steps.length - 1 && (
+          {index < steps.length && (
             <div className="mx-2 h-px flex-grow bg-transparent" />
           )}
         </React.Fragment>

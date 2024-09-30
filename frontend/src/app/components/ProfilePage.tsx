@@ -1,5 +1,5 @@
+"use client";
 import React, { useState } from "react";
-import UserCard from "../components/smallComponents/UserCard";
 import Gig from "./Gig";
 import {
   Input,
@@ -9,9 +9,10 @@ import {
   SortBy,
 } from "./Reviews";
 import { reviews } from "../page";
-import Button from "./ui/Button";
+import Button from "./ui/Btn";
 import { FiMessageSquare } from "react-icons/fi";
 import { AddToList } from "./ActionToolbar";
+import UserCard from "../smallComponents/UserCard";
 
 export default function ProfilePage() {
   const [show, setShow] = useState(false);
@@ -37,7 +38,7 @@ export default function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-[1450px] p-4">
-      <div className="flex justify-center justify-between gap-4">
+      <div className="flex justify-between gap-4">
         <UserCard
           imageClassName="h-36 w-36"
           Image={<UserCard.Image />}

@@ -21,7 +21,6 @@ export class CloudinaryConfig {
   ): Promise<any> {
     return new Promise((resolve, reject) => {
       const originalName = file.originalname.split('.')[0];
-      console.log(originalName);
       cloudinary.uploader.multi;
       const uploadStream = cloudinary.uploader.upload_stream(
         {
@@ -60,6 +59,11 @@ export class CloudinaryConfig {
         },
       );
       streamifier.createReadStream(file.buffer).pipe(uploadStream);
+    });
+  }
+  async deleteFile(publicId: string, resourceType: string) {
+    return cloudinary.uploader.destroy(publicId, {
+      resource_type: resourceType,
     });
   }
 }

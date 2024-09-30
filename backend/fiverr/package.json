@@ -31,6 +31,7 @@
     "class-validator": "^0.14.1",
     "cloudinary": "^2.5.0",
     "express-session": "^1.18.0",
+    "moment-timezone": "^0.5.45",
     "nestjs-command": "^3.1.4",
     "nodemailer": "^6.9.15",
     "passport": "^0.7.0",

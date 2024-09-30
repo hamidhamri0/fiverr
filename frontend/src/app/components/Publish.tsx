@@ -1,21 +1,24 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/app/components/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
 } from "@/app/components/card";
-import { useState } from "react";
-import PhoneNumber from "./PhoneNumber";
+import { Fragment, useState } from "react";
 import VerificationPhoneNumber from "./VerificationPhoneNumber";
 import { useUserInfoStore } from "@/stores/UserInfoStore";
 import { post } from "@/lib/utils/customFetch";
 import { useFormContext } from "react-hook-form";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
-export default function Publish({ onClick }: { onClick: () => void }) {
+export default function Publish({
+  onClick,
+}: {
+  onClick: (cb: (wizard: number) => number) => void;
+}) {
   const [isOpen, setIsOpen] = useState(false);
   const user = useUserInfoStore((state) => state.user);
   const {
@@ -38,7 +41,7 @@ export default function Publish({ onClick }: { onClick: () => void }) {
   }
 
   return (
-    <>
+    <Fragment>
       {isOpen && <VerificationPhoneNumber setIsOpen={setIsOpen} />}
       <div className="mx-auto flex max-w-[700px] flex-col items-center border border-gray-200 bg-gray-50 p-8">
         <div className="w-full max-w-2xl space-y-12">
@@ -177,6 +180,6 @@ export default function Publish({ onClick }: { onClick: () => void }) {
           </div>
         </div>
       </div>
-    </>
+    </Fragment>
   );
 }

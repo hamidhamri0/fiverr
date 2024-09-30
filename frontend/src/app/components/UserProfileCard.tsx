@@ -1,6 +1,6 @@
 import React from "react";
-import UserCard from "./smallComponents/UserCard";
-import Button from "./ui/Button";
+import Button from "./ui/Btn";
+import UserCard from "../smallComponents/UserCard";
 
 type UserStatsProps = {
   From: string;

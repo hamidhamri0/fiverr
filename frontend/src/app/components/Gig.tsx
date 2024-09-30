@@ -1,8 +1,9 @@
+"use client";
 import { useState } from "react";
 import { FaChevronLeft, FaChevronRight, FaHeart, FaStar } from "react-icons/fa";
 import { HiOutlineVideoCamera } from "react-icons/hi2";
 import { twMerge } from "tailwind-merge";
-import LevelRatingCard from "./smallComponents/LevelRatingCard";
+import LevelRatingCard from "./ui/LevelRatingCard";
 
 type GigParam = {
   profileImage: string;
@@ -70,7 +71,7 @@ const ImageSlider = ({
   };
 
   classNameForImage = twMerge(
-    "relative group mb-4 cursor-pointer rounded-md overflow-hidden border border-gray-200 shadow-md",
+    "aspect-[16/9] relative group mb-4 cursor-pointer rounded-md overflow-hidden border border-gray-200 shadow-md",
     classNameForImage,
   );
 

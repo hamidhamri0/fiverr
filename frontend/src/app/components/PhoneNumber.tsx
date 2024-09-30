@@ -7,8 +7,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/app/components/dialog";
-import { Input } from "@/app/components/input";
-import { Button } from "@/app/components/button";
 import { Label } from "@/app/components/label";
 import Link from "next/link";
 import Spinner from "./ui/Spinner";
@@ -16,6 +14,8 @@ import { countriesWithPhoneCode } from "@/lib/utils/countriesWithPhoneCode";
 import { post } from "@/lib/utils/customFetch";
 import { useFormContext } from "react-hook-form";
 import { useUserInfoStore } from "@/stores/UserInfoStore";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 type Country = (typeof countriesWithPhoneCode)[0];
 

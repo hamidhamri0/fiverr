@@ -8,19 +8,23 @@ import {
   Service,
   Subcategory,
   Questions,
+  ResultMetadata,
+  Gig,
+  ResultPackageFeature,
 } from "@/types/gig.interface";
 import { Package } from "@/types/gig.interface";
 import { Images } from "lucide-react";
 
-export default function reshapeDataToDefaultValues(data: GigData) {
+export default function reshapeDataToDefaultValues(data: Gig) {
   return {
     id: data.id || "",
+    step: Number(data.step) || 1,
     title: data?.title || "",
     category: data?.category?.id || "",
     subcategory: data?.subcategory?.id || "",
     serviceType: data?.service?.id || "",
     imageUrls: [],
-    videoUrl: [],
+    videoUrl: undefined,
     pdfUrls: [],
     imageUrlsPreview: data?.imageUrls || [],
     videoUrlPreview: data?.videoUrl || {},
@@ -53,10 +57,6 @@ export default function reshapeDataToDefaultValues(data: GigData) {
 
 export type ReshapeGigData = ReturnType<typeof reshapeDataToDefaultValues>;
 
-type ResultMetadata = {
-  [key: string]: string | string[];
-};
-
 function reshapeMetadataTagToDefaultValues(
   metadata: Metadata[],
 ): ResultMetadata {
@@ -74,11 +74,6 @@ function reshapeMetadataTagToDefaultValues(
   }
   return data;
 }
-
-// create function reshape package that takes Package type as param and return object with default values key value pair with key as featureId and value as packageFeature value
-type ResultPackageFeature = {
-  [key: string]: string;
-};
 
 function reshapePackageToDefaultValues(
   packageData: Package,

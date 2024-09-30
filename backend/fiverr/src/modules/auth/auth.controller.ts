@@ -40,14 +40,16 @@ export class AuthController {
 
   @Post('/login')
   @UseGuards(LocalGuard)
-  async login(@Body() username, @Body() email, @Body() password, @Res() res) {
-    // console.log('LOGIN', username, email, password);
-    // let user = this.authService.validateLocalUser({
-    //   username,
-    //   email,
-    //   password,
-    // });
-    // res.send(user);
-    res.send('login');
+  async login(
+    @Body('username') username,
+    @Body('email') email,
+    @Body('password') password,
+  ) {
+    console.log('LOGIN', username, email, password);
+    return await this.authService.validateLocalUser({
+      username,
+      email,
+      password,
+    });
   }
 }

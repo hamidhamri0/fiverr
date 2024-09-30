@@ -7,7 +7,11 @@ import { Question } from "@/types/gig.interface";
 import toast from "react-hot-toast";
 import SpinnerCenterWithBlur from "./ui/SpinnerCenterWithBlur";
 
-const GigRequirementForm = ({ onClick }: { onClick: () => void }) => {
+const GigRequirementForm = ({
+  onClick,
+}: {
+  onClick: (cb: (wizard: number) => number) => void;
+}) => {
   const {
     handleSubmit,
     setValue,
@@ -18,7 +22,12 @@ const GigRequirementForm = ({ onClick }: { onClick: () => void }) => {
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (data: any) => {
+    console.log(data);
     try {
+      if (data.step < 4) {
+        onClick(() => data.step);
+        return;
+      }
       setLoading(true);
       const question = data.questions?.map((el: Question) => {
         return typeof el.id == "string" ? { ...el, id: null } : el;
@@ -27,10 +36,13 @@ const GigRequirementForm = ({ onClick }: { onClick: () => void }) => {
       await post(`/question/saveQuestions/${gigId}`, { question });
       setValue("initialSubcategory", getValues("subcategory"));
       toast.success("Questions saved successfully");
-      onClick();
+      if (data.step < 5) {
+        setValue("step", 5);
+      }
+      onClick((p) => p + 1);
     } catch (err) {
       // console.log(err);
-      toast.error(err.message);
+      toast.error(err?.message);
     } finally {
       setLoading(false);
     }
@@ -103,6 +115,15 @@ const QuestionInput = () => {
   } = useController({
     control,
     name: "questions",
+    rules: {
+      validate: (value) => {
+        if (value.length < 2) {
+          toast.error("fill at least two questions");
+          return "fill at least two questions";
+        }
+        return true;
+      },
+    },
     defaultValue: [],
   });
 
@@ -111,7 +132,6 @@ const QuestionInput = () => {
   };
 
   const handleUpdateQuestion = (index: number, question: Question) => {
-    // console.log(question, "updated");
     const updatedQuestions = [...questions];
     updatedQuestions[index] = question;
     setQuestions(updatedQuestions);

@@ -4,7 +4,7 @@ import Menus from "./Menu";
 import { formatDistanceToNow } from "date-fns";
 import { OpenArrow } from "./Footer";
 import { de } from "date-fns/locale";
-import Button from "./ui/Button";
+import Button from "./ui/Btn";
 
 type rating = {
   "1": number;

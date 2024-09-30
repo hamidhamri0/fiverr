@@ -6,19 +6,28 @@ import { GigData } from "@/types/gig.interface";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 
-async function page() {
+async function page({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | string[] | undefined };
+}) {
   let gigs = [] as GigData[];
+  let status = "active";
   try {
     const userSession = await getUser();
-    gigs = await get<GigData[]>(`/gig/getAllGigsByUserId/${userSession?.id}`, {
-      isCookie: cookies().toString(),
-    });
+    status = (searchParams.status as string) || "active";
+    gigs = await get<GigData[]>(
+      `/gig/getAllGigsByUserId/${userSession?.id}?status=${status}`,
+      {
+        isCookie: cookies().toString(),
+      },
+    );
   } catch (err) {
-    redirect("/");
+    redirect("/manage_gigs?status=active");
   }
   return (
     <div>
-      <ManageGigs gigs={gigs} />
+      <ManageGigs status={status} initialState={gigs} />
     </div>
   );
 }

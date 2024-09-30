@@ -1,5 +1,12 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
 import { User } from '../user/user.entity';
+
+export enum Proficiency {
+  BASIC = 'basic',
+  INTERMEDIATE = 'intermediate',
+  ADVANCED = 'advanced',
+  NATIVE = 'native',
+}
 
 @Entity('user_languages')
 export class UserLanguage {
@@ -9,6 +16,9 @@ export class UserLanguage {
   @Column({ nullable: false, unique: true })
   language: string;
 
-  @ManyToMany(() => User, (user) => user.languages)
-  users: User[];
+  @Column({ nullable: false, type: 'enum', enum: Proficiency })
+  proficiency: Proficiency;
+
+  @ManyToOne(() => User, (user) => user.languages)
+  user: User;
 }

@@ -24,6 +24,8 @@ import { useGigStore } from "../../stores/GigStore";
 import { useUserInfoStore } from "../../stores/UserInfoStore";
 import SpinnerCenterWithBlur from "./ui/SpinnerCenterWithBlur";
 import { useRouter, usePathname } from "next/navigation";
+import toast from "react-hot-toast";
+import { set } from "date-fns";
 
 export default function GigOverviewForm({
   onClick,
@@ -87,16 +89,14 @@ export default function GigOverviewForm({
       setLoading(true);
       const gig = (await createGig()) as GigData;
       setValue("id", gig.id);
+      setValue("step", Number(gig.step));
       if (pathname.startsWith("/manage_gigs/new")) {
         router.push(`/manage_gigs/${gig.id}/edit?wizard=1`);
       } else {
         onClick((p) => p + 1, true);
       }
     } catch (err) {
-      setError("root", {
-        type: "manual",
-        message: err instanceof Error ? err?.message : "Something went wrong",
-      });
+      toast.error(err instanceof Error ? err?.message : "Something went wrong");
     } finally {
       setLoading(false);
     }
@@ -271,10 +271,7 @@ function Category() {
         const data = await get<Categories>("/category/getAllCategories");
         setCategories(data);
       } catch (err) {
-        setError("root", {
-          type: "manual",
-          message: err instanceof Error ? err?.message : "Something went wrong",
-        });
+        toast.error("Something went wrong");
       }
     }
     fetchCategories();
@@ -316,11 +313,7 @@ function Subcategory() {
   } = useFormContext();
 
   const {
-    field: {
-      value: subcategory,
-      onChange: setSubcategory,
-      ref: subcategoryRef,
-    },
+    field: { value: subcategory, ref: subcategoryRef },
   } = useController({
     control,
     name: "subcategory",
@@ -420,16 +413,11 @@ const ServiceTypeSelect = () => {
         );
         setServices(data);
       } catch (err) {
-        setError("root", {
-          type: "manual",
-          message:
-            (err instanceof Error && err?.message) || "Something went wrong",
-        });
-        console.log(err);
+        toast.error("Something went wrong");
       }
     }
     fetchServices();
-  }, [subcategory, setValue, setError]);
+  }, [subcategory, setValue, setError, setServices]);
 
   if (!subcategory) return null;
 
@@ -477,8 +465,6 @@ const Metadata = () => {
     formState: { errors },
   } = useFormContext();
 
-  // const { metadata, setMetadata } = useGigcontext();
-
   const metadata = useGigStore((state) => state.metadata);
   const setMetadata = useGigStore((state) => state.setMetadata);
 
@@ -504,12 +490,7 @@ const Metadata = () => {
         );
         setMetadata(data);
       } catch (err) {
-        setError("root", {
-          type: "manual",
-          message:
-            (err instanceof Error && err?.message) || "Something went wrong",
-        });
-        console.log(err);
+        toast.error("Something went wrong");
       }
     }
     fetchServiceMetadata();
@@ -711,9 +692,12 @@ const TagsInput: React.FC<TagInputProps> = ({ control, maxTags = 5 }) => {
   const handleInputChange = useCallback(
     debounce(async (value: string) => {
       if (value.length > 0) {
-        let data = await get<TagsType[]>(`/tags/getOneByName?name=${value}`);
-        console.log(data);
-        setActiveSuggestions(data);
+        try {
+          let data = await get<TagsType[]>(`/tags/getOneByName?name=${value}`);
+          setActiveSuggestions(data);
+        } catch (err) {
+          toast.error("Something went wrong");
+        }
       } else {
         setActiveSuggestions([]);
       }

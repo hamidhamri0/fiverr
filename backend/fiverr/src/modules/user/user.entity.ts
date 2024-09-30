@@ -7,6 +7,7 @@ import {
   OneToMany,
   JoinTable,
   ManyToMany,
+  Check,
 } from 'typeorm';
 import { UserLanguage } from '../user-language/user-language.entity';
 import { Gig } from '../gig/gig.entity';
@@ -44,11 +45,11 @@ export class User {
   @Column({ unique: true, nullable: true })
   username?: string;
 
-  @Column({ nullable: true })
-  picture?: string;
+  @Column({ unique: true, nullable: true })
+  description: string;
 
   @Column({ nullable: true })
-  preferredHours?: number;
+  picture?: string;
 
   @Column({ default: true })
   isNew?: boolean;
@@ -62,13 +63,30 @@ export class User {
   @Column({ nullable: true, unique: true })
   facebookId?: string; // Add field for Facebook ID
 
+  @Check(`"preferredStartDay" >= 0`)
+  @Column({ nullable: true })
+  preferredStartDay?: number;
+
+  @Check(`"preferredEndDay" >= 0`)
+  @Column({ nullable: true })
+  preferredEndDay?: number;
+
+  @Column({ nullable: true })
+  preferredStartTime?: string;
+
+  @Column({ nullable: true })
+  preferredEndTime?: string;
+
+  @Column({ nullable: true })
+  timezone: string;
+
   @CreateDateColumn()
   createdAt?: Date;
 
   @UpdateDateColumn()
   updatedAt?: Date;
 
-  @ManyToMany(() => UserLanguage, (userLanguage) => userLanguage.users)
+  @ManyToMany(() => UserLanguage, (userLanguage) => userLanguage.user)
   @JoinTable({
     name: 'user_languages_users',
     joinColumn: {

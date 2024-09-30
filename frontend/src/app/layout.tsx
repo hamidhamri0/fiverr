@@ -5,6 +5,7 @@ import MainHeader from "./components/MainHeader";
 import UserInfoStoreProvider, { User } from "../stores/UserInfoStore";
 import { getUser } from "@/lib/auth/getUser";
 import { Toaster } from "react-hot-toast";
+import Footer from "./components/Footer";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,8 +19,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const userSession = await getUser();
-  console.log("LAYOUT");
+  let userSession = await getUser();
+
   return (
     <html className="max-w-screen" lang="en">
       <body className={inter.className}>
@@ -27,6 +28,7 @@ export default async function RootLayout({
           <MainHeader />
           {children}
           <Toaster />
+          <Footer />
         </UserInfoStoreProvider>
       </body>
     </html>

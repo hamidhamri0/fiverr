@@ -1,52 +1,17 @@
-"use client";
+import React from "react";
+import { getUser } from "@/lib/auth/getUser";
+import { notFound } from "next/navigation";
+import WelcomeModal from "./components/WelcomeModal";
 import WelcomeContent from "./components/WelcomeContent";
-import GigSlides from "./components/GigSlides";
-import SavedGigsForYou from "./components/SavedGigsForYou";
-import VerifiedProServices from "./components/VerifiedProServices";
-import GalleryLayout from "./components/GalleryLayout";
-import Footer from "./components/Footer";
-import Menu from "./components/Menu";
-import MainHeader from "./components/MainHeader";
 import HeroBanner from "./components/HeroBanner";
-import CategoriesContainer from "./components/CategoriesContainer";
+import CategoryBanner from "./components/CategoryBanner";
+import CategoryGrid from "./components/CategoryGrid";
+import Categories from "./components/Categories";
 import Services from "./components/Services";
 import ServicesOverview from "./components/ServicesOverview";
-import CategoryBanner, {
-  CategoryBannerContent,
-} from "./components/CategoryBanner";
-import CategoryCarouselCard from "./components/CategoryCarousel";
-import CategoryGrid from "./components/CategoryGrid";
-import DrowDownFAQ from "./components/DrowDownFAQ";
-import { FaSearch } from "react-icons/fa";
-import Meta from "./components/smallComponents/Icons/Meta";
-import Google from "./components/smallComponents/Icons/Google";
-import Netflix from "./components/smallComponents/Icons/Netflix";
-import Pg from "./components/smallComponents/Icons/Pg";
-import Payoneer from "./components/smallComponents/Icons/Payoneer";
-import RoundedCategoryCarousel from "./components/RoundedCategoryCarousel";
-import FiltersComponent from "./components/FiltersComponent";
-import SelectedFilters from "./components/SelectedFilters";
-import SearchResults from "./components/SearchResults";
-import GigOverview from "./components/GigOverview";
-import SlideShow from "./components/SlideShow";
-import ReviewsCarousel from "./components/ReviewsCarousel";
-import UserProfileCard from "./components/UserProfileCard";
-import Reviews from "./components/Reviews";
-import RelatedTags from "./components/ui/RelatedTags";
-import ActionToolbar from "./components/ActionToolbar";
-import PricingPackageCard from "./components/PricingPackageCard";
-import PackagesTable from "./components/PackagesTable";
-import UserProfile from "./components/UserProfile";
-import LoginCard from "./components/LoginCard";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
-import ProfilePage from "./components/ProfilePage";
-import { create } from "domain";
-import { useStore } from "zustand";
-import UserInfoStoreProvider from "../stores/UserInfoStore";
-import Test from "./components/Test";
-import { get } from "@/app/utils/customFetch";
-
-//bg-[url('/bigImages/ProgrammingBanner.webp')
+import CategoriesContainer from "./components/CategoriesContainer";
+import GigSlides, { Gigs } from "./components/GigSlides";
+import GigsWithTitle from "./components/GigsWithTitle";
 
 export const reviews = [
   {
@@ -164,304 +129,32 @@ export const reviews = [
 //   );
 // };
 
-// function Test() {
-//   return (
-//     <div className="mx-auto grid max-w-[1450px] grid-cols-4 gap-4 p-4">
-//       {[1, 2, 3, 4].map((_, index) => (
-//         <div key={index} className="flex flex-col">
-//           <div className="mb-2 max-w-[200px] overflow-hidden rounded-md">
-//             <img
-//               src="/images/KITCHEN VIEW 02 copy 2.webp"
-//               alt="Description of the image"
-//               className="block max-h-full max-w-full object-cover"
-//             />
-//           </div>
-//           <div>
-//             <h2 className="p-2 font-semibold">@hamidharmi</h2>
-//           </div>
-//         </div>
-//       ))}
-//     </div>
-// <div className="mx-auto mt-8 grid w-full max-w-[1450px] grid-cols-4 gap-6 p-5">
-//   <div className="grid grid-cols-4">
-//     <AspectRatioImage
-//       src="/images/KITCHEN VIEW 02 copy 2.webp"
-//       alt="Description of the image"
-//       ratio="16:9"
-//     />
-//     <AspectRatioImage
-//       src="/images/KITCHEN VIEW 02 copy 2.webp"
-//       alt="Description of the image"
-//       ratio="16:9"
-//     />
-//     <AspectRatioImage
-//       src="/images/KITCHEN VIEW 02 copy 2.webp"
-//       alt="Description of the image"
-//       ratio="16:9"
-//     />
-//   </div>
-// {
-/* <AspectRatioImage
-        src="/images/KITCHEN VIEW 02 copy 2.webp"
-        alt="Description of the image"
-        ratio="16:9"
-      />
-      <AspectRatioImage
-        src="/images/KITCHEN VIEW 02 copy 2.webp"
-        alt="Description of the image"
-        ratio="16:9"
-      />
-      <AspectRatioImage
-        src="/images/KITCHEN VIEW 02 copy 2.webp"
-        alt="Description of the image"
-        ratio="16:9"
-      /> */
-// }
-// </div>
-//   );
-// }
+export default async function Home() {
+  const user = await getUser();
 
-// export const StateStoreContext = createContext<StateStoreApi | undefined>(
-//   undefined,
-// );
-// export type StateStoreApi = ReturnType<typeof createStateStore>;
-
-// const contextAPI = createContext(null);
-
-// const Provider = ({ children }: { children: React.ReactNode }) => {
-//   const storeRef = useRef<StateStoreApi>();
-//   if (!storeRef.current) {
-//     storeRef.current = createStateStore(initCounterStore());
-//   }
-
-//   return (
-//     <StateStoreContext.Provider value={storeRef.current}>
-//       {children}
-//     </StateStoreContext.Provider>
-//   );
-// };
-
-// const useCounterStore = <T,>(selector: (store: StateStore) => T): T => {
-//   const StaterStoreContext = useContext(StateStoreContext);
-
-//   if (!StaterStoreContext) {
-//     throw new Error(`useCounterStore must be used within CounterStoreProvider`);
-//   }
-
-//   return useStore(StaterStoreContext, selector);
-// };
-
-// function GetUsers() {
-//   const users = useCounterStore((state) => state.users);
-//   const setUsers = useCounterStore((state) => state.setUsers);
-//   function getUsers() {
-//     fetch("http://localhost:3001/user/getAllUsers", {
-//       credentials: "include",
-//     })
-//       .then((res) => res.json())
-//       .then((data) => setUsers(data));
-//   }
-//   console.log("GetUsers ", "rendering..");
-
-//   return (
-//     <div>
-//       <h1>Users</h1>
-//       {users.length > 0 && (
-//         <ul>
-//           {users.map((user) => (
-//             <li key={user?.id}>{user?.name}</li>
-//           ))}
-//         </ul>
-//       )}
-//       <button onClick={getUsers}>Get Users</button>
-//     </div>
-//   );
-// }
-
-// function Test() {
-//   console.log("Test ", "rendering..");
-
-//   return <div></div>;
-// }
-// function Test2() {
-//   console.log("Test2 ", "rendering..");
-//   return (
-//     <div>
-//       <p>{username}</p>
-//     </div>
-//   );
-// }
-import { cookies } from "next/headers";
-import AdminPage from "./components/AdminPage";
-import GigOverviewCreation from "./components/GigOverviewManager";
-import reshapeDataToDefaultValues, {
-  ReshapeGigData,
-} from "./utils/reshapeDataToDefaultValues";
-import { GigData } from "../types/gig.interface";
-import Verification from "./components/VerificationCode";
-import PhoneNumber from "./components/PhoneNumber";
-import VerificationCode from "./components/VerificationCode";
-
-export default function Home() {
-  return null;
-  // <VerificationCode
-  //   description=""
-  //   phoneNumber=""
-  //   setStep={() => {}}
-  //   title=""
-  // />
-  // <div className="text-[#74767e] dark:bg-gray-800 dark:text-gray-200">
-  {
-    /* <Verification /> */
-  }
-
-  {
-    /* <Test /> */
-  }
-  {
-    /* <AdminPage /> */
-  }
-  {
-    /* <Provider>
-        <GetUsers />
-        
-        // <Test2 />
-      </Provider> */
-  }
-  {
-    /* <GigOverview /> */
-  }
-  {
-    /* <SlideShow
-        images={[
-          "/images/KITCHEN VIEW 02 copy 2.webp",
-          "/images/KITCHEN VIEW 02 copy 3.webp",
-          "/images/D1.webp",
-          "/images/E1.webp",
-          "/images/E1.webp",
-          "/images/E1.webp",
-          "/images/E1.webp",
-          "/images/E1.webp",
-          "/images/E1.webp",
-          "/images/E1.webp",
-          "/images/E1.webp",
-          "/images/E1.webp",
-          "/images/E1.webp",
-          "/images/E1.webp",
-        ]}
-      /> */
-  }
-  {
-    /* <ReviewsCarousel /> */
-  }
-  {
-    /* <UserProfileCard /> */
-  }
-  {
-    /* <ProfilePage /> */
-  }
-  {
-    /* <LoginCard isModal={false} /> */
-  }
-  {
-    /* <Reviews
-        allRatings={600}
-        eachRating={{
-          "1": 150,
-          "2": 20,
-          "3": 80,
-          "4": 50,
-          "5": 300,
-        }}
-        reviews={reviews}
-      /> */
-  }
-  {
-    /* <RelatedTags /> */
-  }
-  {
-    /* <ActionToolbar /> */
-  }
-  {
-    /* <PricingPackageCard /> */
-  }
-  {
-    /* <PackagesTable /> */
-  }
-  {
-    /* <UserProfile /> */
-  }
-  {
-    /* <RoundedCategoryCarousel /> */
-  }
-  {
-    /* <FiltersComponent /> */
-  }
-  {
-    /* <SelectedFilters /> */
-  }
-  {
-    /* <Test /> */
-  }
-  {
-    /* <SearchResults /> */
-  }
-  {
-    /* <CategoryBanner
-        // className="min-h-[500px] from-green-700 to-green-900 bg-cover bg-no-repeat xl:h-[400px] lg:bg-gradient-to-tl"
-        // bgImage="bg-[url('/bigImages/hero.webp')]"
-        bgImage="bg-[url('/bigImages/ProgrammingBanner.webp')]"
-        mobileBgImage="sm:bg-[url('/bigImages/ProgrammingBannerSmall.webp')]"
-      >
-        <CategoryBannerContent
-          category="Programming & Tech"
-          description="You think it. A programmer develops it."
-        /> */
-  }
-  {
-    /* <HeroBanner /> */
-  }
-  {
-    /* </CategoryBanner> */
-  }
-  {
-    /* <CategoryGrid /> */
-  }
-  {
-    /* <DrowDownFAQ /> */
-  }
-  {
-    /* <CategoryCarouselCard /> */
-  }
-  {
-    /* <CategoriesContainer /> */
-  }
-  {
-    /* <Services /> */
-  }
-  {
-    /* <ServicesOverview /> */
-  }
-  {
-    /* <WelcomeContent /> */
-  }
-  {
-    /* <GigSlides /> */
-  }
-  {
-    /* <SavedGigsForYou /> */
-  }
-  {
-    /* <VerifiedProServices /> */
-  }
-  {
-    /* <GalleryLayout /> */
-  }
-  {
-    /* <LoginCard isModal={false} /> */
-  }
-  {
-    /* <Footer /> */
-  }
-  // </div>
+  return (
+    <></>
+    // <div className="">
+    //   {user?.isNew && <WelcomeModal />}
+    //   {user ? (
+    //     <>
+    //       <WelcomeContent />
+    //       <GigsWithTitle />
+    //       <GigSlides />
+    //     </>
+    //   ) : (
+    //     <>
+    //       <CategoryBanner
+    //         className="min-h-[500px] from-green-700 to-green-900 bg-cover bg-no-repeat xl:h-[400px] lg:bg-gradient-to-tl"
+    //         bgImage="bg-[url('/bigImages/hero.webp')]"
+    //       >
+    //         <HeroBanner />
+    //       </CategoryBanner>
+    //       <CategoriesContainer />
+    //       <Services />
+    //       <ServicesOverview />
+    //     </>
+    //   )}
+    // </div>
+  );
 }

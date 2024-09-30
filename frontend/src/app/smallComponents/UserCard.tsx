@@ -4,9 +4,9 @@ import RatingStarsCard from "../components/ui/RatingStarsCard";
 import LevelRatingCard from "../components/ui/LevelRatingCard";
 import React, { createContext, useContext } from "react";
 import { twMerge } from "tailwind-merge";
-import { RatingBox } from "../Gig";
-import { Location } from "../UserProfile";
 import { LuMessageCircle } from "react-icons/lu";
+import { RatingBox } from "../components/Gig";
+import { Location } from "../components/UserProfile";
 
 type UserCardContext = {
   username: string;

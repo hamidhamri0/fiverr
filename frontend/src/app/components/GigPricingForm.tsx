@@ -247,7 +247,11 @@ function FactoryFeature({
   }
 }
 
-export default function GigPricingForm({ onClick }: { onClick: () => void }) {
+export default function GigPricingForm({
+  onClick,
+}: {
+  onClick: (cb: (wizard: number) => number) => void;
+}) {
   const router = useRouter();
   const features = useGigStore((state) => state.features);
   const setFeatures = useGigStore((state) => state.setFeatures);
@@ -308,10 +312,16 @@ export default function GigPricingForm({ onClick }: { onClick: () => void }) {
         standard: gig.standard,
         premium: gig.premium,
       });
+      if (gig.step < 3) {
+        setValue("step", 3);
+      }
       toast.success("packages saved successfully");
-      onClick();
+      onClick((p) => p + 1);
     } catch (err) {
-      toast.error(err.message);
+      toast.error(
+        err?.message ||
+          "An error occurred while saving packages, please try again later",
+      );
       console.log(err);
     } finally {
       setLoading(false);

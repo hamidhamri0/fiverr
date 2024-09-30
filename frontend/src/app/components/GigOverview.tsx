@@ -1,7 +1,6 @@
 import React from "react";
-import { FaStar } from "react-icons/fa";
-import LevelRatingCard from "./smallComponents/LevelRatingCard";
-import RatingCard from "./smallComponents/RatingCard";
+import LevelRatingCard from "./ui/LevelRatingCard";
+import RatingStarsCard from "./ui/RatingStarsCard";
 
 export default function GigOverview() {
   return (
@@ -26,7 +25,7 @@ export default function GigOverview() {
             </div>
           </div>
           <div className="flex items-center gap-2">
-            <RatingCard count={47} rating={4.9} />
+            <RatingStarsCard count={47} rating={4.9} />
             <span className="h-[90%] w-[0.5px] bg-gray-200"></span>
             <span className="text-sm text-gray-500">4 orders in queue</span>
           </div>

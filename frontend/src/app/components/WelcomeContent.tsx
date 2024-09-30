@@ -99,58 +99,64 @@ export default function WelcomeContent() {
           Made on Fiverr
         </p>
       </div>
-      <GridSlider>
-        <GridSlider.Container>
-          <GridSlider.SlidersNav
-            color="gray"
-            className="mb-4 ml-auto justify-end"
-          />
-          <GridSlider.Grid>
-            <div className="flex gap-4">
-              <RecommendedBox
-                titles={{
-                  h3: "recommended for you",
-                  h4: "Get matched with freelancers",
-                  h5: "Create a brief and get custom offers.",
-                  buttonAction: "Create a brief",
-                }}
-              >
-                <MdOutlineNotifications />
-              </RecommendedBox>
-              <RecommendedBox
-                titles={{
-                  h3: "BUSINESS RECOMMENDATIONS",
-                  h4: "Tailor Fiverr to your needs",
-                  h5: "Tell us a bit about your business.",
-                  buttonAction: "Add your info",
-                }}
-              >
-                <LuHeart />
-              </RecommendedBox>
-              <RecommendedBox
-                titles={{
-                  h3: "BUSINESS RECOMMENDATIONS",
-                  h4: "Tailor Fiverr to your needs",
-                  h5: "Tell us a bit about your business.",
-                  buttonAction: "Add your info",
-                }}
-              >
-                <LuHeart />
-              </RecommendedBox>
-              <RecommendedBox
-                titles={{
-                  h3: "BUSINESS RECOMMENDATIONS",
-                  h4: "Tailor Fiverr to your needs",
-                  h5: "Tell us a bit about your business.",
-                  buttonAction: "Add your info",
-                }}
-              >
-                <LuHeart />
-              </RecommendedBox>
-            </div>
-          </GridSlider.Grid>
-        </GridSlider.Container>
-      </GridSlider>
+      <WelcomeContentGridSlides />
     </div>
+  );
+}
+
+function WelcomeContentGridSlides() {
+  return (
+    <GridSlider>
+      <GridSlider.Container>
+        <GridSlider.SlidersNav
+          color="gray"
+          className="mb-4 ml-auto justify-end"
+        />
+        <GridSlider.Grid>
+          <div className="flex gap-4">
+            <RecommendedBox
+              titles={{
+                h3: "recommended for you",
+                h4: "Get matched with freelancers",
+                h5: "Create a brief and get custom offers.",
+                buttonAction: "Create a brief",
+              }}
+            >
+              <MdOutlineNotifications />
+            </RecommendedBox>
+            <RecommendedBox
+              titles={{
+                h3: "BUSINESS RECOMMENDATIONS",
+                h4: "Tailor Fiverr to your needs",
+                h5: "Tell us a bit about your business.",
+                buttonAction: "Add your info",
+              }}
+            >
+              <LuHeart />
+            </RecommendedBox>
+            <RecommendedBox
+              titles={{
+                h3: "BUSINESS RECOMMENDATIONS",
+                h4: "Tailor Fiverr to your needs",
+                h5: "Tell us a bit about your business.",
+                buttonAction: "Add your info",
+              }}
+            >
+              <LuHeart />
+            </RecommendedBox>
+            <RecommendedBox
+              titles={{
+                h3: "BUSINESS RECOMMENDATIONS",
+                h4: "Tailor Fiverr to your needs",
+                h5: "Tell us a bit about your business.",
+                buttonAction: "Add your info",
+              }}
+            >
+              <LuHeart />
+            </RecommendedBox>
+          </div>
+        </GridSlider.Grid>
+      </GridSlider.Container>
+    </GridSlider>
   );
 }
