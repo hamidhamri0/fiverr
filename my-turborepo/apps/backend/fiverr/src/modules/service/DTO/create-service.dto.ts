@@ -8,4 +8,8 @@ export class CreateServiceDTO {
   @IsNumber()
   @IsNotEmpty()
   subcategoryId: number;
+
+  @IsString()
+  @IsNotEmpty()
+  image: string;
 }

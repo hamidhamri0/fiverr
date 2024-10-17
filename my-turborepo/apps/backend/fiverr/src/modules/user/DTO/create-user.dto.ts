@@ -8,6 +8,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { LastVisitedGig } from '../user.entity';
 
 class BaseUserDTO {
   @IsOptional()
@@ -53,10 +54,16 @@ class BaseUserDTO {
 export class CreateUserLocalDTO extends BaseUserDTO {
   @IsString()
   password: string;
+
+  @IsOptional()
+  lastVisitedGigs?: LastVisitedGig[];
 }
 export class CreateUserGoogleDTO extends BaseUserDTO {
   @IsString()
   googleId: string;
+
+  @IsOptional()
+  lastVisitedGigs?: LastVisitedGig[];
 
   @IsOptional()
   @IsString()

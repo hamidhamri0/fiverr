@@ -9,6 +9,7 @@ import {
   OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  VirtualColumn,
 } from 'typeorm';
 import { User } from '../user/user.entity';
 import { Service } from '../service/service.entity';
@@ -20,6 +21,9 @@ import { Metadata } from '../metadata/metadata.entity';
 import { MetadataTag } from '../metadata-tag/metadata-tag.entity';
 import { FAQ } from '../faq/faq.entity';
 import { Question } from '../question/question.entity';
+import { GigReviews } from '@modules/gig-reviews/gig-reviews.entity';
+import { GigWithAvgRatingAndTotalReviews } from 'types/gig';
+
 export enum GigStatus {
   ACTIVE = 'active',
   PENDING = 'pending',
@@ -39,7 +43,7 @@ export class Gig {
   @Column('jsonb', {
     nullable: true,
   })
-  aboutGig?: string;
+  aboutGig?: object;
 
   @Column('boolean', { default: false })
   isPublished?: boolean;
@@ -52,36 +56,39 @@ export class Gig {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'userId' })
-  user: User;
+  user?: User;
 
   @ManyToOne(() => Category, (category) => category.gigs, {
     nullable: false,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'categoryId' })
-  category: Category;
+  category?: Category;
 
   @ManyToOne(() => Subcategory, (subcategory) => subcategory.gigs, {
     nullable: false,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'subcategoryId' })
-  subcategory: Subcategory;
+  subcategory?: Subcategory;
 
   @ManyToOne(() => Service, (service) => service.gigs, {
     nullable: false,
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'serviceId' })
-  service: Service;
+  service?: Service;
 
-  @Column('jsonb', { default: () => "'[]'" })
+  @Column('jsonb', {
+    default:
+      '["https://res.cloudinary.com/dnnaq2dbk/image/upload/v1727869983/default-product-img_cj4wcq.jpg"]',
+  })
   imageUrls: string[];
 
-  @Column('jsonb', { default: () => "'{}'" })
+  @Column('jsonb', { default: '{}' })
   videoUrl: { videoUrl: string; thumbnail: string };
 
-  @Column('jsonb', { default: () => "'[]'" })
+  @Column('jsonb', { default: '[]' })
   pdfUrls: string[];
 
   @Column('numeric', { default: 0 })
@@ -103,6 +110,9 @@ export class Gig {
   })
   status: GigStatus;
 
+  @OneToMany(() => GigReviews, (GigReviews) => GigReviews.gig)
+  reviews?: GigReviews[];
+
   @ManyToMany(() => Metadata)
   @JoinTable({
     name: 'gig_metadata',
@@ -115,7 +125,7 @@ export class Gig {
       referencedColumnName: 'id',
     },
   })
-  metadata: Metadata[];
+  metadata?: Metadata[];
 
   @ManyToMany(() => MetadataTag)
   @JoinTable({
@@ -129,7 +139,7 @@ export class Gig {
       referencedColumnName: 'id',
     },
   })
-  metadataTags: MetadataTag[];
+  metadataTags?: MetadataTag[];
 
   @ManyToMany(() => Tag, (tag) => tag.gigs)
   @JoinTable({
@@ -137,12 +147,12 @@ export class Gig {
     joinColumn: { name: 'gigId', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'tagId', referencedColumnName: 'id' },
   })
-  tags: Tag[];
+  tags?: Tag[];
 
   @OneToMany(() => Package, (package_) => package_.gig, {
     cascade: true,
   })
-  packages: Package[];
+  packages?: Package[];
 
   @OneToMany(() => FAQ, (faq) => faq.gig, {
     cascade: true,
@@ -152,7 +162,31 @@ export class Gig {
   @OneToMany(() => Question, (question) => question.gig, {
     cascade: true,
   })
-  questions: Question[];
+  questions?: Question[];
+
+  @VirtualColumn({
+    query: () => '',
+    type: 'numeric',
+  })
+  totalReviews?: number;
+
+  @VirtualColumn({
+    query: () => '',
+    type: 'numeric',
+  })
+  startingPrice?: number;
+
+  @VirtualColumn({
+    query: () => '',
+    type: 'numeric',
+  })
+  averageRating?: number;
+
+  @VirtualColumn({
+    query: () => '',
+    type: 'jsonb',
+  })
+  reviewsChart?: { rating: number; totalReviews: number }[];
 
   @CreateDateColumn()
   createdAt: Date;
@@ -160,3 +194,28 @@ export class Gig {
   @UpdateDateColumn()
   updatedAt: Date;
 }
+
+type Q =
+  | 'category'
+  | 'user'
+  | 'subcategory'
+  | 'metadata'
+  | 'metadataTags'
+  | 'faqs'
+  | 'service'
+  | 'features'
+  | 'tags'
+  | 'packages'
+  | 'questions'
+  | 'packageFeatures'
+  | 'reviews'
+  | 'userLanguages'
+  | 'startingPrice'
+  | 'userRating'
+  | 'reviewsChart';
+
+export type Query = Q[];
+
+export type userFeedGigs = {
+  [key: string]: GigWithAvgRatingAndTotalReviews[];
+};

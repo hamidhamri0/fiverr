@@ -6,13 +6,13 @@ import {
   Res,
   Post,
   Body,
-  UseFilters,
+  // UseFilters,
   UnauthorizedException,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { GoogleGuard } from './guards/google.guard';
 import { LocalGuard } from './guards/local.guard';
-import { GoogleAuthExceptionFilter } from './filters/google-auth.filter';
+// import { GoogleAuthExceptionFilter } from './filters/google-auth.filter';
 
 @Controller('auth')
 export class AuthController {
@@ -21,7 +21,7 @@ export class AuthController {
   @Get('google')
   @UseGuards(GoogleGuard)
   // @UseFilters(GoogleAuthExceptionFilter)
-  async googleAuth(@Req() req, @Res() res) {}
+  async googleAuth() {}
 
   @Get('google/callback')
   @UseGuards(GoogleGuard)
@@ -31,9 +31,9 @@ export class AuthController {
   }
 
   @Get('session')
-  async isLogged(@Req() req, @Res() res) {
-    if (req.user) {
-      return res.send(req.user);
+  async isLogged(@Req() req) {
+    if (req.isAuthenticated()) {
+      return req.user;
     }
     throw new UnauthorizedException("You're not logged in");
   }
@@ -45,7 +45,6 @@ export class AuthController {
     @Body('email') email,
     @Body('password') password,
   ) {
-    console.log('LOGIN', username, email, password);
     return await this.authService.validateLocalUser({
       username,
       email,

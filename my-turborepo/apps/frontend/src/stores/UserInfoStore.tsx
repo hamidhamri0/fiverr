@@ -3,24 +3,7 @@
 import { ReactNode, createContext, useContext, useEffect, useRef } from "react";
 import { useStore } from "zustand";
 import { createStore } from "zustand/vanilla";
-
-export type User = {
-  id: string;
-  name: string;
-  email: string;
-  username: string;
-  country: string | null;
-  googleId?: string | null;
-  appleId?: string | null;
-  facebookId?: string | null;
-  isNew: boolean;
-  isVerified: boolean;
-  isVerifiedPhoneNumber: boolean;
-  isVerifiedEmail: boolean;
-  phoneNumber: string | null;
-  createdAt: Date;
-  updatedAt: Date;
-};
+import { User } from "@fiverr/shared";
 
 export type State = {
   user: User | null;
@@ -38,17 +21,30 @@ export const defaultInitState: State = {
     name: "",
     email: "",
     username: "",
-    country: null,
-    phoneNumber: null,
-    googleId: null,
-    appleId: null,
-    facebookId: null,
+    country: "",
+    phoneNumber: undefined,
+    googleId: undefined,
+    appleId: undefined,
+    facebookId: undefined,
     isNew: false,
     isVerifiedPhoneNumber: false,
     isVerifiedEmail: false,
-    isVerified: false,
     createdAt: new Date(),
     updatedAt: new Date(),
+    description: "",
+    picture: "",
+    languages: [],
+    timezone: "",
+    preferredStartDay: 0,
+    preferredEndDay: 0,
+    preferredStartTime: "",
+    preferredEndTime: "",
+    phoneVerifications: [],
+    gigs: [],
+    gigRatings: [],
+    userRating: 0,
+    bio: "",
+    skills: [],
   },
 };
 
@@ -83,7 +79,7 @@ export const useUserInfoStore = <T,>(selector: (store: StateStore) => T): T => {
   const counterStoreContext = useContext(Context);
 
   if (!counterStoreContext) {
-    throw new Error(`useCounterStore must be used within CounterStoreProvider`);
+    throw new Error(`useUserInfoStore must be used within useUserInfoProvider`);
   }
 
   return useStore(counterStoreContext, selector);

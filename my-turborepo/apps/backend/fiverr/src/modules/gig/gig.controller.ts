@@ -6,12 +6,15 @@ import {
   Param,
   Post,
   Query,
+  UseGuards,
 } from '@nestjs/common';
 import { GigService } from './gig.service';
 import { GigDTO } from './DTO/gig.dto';
 import { Gig, GigStatus } from './gig.entity';
 import { SaveGigWithPackagesDTO } from './DTO/save-gig-with-packages.dto';
-// import { UpdateGigDTO } from './DTO/update-gig-dto';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
+import { User } from 'types/user';
+import { LoggedUserGuard } from 'src/common/guards/logged-user.guard';
 
 @Controller('gig')
 export class GigController {
@@ -53,15 +56,56 @@ export class GigController {
     }
   }
 
-  @Get('getAllGigs')
-  async getAllGigs(): Promise<Gig[]> {
-    return await this.gigService.getAllGigs();
+  @Get('/getAllGigs')
+  async getAllGigs(
+    @Query('include') include: string,
+    @Query('limit') limit: number,
+  ): Promise<Gig[]> {
+    return await this.gigService.getGigs(include, limit ? +limit : undefined);
+  }
+
+  @Get('/test')
+  async test() {
+    return await this.gigService.test();
+  }
+
+  @Get('findUsersGigs')
+  @UseGuards(LoggedUserGuard)
+  async findUsersGigs(
+    @CurrentUser() user: User,
+    @Query('include') include: string,
+    @Query('limit') limit: number,
+  ) {
+    return await this.gigService.findUserGigs(
+      user,
+      include,
+      limit ? +limit : undefined,
+    );
+  }
+
+  @Get('findRandomGigsBySubcategoryName')
+  @UseGuards(LoggedUserGuard)
+  async findRandomGigsBySubcategoryName(
+    @CurrentUser() user: User,
+    @Query('subcategory') subcategory: string,
+    @Query('include') include: string,
+    @Query('limit') limit: number,
+  ) {
+    return await this.gigService.findRandomGigsBySubcategoryName(
+      subcategory,
+      include,
+      user,
+      limit ? +limit : undefined,
+    );
   }
 
   @Get('getOneById/:id')
-  async getGig(@Param('id') id: string): Promise<Gig> {
+  async getGig(
+    @Param('id') id: string,
+    @Query('include') include: string,
+  ): Promise<Gig> {
     try {
-      return this.gigService.getGigWithAllRelations(id);
+      return await this.gigService.getGigById(id, include);
     } catch (err) {
       console.log('first error', err);
       throw new HttpException('Gig not found', 404);

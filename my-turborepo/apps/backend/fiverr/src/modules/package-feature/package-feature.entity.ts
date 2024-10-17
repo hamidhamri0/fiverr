@@ -5,6 +5,7 @@ import {
   JoinColumn,
   PrimaryColumn,
   OneToOne,
+  CreateDateColumn,
 } from 'typeorm';
 import { Package } from '../package/package.entity';
 import { Feature } from '../feature/feature.entity';
@@ -29,4 +30,7 @@ export class PackageFeature {
   @OneToOne(() => Feature)
   @JoinColumn()
   feature: Feature;
+
+  @CreateDateColumn()
+  createdAt: Date;
 }

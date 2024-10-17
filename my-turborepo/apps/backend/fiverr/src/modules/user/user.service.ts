@@ -6,6 +6,7 @@ import { CreateUserGoogleDTO, CreateUserLocalDTO } from './DTO/create-user.dto';
 import { UserLanguage } from '../user-language/user-language.entity';
 import { PhoneVerificationService } from '../phone-verification/phone-verification.service';
 import * as moment from 'moment-timezone';
+import { updateUserDto } from './DTO/update-user.dto';
 
 @Injectable()
 export class UserService {
@@ -50,7 +51,6 @@ export class UserService {
     user.timezone = timezone;
     user.preferredStartDay = startDay;
     user.preferredEndDay = endDay;
-    user.isNew = false;
 
     return this.userRepository.save(user);
   }
@@ -69,8 +69,19 @@ export class UserService {
     }
   }
 
-  async updateUserInfo(userId: string, userInfo: Partial<User>) {
-    return await this.userRepository.update(userId, userInfo);
+  async updateUserInfo(userId: string, userInfo: updateUserDto) {
+    if (userInfo?.username) {
+      const user = await this.userRepository.findOne({
+        where: { username: userInfo.username },
+      });
+      if (user) {
+        throw new BadRequestException('Username already exists');
+      }
+    }
+    return await this.userRepository.update(userId, {
+      ...userInfo,
+      isNew: false,
+    });
   }
 
   async storeEmailVerificationCode(email: string, verificationCode: string) {
@@ -100,7 +111,9 @@ export class UserService {
   }
 
   async findOneByUsername(username: string) {
-    return this.userRepository.findOne({ where: { username } });
+    return this.userRepository.findOne({
+      where: { username },
+    });
   }
 
   async findOneByGoogleId(googleId: string) {
@@ -149,12 +162,12 @@ export class UserService {
   }
 
   async createLocalUser(user: CreateUserLocalDTO) {
-    let newUser = this.userRepository.create(user);
+    const newUser = this.userRepository.create(user);
     return this.userRepository.save(newUser);
   }
 
   async createGoogleUser(user: CreateUserGoogleDTO) {
-    let newUser = this.userRepository.create(user);
+    const newUser = this.userRepository.create(user);
     return this.userRepository.save(newUser);
   }
 }

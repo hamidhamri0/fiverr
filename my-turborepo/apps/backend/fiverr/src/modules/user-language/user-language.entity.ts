@@ -19,6 +19,10 @@ export class UserLanguage {
   @Column({ nullable: false, type: 'enum', enum: Proficiency })
   proficiency: Proficiency;
 
-  @ManyToOne(() => User, (user) => user.languages)
+  @ManyToOne(() => User, (user) => user.languages, {
+    nullable: false,
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
   user: User;
 }

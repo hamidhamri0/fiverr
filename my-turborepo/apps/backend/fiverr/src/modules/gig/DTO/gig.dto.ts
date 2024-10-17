@@ -4,7 +4,6 @@ import {
   ArrayMinSize,
   IsArray,
   IsInt,
-  IsJSON,
   IsNotEmpty,
   IsNumber,
   IsObject,
@@ -13,6 +12,7 @@ import {
 } from 'class-validator';
 import { FaqDTO } from 'src/modules/faq/DTO/faq-dto';
 import { isMetadata } from '../validator/metadata.validator';
+import { Gig } from '../gig.entity';
 
 export class GigDTO {
   @IsString()
@@ -31,7 +31,7 @@ export class GigDTO {
     message: 'aboutGig must be an object',
   })
   @IsOptional()
-  aboutGig?: string;
+  aboutGig?: object;
 
   @IsNumber()
   @IsNotEmpty()
@@ -61,3 +61,8 @@ export class GigDTO {
   @IsOptional()
   faqs: FaqDTO[];
 }
+
+export type GigWithAvgRatingAndTotalReviews = Gig & {
+  totalReviews: number;
+  averageRating: number;
+};

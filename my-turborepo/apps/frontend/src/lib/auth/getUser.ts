@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { get } from "../utils/customFetch";
-import { User } from "@/stores/UserInfoStore";
+import { User } from "@fiverr/shared";
+import { sleep } from "../utils";
 
 export async function getUser(): Promise<User | null> {
   try {

@@ -60,7 +60,6 @@ export const post = <B, T = object>(
   body: B,
   options: FetchOptions = {},
 ): Promise<T> => {
-  console.log("body", body);
   options.method = "POST";
   options.body = JSON.stringify(body);
   return request<T>(endpoint, options);

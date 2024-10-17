@@ -1,30 +1,29 @@
-// src/stores/counter-store.ts
 "use client";
-import { ReactNode, createContext, useContext, useEffect, useRef } from "react";
+import { ReactNode, createContext, useContext, useRef } from "react";
 import { useStore } from "zustand";
 import { createStore } from "zustand/vanilla";
 import {
-  Categories,
-  Services,
-  Subcategories,
-  Metadata,
+  Category,
   Feature,
-  GigData,
-} from "../types/gig.interface";
+  Gig,
+  Metadata,
+  Subcategory,
+  Service,
+} from "@fiverr/shared";
 
 export type State = {
-  categories: Categories;
-  subcategories: Subcategories;
-  services: Services;
+  categories: Category[];
+  subcategories: Subcategory[];
+  services: Service[];
   metadata: Metadata[];
   features: Feature[];
-  gig: GigData;
+  gig: Gig;
 };
 
 export type StateActions = {
-  setCategories: (categories: Categories) => void;
-  setSubcategories: (subcategories: Subcategories) => void;
-  setServices: (services: Services) => void;
+  setCategories: (categories: Category[]) => void;
+  setSubcategories: (subcategories: Subcategory[]) => void;
+  setServices: (services: Service[]) => void;
   setMetadata: (metadata: Metadata[]) => void;
   setFeatures: (features: Feature[]) => void;
 };
@@ -37,7 +36,7 @@ export const defaultInitState: State = {
   services: [],
   metadata: [],
   features: [],
-  gig: {} as GigData,
+  gig: {} as Gig,
 };
 
 export const createStateStore = (initState: State = defaultInitState) => {

@@ -6,7 +6,9 @@ export class PhoneVerification {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, {
+    onDelete: 'CASCADE',
+  })
   user: User;
 
   @Column()

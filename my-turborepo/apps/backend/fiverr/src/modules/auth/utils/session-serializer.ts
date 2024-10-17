@@ -14,16 +14,16 @@ export class SessionSerializer extends PassportSerializer {
     super();
   }
 
-  serializeUser(user: User, done: Function) {
+  serializeUser(user: User, done: any) {
     if (user.googleId) {
+      console.log(user, 'PPPPPP');
       done(null, { userId: user.googleId, type: 'google' });
     } else if (user.id) {
-      done(null, { userId: user.googleId, type: 'local' });
+      done(null, { userId: user.id, type: 'local' });
     }
   }
 
-  async deserializeUser({ userId, type }: UserType, done: Function) {
-    console.log('deserializeUser');
+  async deserializeUser({ userId, type }: UserType, done: any) {
     if (type === 'local') {
       const user = await this.userService.findOneById(userId);
       done(null, user);

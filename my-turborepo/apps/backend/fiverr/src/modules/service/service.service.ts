@@ -36,9 +36,11 @@ export class ServiceService {
       );
     }
     // Create a new Service entity and set the subcategory relationship
-    let newService = this.serviceRepository.create({
+    const slug = service.name.replace(/\s+/g, '-').toLowerCase();
+    const newService = this.serviceRepository.create({
       ...service,
       subcategory: subcategory,
+      slug,
     });
     // Save the new Service entity to the database
     return this.serviceRepository.save(newService);

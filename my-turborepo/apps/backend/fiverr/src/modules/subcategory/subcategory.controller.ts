@@ -12,7 +12,6 @@ import { SubcategoryService } from './subcategory.service';
 import { CreateSubcategoryDTO } from './DTO/create-subcategory.dto';
 import { ParseIdPipe } from 'src/common/pipes/parse-id.pipe';
 import { NameValidationPipe } from 'src/common/pipes/name-validation.pipe';
-import { AdminGuard } from 'src/common/guards/admin.guard';
 import { LoggedUserGuard } from 'src/common/guards/logged-user.guard';
 
 @Controller('subcategory')
@@ -45,10 +44,12 @@ export class SubcategoryController {
   @Post('/createSubcategory')
   async createSubcategory(
     @Query('categoryId', ParseIdPipe) categoryId: number,
+    @Query('subcategoryGroupId', ParseIdPipe) subcategoryGroupId: number,
     @Body() subcategoryData: CreateSubcategoryDTO,
   ) {
     return this.subcategoryService.createSubcategory(
       categoryId,
+      subcategoryGroupId,
       subcategoryData,
     );
   }

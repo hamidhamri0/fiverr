@@ -8,7 +8,6 @@ import {
 } from 'typeorm';
 import { Subcategory } from '../subcategory/subcategory.entity';
 import { FeatureOption } from '../feature-option/feature-option.entity';
-import { PackageFeature } from '../package-feature/package-feature.entity';
 
 @Entity('features')
 export class Feature {

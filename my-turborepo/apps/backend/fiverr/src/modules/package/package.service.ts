@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Package } from './package.entity';
-import { EntityManager, Feature, Repository } from 'typeorm';
+import { EntityManager, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PackageFeature } from '../package-feature/package-feature.entity';
 import { createPackageDTO } from './DTO/createPackageDto';
@@ -37,6 +37,7 @@ export class PackageService {
     createPackageDTO: createPackageDTO,
     transactionalEntityManager: EntityManager,
   ) {
+    const sharedFeatures = ['name', 'description', 'price', 'deliveryTime'];
     const gig = await this.gigService.findOneById(gigId);
     if (gig.step < 3) {
       gig.step = 3;
@@ -60,7 +61,15 @@ export class PackageService {
         newPackage.gig = { id: gigId } as Gig;
         newPackage.packageFeatures = [];
 
+        for (const sharedFeature of sharedFeatures) {
+          if (features[sharedFeature]) {
+            newPackage[sharedFeature] = features[sharedFeature];
+          }
+        }
+
         for (const feature in features) {
+          if (sharedFeatures.includes(feature) || isNaN(Number(feature)))
+            continue;
           const featureEntity = await this.featureService.findOneById(
             Number(feature),
           );
@@ -102,6 +111,7 @@ export class PackageService {
     createPackageDTO: createPackageDTO,
     transactionalEntityManager: EntityManager,
   ) {
+    const sharedFeatures = ['name', 'description', 'price', 'deliveryTime'];
     const gig = await this.gigService.findOneById(gigId);
     if (!gig) {
       throw new Error(`Gig with id ${gigId} not found`);
@@ -115,6 +125,11 @@ export class PackageService {
           packageType,
           gigId,
         );
+        for (const sharedFeature of sharedFeatures) {
+          if (newFeatures[sharedFeature]) {
+            existingPackage[sharedFeature] = newFeatures[sharedFeature];
+          }
+        }
 
         if (!existingPackage) {
           throw new Error(
@@ -122,8 +137,12 @@ export class PackageService {
           );
         }
 
-        let featuresToUpdate = [];
+        const featuresToUpdate = [];
         for (const featureId in newFeatures) {
+          // these features should be on the package entity
+          if (sharedFeatures.includes(featureId) || isNaN(Number(featureId))) {
+            continue;
+          }
           const existingFeature = existingPackage.packageFeatures.find(
             (f) => f.featureId === Number(featureId),
           );
@@ -149,6 +168,7 @@ export class PackageService {
           }
         }
 
+        await transactionalEntityManager.save(existingPackage);
         if (featuresToUpdate.length > 0) {
           await transactionalEntityManager.save(featuresToUpdate);
         }

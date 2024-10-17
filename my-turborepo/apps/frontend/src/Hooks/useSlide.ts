@@ -1,3 +1,5 @@
+"use client";
+import { set } from "date-fns";
 import React, { useEffect, useRef, useState } from "react";
 
 export default function useSlide() {
@@ -9,43 +11,56 @@ export default function useSlide() {
   const [scrollLeft, setScrollLeft] = useState(0);
 
   const [isLastElementVisible, setIsLastElementVisible] = useState(false);
-  const [isFirstElementVisible, setIsFirstElementVisible] = useState(false);
+  const [isFirstElementVisible, setIsFirstElementVisible] = useState(true);
+
+  // useEffect(() => {
+  //   const container = scrollRef.current;
+  //   const firstElement = container?.firstElementChild
+  //     ?.firstElementChild as HTMLElement;
+  //   const lastElement = container?.firstElementChild
+  //     ?.lastElementChild as HTMLElement;
+
+  //   if (!container || !firstElement || !lastElement) return;
+
+  //   const observer = new IntersectionObserver(
+  //     (entries) => {
+  //       entries.forEach((entry) => {
+  //         if (entry.target === firstElement) {
+  //           setIsFirstElementVisible(entry.isIntersecting);
+  //         }
+  //         if (entry.target === lastElement) {
+  //           setIsLastElementVisible(entry.isIntersecting);
+  //         }
+  //       });
+  //     },
+  //     {
+  //       root: container,
+  //       rootMargin: "0px",
+  //       threshold: [0.99], // Elements need to be fully visible
+  //     },
+  //   );
+
+  //   observer.observe(firstElement);
+  //   observer.observe(lastElement);
+
+  //   // Cleanup observer on component unmount
+  //   return () => {
+  //     observer.unobserve(firstElement);
+  //     observer.unobserve(lastElement);
+  //   };
+  // }, []);
 
   useEffect(() => {
-    const container = scrollRef.current;
-    const firstElement = container?.firstElementChild as HTMLElement;
-    const lastElement = container?.firstElementChild?.childNodes[
-      container?.firstElementChild?.childNodes.length - 1
-    ] as HTMLElement;
-
-    if (!container || !firstElement || !lastElement) return;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.target === firstElement) {
-            setIsFirstElementVisible(entry.isIntersecting);
-          }
-          if (entry.target === lastElement) {
-            setIsLastElementVisible(entry.isIntersecting);
-          }
-        });
-      },
-      {
-        root: container,
-        rootMargin: "0px",
-        threshold: [0.99], // Elements need to be fully visible
-      },
-    );
-
-    observer.observe(firstElement);
-    observer.observe(lastElement);
-
-    // Cleanup observer on component unmount
-    return () => {
-      observer.unobserve(firstElement);
-      observer.unobserve(lastElement);
-    };
+    let container = scrollRef.current;
+    if (container) {
+      const firstChild = container.firstElementChild as HTMLElement;
+      const first = firstChild.firstElementChild as HTMLElement;
+      const last = firstChild.lastElementChild as HTMLElement;
+      if (first == last) {
+        setIsFirstElementVisible(true);
+        setIsLastElementVisible(true);
+      }
+    }
   }, []);
 
   const scrollLeftHandler = (e: React.MouseEvent) => {
@@ -65,9 +80,14 @@ export default function useSlide() {
         ).getBoundingClientRect();
         if (Math.floor(childRect.left) < Math.floor(containerRect.left)) {
           scrollByWidth = containerRect.left - childRect.left;
+          if (firstChildChildren[i] == firstChildChildren[0]) {
+            setIsFirstElementVisible(true);
+          }
           break;
         }
       }
+
+      setIsLastElementVisible(false);
 
       container.scrollBy({
         left: -scrollByWidth,
@@ -77,12 +97,6 @@ export default function useSlide() {
       setTimeout(() => {
         setIsScrolling(false);
       }, 100);
-      // const scrollEnd = function () {
-      //   setIsScrolling(false);
-      //   container.removeEventListener("scrollend", scrollEnd);
-      // };
-      // console.log(container, "container");
-      // container.addEventListener("scrollend", scrollEnd);
     }
   };
 
@@ -96,31 +110,21 @@ export default function useSlide() {
 
       const containerRect = container.getBoundingClientRect();
       const firstChildChildren = Array.from(firstChild.childNodes);
+      const lastChild = firstChildChildren[
+        firstChildChildren.length - 1
+      ] as HTMLElement;
       let scrollByWidth = 0;
       for (const child of firstChildChildren) {
         const childRect = (child as HTMLElement).getBoundingClientRect();
         if (Math.floor(childRect.right) > Math.floor(containerRect.right)) {
-          scrollByWidth = childRect.right - containerRect.right;
+          scrollByWidth = childRect.right - containerRect.right + 1;
+          if (child === lastChild) {
+            setIsLastElementVisible(true);
+          }
           break;
         }
       }
-
-      // const gap = Number(
-      //   getComputedStyle(firstChild).gap.replace("px", "") || 0,
-      // );
-
-      // setCurrentElement((p) => p + 1);
-      // const childWidth =
-      //   firstChild?.childNodes?.[currentElement]?.getBoundingClientRect()
-      //     ?.width + gap;
-
-      // const remainingScrollWidth =
-      //   scrollRef.current.scrollWidth -
-      //   scrollRef.current.clientWidth -
-      //   scrollRef.current.scrollLeft;
-
-      // const scrollByWidth =
-      //   remainingScrollWidth > childWidth ? childWidth : remainingScrollWidth;
+      setIsFirstElementVisible(false);
 
       container.scrollBy({
         left: scrollByWidth,
@@ -129,19 +133,8 @@ export default function useSlide() {
       setTimeout(() => {
         setIsScrolling(false);
       }, 100);
-      // const scrollEnd = function () {
-      //   setIsScrolling(false);
-      //   scrollRef.current?.removeEventListener("scrollend", scrollEnd);
-      // };
-      // container.addEventListener("scrollend", scrollEnd);
     }
   };
-
-  // useEffect(() => {
-  //   const container = scrollRef.current;
-  //   if (!container) return;
-
-  // }, []);
 
   const onMouseDown = (e: React.MouseEvent) => {
     if (scrollRef.current) {

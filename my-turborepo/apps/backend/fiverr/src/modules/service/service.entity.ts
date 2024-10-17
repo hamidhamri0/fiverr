@@ -3,7 +3,6 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  ManyToMany,
   JoinColumn,
   OneToMany,
 } from 'typeorm';
@@ -18,6 +17,12 @@ export class Service {
 
   @Column()
   name: string;
+
+  @Column({ unique: true })
+  slug: string;
+
+  @Column()
+  image: string;
 
   @ManyToOne(() => Subcategory, (subcategory) => subcategory.services, {
     nullable: false,

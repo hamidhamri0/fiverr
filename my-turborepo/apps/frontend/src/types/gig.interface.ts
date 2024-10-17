@@ -1,3 +1,5 @@
+import { Gig } from "@fiverr/shared";
+
 export type Type = {
   id: number;
   name: string;
@@ -63,52 +65,6 @@ export type Faq = {
   position: number;
 };
 
-export type GigFromFetch = {
-  id: string;
-  title: string;
-  aboutGig: AboutGig;
-  description: string;
-  isPublished: boolean;
-  step: number;
-  category: Category;
-  subcategory: Subcategory;
-  service: Service;
-  metadata: Metadata[];
-  tags: Tag[];
-  packages: Package[];
-  faqs: Faq[];
-  clicks: number;
-  orders: number;
-  impressions: number;
-  cancellations: number;
-  questions: Questions;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type GigRefactored = {
-  id: string;
-  title: string;
-  aboutGig: AboutGig;
-  description: string;
-  isPublished: boolean;
-  step: number;
-  category: string;
-  subcategory: string;
-  service: string;
-  metadataTag: Metadata[];
-  tags: Tag[];
-  packages: Package[];
-  faqs: Faq[];
-  clicks: number;
-  orders: number;
-  impressions: number;
-  cancellations: number;
-  questions: Questions;
-  createdAt: string;
-  updatedAt: string;
-};
-
 export type ResultMetadata = {
   [key: string]: string | string[];
 };
@@ -117,18 +73,7 @@ export type ResultPackageFeature = {
   [key: string]: string;
 };
 
-export type GigData = {
-  id: string;
-  title: string;
-  aboutGig: AboutGig;
-  description: string;
-  isPublished: boolean;
-  step: number;
-  createdAt: string;
-  updatedAt: string;
-  category: Category;
-  subcategory: Subcategory;
-  service: Service;
+export type GigData = Gig & {
   metadataTag: ResultMetadata[];
   tags: Tag[];
   packages: Package[];
@@ -145,8 +90,8 @@ export type GigData = {
     videoUrl?: string;
     thumbnail?: string;
   };
-  pdfUrls: File[] | undefined[];
   pdfUrlsPreview: string[];
+  editor: string;
 };
 
 export type Option = {
@@ -164,17 +109,6 @@ export type Feature = {
 export type Features = Feature[];
 
 export type GigInputData = {
-  /*
-"title": "baby firl in the building",
-    "description":"creating the best 3d modelling i history",
-    "metadataIds": [1, 2],
-    "metadataTagIds": [1,5,7],
-    "categoryId":1,
-    "subcategoryId":1,
-    "serviceId":1,
-    "tagIds": [1],
-    "userId": "0fb5e0e7-25ea-400b-b3b8-285b88b6587c",
-  */
   title: string;
   description: string;
   metadataIds: string[];

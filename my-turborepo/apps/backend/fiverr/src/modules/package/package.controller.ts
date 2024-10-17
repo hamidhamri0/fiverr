@@ -1,14 +1,5 @@
-import {
-  Body,
-  Controller,
-  Param,
-  ParseUUIDPipe,
-  Post,
-  Get,
-} from '@nestjs/common';
+import { Controller, Param, ParseUUIDPipe, Get } from '@nestjs/common';
 import { PackageService } from './package.service';
-import { createPackageDTO } from './DTO/createPackageDto';
-import { updatePackageDTO } from './DTO/updatePackageDto';
 
 @Controller('package')
 export class PackageController {
