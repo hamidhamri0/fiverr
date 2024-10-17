@@ -19,12 +19,27 @@ export class CategoryService {
     return this.categoryRepository.findOne({ where: { id } });
   }
 
+  async getCategoryWithSubCategoryGroupsByCategoryName(slug: string) {
+    const queryBuilder = this.categoryRepository
+      .createQueryBuilder('category')
+      .leftJoinAndSelect('category.subcategoryGroups', 'subcategoryGroups')
+      .leftJoinAndSelect('subcategoryGroups.subcategories', 'subcategories')
+      .where('category.slug = :slug', {
+        slug,
+      });
+    return await queryBuilder.getOne();
+  }
+
   async findOneByName(name: string) {
     return this.categoryRepository.findOne({ where: { name } });
   }
 
   async createCategory(category: CreateCategoryDTO) {
-    let newCategory = this.categoryRepository.create(category);
+    const slug = category.name.replace(/\s+/g, '-').toLowerCase();
+    const newCategory = this.categoryRepository.create({
+      ...category,
+      slug,
+    });
     return this.categoryRepository.save(newCategory);
   }
 

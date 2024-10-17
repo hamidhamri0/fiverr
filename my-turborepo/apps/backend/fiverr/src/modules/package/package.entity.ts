@@ -26,6 +26,26 @@ export class Package {
   @JoinColumn({ name: 'gigId' })
   gig: Gig;
 
+  @Column({
+    nullable: true,
+  })
+  price: number;
+
+  @Column({
+    nullable: true,
+  })
+  name: string;
+
+  @Column({
+    nullable: true,
+  })
+  description: string;
+
+  @Column({
+    nullable: true,
+  })
+  deliveryTime: string;
+
   @OneToMany(() => PackageFeature, (packageFeature) => packageFeature.package, {
     cascade: true,
   })

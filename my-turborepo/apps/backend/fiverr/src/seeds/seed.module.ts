@@ -10,6 +10,7 @@ import { SeedController } from './seed.controller';
 import { TagModule } from 'src/modules/tag/tag.module';
 import { FeatureModule } from 'src/modules/feature/feature.module';
 import { FeatureOptionModule } from 'src/modules/feature-option/feature-option.module';
+import { SubcategoryGroupModule } from '@modules/subcategory-group/subcategory-group.module';
 
 /**
  * Import and provide seeder classes.
@@ -26,6 +27,7 @@ import { FeatureOptionModule } from 'src/modules/feature-option/feature-option.m
     TagModule,
     FeatureModule,
     FeatureOptionModule,
+    SubcategoryGroupModule,
   ],
   controllers: [SeedController],
   providers: [DatabaseSeeder, SeedCommand],

@@ -6,12 +6,12 @@ import {
   JoinColumn,
   OneToMany,
   Unique,
-  ManyToMany,
 } from 'typeorm';
 import { Category } from '../category/category.entity';
 import { Service } from '../service/service.entity';
 import { Feature } from '../feature/feature.entity';
 import { Gig } from '../gig/gig.entity';
+import { SubcategoryGroup } from '@modules/subcategory-group/subcategory-group.entity';
 
 @Entity('subcategories')
 @Unique(['name', 'category'])
@@ -19,8 +19,11 @@ export class Subcategory {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ unique: true })
   name: string;
+
+  @Column({ unique: true })
+  slug: string;
 
   @ManyToOne(() => Category, (category) => category.subcategories, {
     onDelete: 'CASCADE',
@@ -28,6 +31,12 @@ export class Subcategory {
   })
   @JoinColumn({ name: 'categoryId' })
   category: Category;
+
+  @ManyToOne(() => SubcategoryGroup, (group) => group.subcategories, {
+    nullable: false,
+    onDelete: 'CASCADE',
+  })
+  group: SubcategoryGroup;
 
   @OneToMany(() => Service, (service) => service.subcategory)
   services: Service[];

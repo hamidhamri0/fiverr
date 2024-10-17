@@ -41,7 +41,7 @@ export class PackageFeatureService {
       );
     }
     // Create a new PackageFeature entity and set the package and feature relationships
-    let newPackageFeature = this.packageFeatureRepository.create({
+    const newPackageFeature = this.packageFeatureRepository.create({
       package: packageEntity,
       featureId,
       value,

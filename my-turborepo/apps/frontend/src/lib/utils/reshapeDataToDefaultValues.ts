@@ -1,19 +1,8 @@
 import { generateText } from "@tiptap/core";
 import Highlight from "@tiptap/extension-highlight";
 import StarterKit from "@tiptap/starter-kit";
-import {
-  Category,
-  GigData,
-  Metadata,
-  Service,
-  Subcategory,
-  Questions,
-  ResultMetadata,
-  Gig,
-  ResultPackageFeature,
-} from "@/types/gig.interface";
-import { Package } from "@/types/gig.interface";
-import { Images } from "lucide-react";
+import { ResultMetadata, ResultPackageFeature } from "@/types/gig.interface";
+import { Gig, Metadata, Package } from "@fiverr/shared";
 
 export default function reshapeDataToDefaultValues(data: Gig) {
   return {
@@ -51,7 +40,7 @@ export default function reshapeDataToDefaultValues(data: Gig) {
     editor:
       (data?.aboutGig &&
         generateText(data?.aboutGig, [StarterKit, Highlight])) ||
-      "",
+      {},
   };
 }
 
@@ -82,5 +71,11 @@ function reshapePackageToDefaultValues(
   for (const feature of packageData.packageFeatures) {
     data[feature.featureId] = feature.value;
   }
+  console.log(packageData);
+  data["name"] = packageData.name;
+  data["description"] = packageData.description;
+  data["price"] = String(packageData.price);
+  data["deliveryTime"] = packageData.deliveryTime;
+
   return data;
 }

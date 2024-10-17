@@ -10,40 +10,43 @@ const config: Config = {
   ],
 
   theme: {
-  	screens: {
-  		'1150': {
-  			max: '1150px'
-  		},
-  		'2xl': {
-  			max: '1500px'
-  		},
-  		xl: {
-  			max: '1279px'
-  		},
-  		lg: {
-  			max: '1023px'
-  		},
-  		md: {
-  			max: '824px'
-  		},
-  		sm: {
-  			max: '680px'
-  		},
-  		xs: {
-  			max: '550px'
-  		}
-  	},
-  	extend: {
-  		width: {
-  			'1400': '1400px'
-  		},
-  		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
-  		},
-  		colors: {}
-  	}
+    screens: {
+      "1150": {
+        max: "1150px",
+      },
+      "2xl": {
+        max: "1500px",
+      },
+      x2xl: {
+        max: "1150px",
+      },
+      xl: {
+        max: "1279px",
+      },
+      lg: {
+        max: "1023px",
+      },
+      md: {
+        max: "824px",
+      },
+      sm: {
+        max: "680px",
+      },
+      xs: {
+        max: "550px",
+      },
+    },
+    extend: {
+      width: {
+        "1400": "1400px",
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      colors: {},
+    },
   },
   plugins: [require("@tailwindcss/typography"), require("tailwindcss-animate")],
 };

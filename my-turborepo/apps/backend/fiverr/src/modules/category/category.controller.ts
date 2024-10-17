@@ -5,15 +5,15 @@ import {
   Get,
   Post,
   Query,
-  UseGuards,
+  // UseGuards,
 } from '@nestjs/common';
 import { CategoryService } from './category.service';
 import { CreateCategoryDTO } from './DTO/create-category-dto';
 import { ParseIdPipe } from 'src/common/pipes/parse-id.pipe';
-import { LoggedUserGuard } from 'src/common/guards/logged-user.guard';
+// import { LoggedUserGuard } from 'src/common/guards/logged-user.guard';
 
 @Controller('category')
-@UseGuards(new LoggedUserGuard())
+// @UseGuards(new LoggedUserGuard())
 export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
   @Get('/getAllCategories')
@@ -24,6 +24,17 @@ export class CategoryController {
   @Get('/getOneById')
   async findOneById(@Query('id', ParseIdPipe) id: number) {
     return this.categoryService.findOneById(id);
+  }
+
+  @Get('/getCategoryWithSubCategoryGroupsByCategoryName')
+  async getCategoryWithSubCategoryGroupsByCategoryName(
+    @Query('category') slug: string,
+  ) {
+    console.log(slug);
+
+    return this.categoryService.getCategoryWithSubCategoryGroupsByCategoryName(
+      slug,
+    );
   }
 
   @Get('/getOneByName')

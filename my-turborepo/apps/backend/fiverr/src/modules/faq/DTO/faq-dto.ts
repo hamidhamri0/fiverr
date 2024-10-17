@@ -15,10 +15,3 @@ export class FaqDTO {
   @IsNumber()
   position: number;
 }
-
-// export class CreateFaqsDTO {
-//   @IsArray()
-//   @ValidateNested({ each: true })
-//   @Type(() => FaqDTO)
-//   faqs: FaqDTO[];
-// }

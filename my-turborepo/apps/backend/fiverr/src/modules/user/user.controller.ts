@@ -11,6 +11,7 @@ import { UserService } from './user.service';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { userPreferencesDto } from './DTO/user-preferences.dto';
 import { User } from './user.entity';
+import { updateUserDto } from './DTO/update-user.dto';
 
 @Controller('user')
 export class UserController {
@@ -29,7 +30,7 @@ export class UserController {
   async updateUserInfo(
     @CurrentUser() user,
     @Body()
-    userInfo: Partial<User>,
+    userInfo: updateUserDto,
   ) {
     return this.userService.updateUserInfo(user?.id, userInfo);
   }

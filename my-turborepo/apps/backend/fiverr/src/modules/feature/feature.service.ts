@@ -42,7 +42,7 @@ export class FeatureService {
       );
     }
     // Create a new Feature entity and set the subcategory relationship
-    let newFeature = this.featureRepository.create({
+    const newFeature = this.featureRepository.create({
       ...feature,
       subcategory: subcategory,
     });

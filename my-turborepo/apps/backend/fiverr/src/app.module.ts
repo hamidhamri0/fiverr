@@ -3,25 +3,15 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UserModule } from './modules/user/user.module';
 import { UserLanguageModule } from './modules/user-language/user-language.module';
-import { CategoryController } from './modules/category/category.controller';
 import { CategoryModule } from './modules/category/category.module';
-import { SubcategoryController } from './modules/subcategory/subcategory.controller';
-import { SubcategoryService } from './modules/subcategory/subcategory.service';
 import { SubcategoryModule } from './modules/subcategory/subcategory.module';
 import { ServiceModule } from './modules/service/service.module';
-import { TagController } from './modules/tag/tag.controller';
-import { TagService } from './modules/tag/tag.service';
 import { TagModule } from './modules/tag/tag.module';
-
-import { PackageController } from './modules/package/package.controller';
-import { PackageService } from './modules/package/package.service';
 import { PackageModule } from './modules/package/package.module';
 import { PackageFeatureModule } from './modules/package-feature/package-feature.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AuthController } from './modules/auth/auth.controller';
 import { AuthModule } from './modules/auth/auth.module';
 import { PassportModule } from '@nestjs/passport';
-import { CategoryService } from './modules/category/category.service';
 import { MetadataModule } from './modules/metadata/metadata.module';
 import { MetadataTagModule } from './modules/metadata-tag/metadata-tag.module';
 import { FeatureModule } from './modules/feature/feature.module';
@@ -40,6 +30,8 @@ import { CloudinaryModule } from './modules/cloudinary/cloudinary.module';
 import { TwilioModule } from './modules/twilio/twilio.module';
 import { MailerModule } from './modules/mailer/mailer.module';
 import { PhoneVerificationModule } from './modules/phone-verification/phone-verification.module';
+import { GigReviewsModule } from './modules/gig-reviews/gig-reviews.module';
+import { SubcategoryGroupModule } from '@modules/subcategory-group/subcategory-group.module';
 
 @Module({
   imports: [
@@ -52,11 +44,13 @@ import { PhoneVerificationModule } from './modules/phone-verification/phone-veri
       database: 'fiverr',
       autoLoadEntities: true,
       // entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+      // logging: true,
       synchronize: true,
     }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
+    GigReviewsModule,
     MailerModule,
     PhoneVerificationModule,
     TwilioModule,
@@ -81,6 +75,8 @@ import { PhoneVerificationModule } from './modules/phone-verification/phone-veri
     QuestionModule,
     CloudinaryModule,
     TwilioModule,
+    GigReviewsModule,
+    SubcategoryGroupModule,
   ],
   controllers: [AppController],
   providers: [

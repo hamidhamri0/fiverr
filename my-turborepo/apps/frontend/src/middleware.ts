@@ -2,18 +2,18 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { get } from "./lib/utils/customFetch";
 import { cookies } from "next/headers";
-import { User } from "./stores/UserInfoStore";
+import { User } from "@fiverr/shared";
 
 export async function middleware(request: NextRequest) {
   const cookie = cookies().toString();
   try {
-    // const user = await get<User>("/auth/session", {
-    //   isCookie: cookie,
-    // });
+    const user = await get<User>("/auth/session", {
+      isCookie: cookie,
+    });
 
-    // if (user.isNew) {
-    //   return NextResponse.redirect(new URL("/", request.url));
-    // }
+    if (user.isNew) {
+      return NextResponse.redirect(new URL("/", request.url));
+    }
 
     return NextResponse.next();
   } catch (error) {
@@ -24,5 +24,5 @@ export async function middleware(request: NextRequest) {
 
 // See "Matching Paths" below to learn more
 export const config = {
-  matcher: ["/manage_gigs/:path*"],
+  matcher: ["/:path*/manage_gigs/:path*"],
 };

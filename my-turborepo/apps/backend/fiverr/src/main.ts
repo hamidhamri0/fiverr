@@ -3,7 +3,7 @@ import { AppModule } from './app.module';
 import * as session from 'express-session';
 import * as passport from 'passport';
 import { ValidationPipe } from '@nestjs/common';
-import { GlobalExceptionFilter } from './common/filters/GlobalExceptionFilter';
+// import { GlobalExceptionFilter } from './common/filters/GlobalExceptionFilter';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -26,7 +26,7 @@ async function bootstrap() {
       secret: 'myeofkseijkijsecret',
       resave: false,
       saveUninitialized: false,
-      cookie: { maxAge: 60000000 }, // Adjust secure based on your environment
+      cookie: { maxAge: 600000000000 }, // Adjust secure based on your environment
     }),
   );
   app.use(passport.initialize());

@@ -8,10 +8,13 @@ import {
   JoinTable,
   ManyToMany,
   Check,
+  VirtualColumn,
 } from 'typeorm';
 import { UserLanguage } from '../user-language/user-language.entity';
 import { Gig } from '../gig/gig.entity';
 import { PhoneVerification } from '../phone-verification/phone-verification.entity';
+import { GigReviews } from '@modules/gig-reviews/gig-reviews.entity';
+import { Category } from 'types/category';
 
 @Entity('users')
 export class User {
@@ -21,14 +24,17 @@ export class User {
   @Column({ nullable: true })
   name?: string;
 
+  @Column({ nullable: true })
+  bio: string;
+
   @Column({ unique: true })
   email: string;
 
   @Column({ nullable: true })
-  password?: string; // Make password optional
+  password?: string; // Make password optional because of Oauth
 
   @Column({ nullable: true })
-  country?: string;
+  country: string;
 
   @Column({ nullable: true })
   phoneNumber?: string;
@@ -43,13 +49,13 @@ export class User {
   isVerifiedEmail?: boolean;
 
   @Column({ unique: true, nullable: true })
-  username?: string;
+  username: string;
 
-  @Column({ unique: true, nullable: true })
-  description: string;
-
-  @Column({ nullable: true })
-  picture?: string;
+  @Column({
+    default:
+      'https://res.cloudinary.com/dnnaq2dbk/image/upload/v1727869488/profile_hagunn.webp',
+  })
+  picture: string;
 
   @Column({ default: true })
   isNew?: boolean;
@@ -63,9 +69,24 @@ export class User {
   @Column({ nullable: true, unique: true })
   facebookId?: string; // Add field for Facebook ID
 
+  @Column({ default: false })
+  pro: boolean;
+
+  @Column({ default: 0 })
+  level: number;
+
+  @Column({
+    type: 'jsonb',
+    default: '[]',
+  })
+  lastVisitedGigs: LastVisitedGig[];
+
   @Check(`"preferredStartDay" >= 0`)
   @Column({ nullable: true })
   preferredStartDay?: number;
+
+  @Column({ nullable: true, type: 'jsonb', default: '[]' })
+  skills?: string[];
 
   @Check(`"preferredEndDay" >= 0`)
   @Column({ nullable: true })
@@ -81,10 +102,13 @@ export class User {
   timezone: string;
 
   @CreateDateColumn()
-  createdAt?: Date;
+  createdAt: Date;
 
   @UpdateDateColumn()
-  updatedAt?: Date;
+  updatedAt: Date;
+
+  @OneToMany(() => GigReviews, (gigRating) => gigRating.user)
+  gigReviews?: GigReviews[];
 
   @ManyToMany(() => UserLanguage, (userLanguage) => userLanguage.user)
   @JoinTable({
@@ -107,5 +131,22 @@ export class User {
     () => PhoneVerification,
     (phoneVerification) => phoneVerification.user,
   )
-  phoneVerifications: PhoneVerification[];
+  phoneVerifications?: PhoneVerification[];
+
+  @VirtualColumn({
+    query: () => '',
+    type: 'numeric',
+  })
+  userTotalReviews: number;
+
+  @VirtualColumn({
+    query: () => '',
+    type: 'numeric',
+  })
+  userRating: number;
 }
+
+export type LastVisitedGig = {
+  gigId: string;
+  category: Category;
+};

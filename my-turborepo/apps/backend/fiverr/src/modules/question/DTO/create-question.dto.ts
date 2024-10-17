@@ -6,7 +6,6 @@ import {
   ValidateNested,
   IsObject,
   IsOptional,
-  isArray,
   ArrayMinSize,
   ArrayMaxSize,
   IsNumber,
@@ -27,7 +26,7 @@ class QuestionType {
   multiple: boolean;
 }
 
-export class Question {
+export class QuestionDto {
   @IsOptional()
   @IsNumber()
   id?: number;
@@ -51,10 +50,10 @@ export class Question {
 export class SaveQuestionDto {
   @IsArray()
   @ValidateNested()
-  @Type(() => Question)
+  @Type(() => QuestionDto)
   @ArrayMinSize(2, {
     message: 'at least two questions',
   })
   @ArrayMaxSize(5)
-  question: Question[];
+  question: QuestionDto[];
 }

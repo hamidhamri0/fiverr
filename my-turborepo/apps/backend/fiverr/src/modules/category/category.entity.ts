@@ -1,26 +1,33 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-  ManyToMany,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { Subcategory } from '../subcategory/subcategory.entity';
 import { Gig } from '../gig/gig.entity';
+import { SubcategoryGroup } from '@modules/subcategory-group/subcategory-group.entity';
 
 @Entity('categories')
 export class Category {
   @PrimaryGeneratedColumn()
-  id?: number;
+  id: number;
 
   @Column({ unique: true })
   name: string;
 
+  @Column({ unique: true })
+  slug: string;
+
   @OneToMany(() => Subcategory, (subcategory) => subcategory.category)
   subcategories?: Subcategory[];
 
+  @Column()
+  image: string;
+
+  @OneToMany(
+    () => SubcategoryGroup,
+    (subcategoryGroup) => subcategoryGroup.category,
+  )
+  subcategoryGroups?: SubcategoryGroup[];
+
   @OneToMany(() => Gig, (gig) => gig.category)
-  gigs: Gig[];
+  gigs?: Gig[];
 }
 
 /*

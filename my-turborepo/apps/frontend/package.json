@@ -1,5 +1,5 @@
 {
-  "name": "fiverralike",
+  "name": "frontend",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,6 +10,7 @@
     "start:all": "concurrently \"cd C:\\Users\\hamid\\Documents\\GitHub\\fiverr\\backend\\fiver && yarn start:dev\" \"cd C:\\Users\\hamid\\Documents\\GitHub\\fiverr\\frontend && yarn dev\""
   },
   "dependencies": {
+    "@fiverr/shared": "*",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-dialog": "^1.1.1",
@@ -22,13 +23,16 @@
     "@tailwindcss/typography": "^0.5.15",
     "@tiptap/core": "^2.6.6",
     "@tiptap/extension-highlight": "^2.6.6",
+    "@tiptap/extension-text-style": "^2.8.0",
+    "@tiptap/html": "^2.8.0",
     "@tiptap/react": "^2.6.6",
     "@tiptap/starter-kit": "^2.6.6",
     "axios": "^1.7.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
-    "dompurify": "^3.1.6",
+    "dompurify": "^3.1.7",
+    "embla-carousel-react": "^8.3.0",
     "libphonenumber-js": "^1.11.9",
     "lucide-react": "^0.446.0",
     "moment-timezone": "^0.5.45",
@@ -48,6 +52,7 @@
     "zustand": "^4.5.5"
   },
   "devDependencies": {
+    "@types/dompurify": "^3.0.5",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",

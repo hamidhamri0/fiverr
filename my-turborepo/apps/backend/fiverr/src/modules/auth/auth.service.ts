@@ -1,9 +1,13 @@
+import { GigService } from '@modules/gig/gig.service';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UserService } from 'src/modules/user/user.service';
 
 @Injectable()
 export class AuthService {
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private gigService: GigService,
+  ) {}
 
   async validateLocalUser({
     email,
@@ -19,11 +23,17 @@ export class AuthService {
       const userByUsername = await this.userService.findOneByUsername(username);
       if (userByUsername)
         throw new UnauthorizedException('Username already exists');
-      return await this.userService.createLocalUser({
+      const randomGigs = await this.gigService.findRandomGigs(5);
+      const newUser = await this.userService.createLocalUser({
         email,
         password,
         username,
+        lastVisitedGigs: randomGigs.map((gig) => ({
+          gigId: gig.id,
+          category: gig.category,
+        })),
       });
+      return newUser;
     }
 
     if (user.password !== password)
@@ -44,15 +54,20 @@ export class AuthService {
     picture: string;
   }) {
     let userWithGoogle = await this.userService.findOneByGoogleId(googleId);
-    let userWithEmail = await this.userService.findOneByEmail(email);
+    const userWithEmail = await this.userService.findOneByEmail(email);
 
     if (userWithGoogle) return userWithGoogle;
     if (!userWithGoogle && !userWithEmail) {
+      const randomGigs = await this.gigService.findRandomGigs(5);
       userWithGoogle = await this.userService.createGoogleUser({
         googleId,
         email,
         name,
         picture,
+        lastVisitedGigs: randomGigs.map((gig) => ({
+          gigId: gig.id,
+          category: gig.category,
+        })),
       });
       return userWithGoogle;
     }
