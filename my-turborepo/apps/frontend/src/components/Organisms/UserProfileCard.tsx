@@ -1,6 +1,6 @@
 ("use client");
 import React from "react";
-import Button from "../Atoms/Btn";
+import Button from "@/Components/Atoms/Btn";
 import UserCard, {
   UserCardBio,
   UserCardImage,

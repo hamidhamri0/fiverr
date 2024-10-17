@@ -6,3 +6,4 @@ export const ACCEPTED_IMAGE_TYPES = [
   "image/webp",
 ];
 export const ACCEPTED_VIDEO_TYPES = ["video/mp4", "video/webm", "video/ogg"];
+export const MAX_RATING = 3;

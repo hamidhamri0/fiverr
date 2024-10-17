@@ -3,9 +3,9 @@ import React, { useState } from "react";
 import { LuRepeat2 } from "react-icons/lu";
 import { MdOutlineAccessTime } from "react-icons/md";
 import { FaCheck } from "react-icons/fa";
-import Button from "../Atoms/Btn";
+import Button from "@/Components/Atoms/Btn";
 import { TiArrowRight } from "react-icons/ti";
-import { GigWithAvgRatingAndTotalReviews as Gig } from "types/gig";
+import { GigWithAvgRatingAndTotalReviews as Gig } from "@fiverr/shared";
 import reshapePackageData from "@/lib/utils/reshapePackageData";
 import PricingButton from "@/Components/Atoms/PricingButton";
 

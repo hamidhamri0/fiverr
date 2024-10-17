@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 
 const SlideShow = ({ images }: { images: string[] }) => {
   const [currentIndex, setCurrentIndex] = useState(0);

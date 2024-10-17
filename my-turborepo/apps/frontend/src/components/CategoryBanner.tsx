@@ -1,6 +1,6 @@
 import React from "react";
 import { IoIosPlayCircle } from "react-icons/io";
-import { twMerge } from "tailwind-merge";
+import { cn } from "@/lib/utils";
 
 type CategoryBannerProps = {
   bgImage: string;
@@ -37,7 +37,7 @@ export default function CategoryBanner({
   children,
   className = "",
 }: CategoryBannerProps) {
-  className = twMerge(
+  className = cn(
     `${bgImage} bg-cover mx-auto flex max-h-[294px] min-h-[240px] max-w-[1450px] flex-col items-center justify-center gap-12 rounded-2xl bg-no-repeat px-4 `,
     className,
     mobileBgImage,

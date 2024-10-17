@@ -1,8 +1,6 @@
 "use client";
-import { useRef, useState } from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import useSlide from "../Hooks/useSlide";
-
 const categories = [
   "Graphics & Design",
   "Programming & Tech",
@@ -19,7 +17,6 @@ const categories = [
   "Cpp and Assembly as",
   "Cpp and Assembly asz",
 ];
-
 export default function Categories() {
   const {
     scrollRef,

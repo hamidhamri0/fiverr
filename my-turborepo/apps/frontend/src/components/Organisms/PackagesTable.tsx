@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { FaCheck } from "react-icons/fa";
-import Button from "../Atoms/Btn";
+import Button from "@/Components/Atoms/Btn";
 import { GigWithAvgRatingAndTotalReviews as Gig } from "@fiverr/shared";
 import reshapePackageData from "@/lib/utils/reshapePackageData";
 import { cn } from "@/lib/utils";

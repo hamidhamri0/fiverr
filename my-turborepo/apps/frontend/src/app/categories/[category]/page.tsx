@@ -3,7 +3,7 @@ import { getCategoryWithSubCategoryGroups } from "@/lib/cateogry";
 import CategoryBanner, {
   CategoryBannerContent,
 } from "@/Components/CategoryBanner";
-import HeroBanner from "@/Components/HeroBanner";
+import HeroBanner from "@/Components/Organisms/HeroBanner";
 import CategoryGrid from "@/Components/Organisms/SubcategoriesGrid";
 import CategoryCarousel from "@/Components/Organisms/ServicesCardCarousel";
 

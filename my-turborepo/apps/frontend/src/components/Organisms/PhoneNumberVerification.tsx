@@ -3,8 +3,6 @@ import PhoneNumberModal from "./PhoneNumberModal";
 import VerificationCode from "./PhoneNumberVerificationCodeModal";
 import { countriesWithPhoneCode } from "@/lib/utils/countriesWithPhoneCode";
 
-type Country = (typeof countriesWithPhoneCode)[0];
-
 export default function VerificationPhoneNumber({
   setIsOpen,
 }: {

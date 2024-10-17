@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import RatingStarsCard from "./Molecules/RatingStarsCard";
-import Menus from "./Menu";
+import Menus from "./Organisms/Menu";
 import { formatDistanceToNow } from "date-fns";
 import Button from "./Atoms/Btn";
 import { Gig } from "types/gig";
@@ -9,12 +9,6 @@ import { GigReviews } from "types/gig-reviews";
 import { countriesWithPhoneCode } from "@/lib/utils/countriesWithPhoneCode";
 import Image from "next/image";
 import ReviewBar from "@/Components/Molecules/ReviewBar";
-
-type ReviewBarProp = {
-  totalReviews: number;
-  star: number;
-  totalReviewsForStart: number;
-};
 
 // export function ReviewProgressBarWithReviewsCard({
 //   reviewsChart,

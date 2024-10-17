@@ -1,6 +1,6 @@
 "use client";
 import { HiOutlineVideoCamera } from "react-icons/hi2";
-import { twMerge } from "tailwind-merge";
+import { cn } from "@/lib/utils";
 import LevelRatingCard from "@/Components/Molecules/LevelRatingCard";
 import { ImageSlider } from "@/Components/Molecules/ImageSlider";
 import RatingBox from "@/Components/Molecules/RatingBox";
@@ -37,7 +37,7 @@ export default function Gig({
   classNameForImage = "",
   includeImageText = true,
 }: GigParam) {
-  className = twMerge("group", className);
+  className = cn("group", className);
   return (
     <div className={className}>
       <ImageSlider classNameForImage={classNameForImage} images={gigImages} />

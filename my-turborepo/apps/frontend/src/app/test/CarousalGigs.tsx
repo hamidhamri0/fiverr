@@ -9,7 +9,7 @@
 //   CarouselSliders,
 // } from "../components/Carousal";
 
-import WelcomeModal from "../../Components/WelcomeModal";
+import WelcomeModal from "../../Components/Organisms/WelcomeModal";
 
 // export default function CarousalGigs({ gigs }: { gigs: any[] }) {
 //   return (

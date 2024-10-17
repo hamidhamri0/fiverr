@@ -1,16 +1,17 @@
 "use client";
 import React from "react";
 import { GigWithAvgRatingAndTotalReviews as GigType } from "@fiverr/shared";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
-  CarouselSliders,
-} from "../Carousal";
+
 import Gig from "./Gig";
 import Link from "next/link";
+import {
+  Carousel,
+  CarouselSliders,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/Components/Organisms/Carousal";
 
 type GigsProps = {
   carouselClassName?: string;

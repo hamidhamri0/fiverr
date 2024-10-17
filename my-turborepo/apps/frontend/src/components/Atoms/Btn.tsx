@@ -1,5 +1,5 @@
 import React from "react";
-import { twMerge } from "tailwind-merge";
+import { cn } from "@/lib/utils";
 
 type colors = "white" | "black" | "green";
 
@@ -29,7 +29,7 @@ export default function Button({
     green: "bg-green-500 border-green-500 text-white hover:bg-green-700",
   };
 
-  className = twMerge(
+  className = cn(
     "border font-semibold transition-all  px-4 py-2 rounded-md flex items-center gap-2",
     grow && "w-full",
     colors[color],

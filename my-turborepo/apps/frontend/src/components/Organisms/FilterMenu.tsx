@@ -1,4 +1,4 @@
-import Menus from "@/Components/Menu";
+import Menus from "@/Components/Organisms/Menu";
 import FilterListContainer from "@/Components/Molecules/FilterListContainer";
 import RadioList from "@/Components/Organisms/RadioList";
 let deliveryTime = [

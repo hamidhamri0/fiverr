@@ -1,11 +1,11 @@
 "use client";
 import GigDescriptionAndFAQCreation from "@/Components/GigDescriptionAndFAQForm";
-import GigGallery from "@/Components/GigGalleryForm";
+import GigGallery from "@/Components/Organisms/GigGalleryForm";
 import GigOverviewForm from "@/Components/GigOverviewForm";
 import GigPricingForm from "@/Components/GigPricingForm";
 import GigRequirementForm from "@/Components/GigRequirementForm";
-import Publish from "@/Components/Publish";
-import StepIndicator from "@/Components/StepsIndecator";
+import Publish from "@/Components/Organisms/Publish";
+import StepIndicator from "@/Components/Molecules/StepsIndecator";
 import { useWizardQuery } from "@/Hooks/useWizardQuery";
 import { ReshapeGigData } from "@/lib/utils/reshapeDataToDefaultValues";
 import { GigData } from "@/types/gig.interface";

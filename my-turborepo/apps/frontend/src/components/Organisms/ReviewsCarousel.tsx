@@ -5,7 +5,7 @@ import {
   CarouselContent,
   CarouselItem,
   CarouselSliders,
-} from "../Carousal";
+} from "./Carousal";
 import { Gig } from "@fiverr/shared";
 import ReviewItem from "@/Components/Molecules/ReviewItem";
 

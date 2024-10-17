@@ -4,7 +4,7 @@ import { getUser } from "@/lib/auth/getUser";
 import { GigData } from "@/types/gig.interface";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import ManageGigs from "@/Components/ManageGigs";
+import ManageGigs from "@/Components/Templates/ManageGigs";
 import { User } from "types/user";
 
 async function page({

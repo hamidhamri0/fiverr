@@ -1,7 +1,12 @@
 "use client";
 import React from "react";
-import GridSlider from "../GridSlider";
 import ServiceCard from "@/Components/Molecules/ServiceCard";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselSliders,
+} from "@/Components/Organisms/Carousal";
 
 const services = [
   {
@@ -63,28 +68,26 @@ const services = [
 
 export default function Services() {
   return (
-    <GridSlider>
-      <GridSlider.Container>
-        <div className="flex items-center">
-          <h2 className="mb-6 text-5xl text-gray-700 sm:text-4xl">
-            Popular Services
-          </h2>
-          <GridSlider.SlidersNav color="gray" className="ml-auto" />
-        </div>
-        <GridSlider.Grid>
-          <div className="grid auto-cols-[200px] grid-flow-col gap-4 p-2 lg:auto-cols-[180px] xs:auto-cols-[160px]">
-            {services.map((service) => (
-              <ServiceCard
-                key={service.title}
-                title={service.title}
-                image={service.image}
-                color={service.color}
-              />
-            ))}
-          </div>
-        </GridSlider.Grid>
-        <GridSlider.SlidersArrows />
-      </GridSlider.Container>
-    </GridSlider>
+    <Carousel>
+      <div className="flex items-center">
+        <h2 className="mb-6 text-5xl text-gray-700 sm:text-4xl">
+          Popular Services
+        </h2>
+      </div>
+      <CarouselSliders className="mb-4 ml-auto" />
+      <CarouselContent>
+        {/* <div className="grid auto-cols-[200px] grid-flow-col gap-4 p-2 lg:auto-cols-[180px] xs:auto-cols-[160px]"> */}
+        {services.map((service) => (
+          <CarouselItem key={service.title} className="basis-1/6">
+            <ServiceCard
+              title={service.title}
+              image={service.image}
+              color={service.color}
+            />
+          </CarouselItem>
+        ))}
+        {/* </div> */}
+      </CarouselContent>
+    </Carousel>
   );
 }

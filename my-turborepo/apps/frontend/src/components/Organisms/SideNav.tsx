@@ -2,8 +2,8 @@
 import React, { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { IoMdMenu } from "react-icons/io";
-import { useOutsideClick } from "../../Hooks/useOutsideClick";
 import { SideNavContent } from "@/Components/Molecules/SideNavContent";
+import { useOutsideClick } from "@/Hooks/useOutsideClick";
 
 export default function SideNav() {
   const [showSideNav, setShowSideNav] = useState(false);

@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import Gig from "./Organisms/Gig";
 import Button from "./Atoms/Btn";
-import { AddToList } from "./ActionToolbar";
+import AddToList from "./Molecules/ActionToolbar";
 import UserCard from "./Organisms/UserCard";
 
 export default function ProfilePage() {

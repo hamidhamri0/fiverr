@@ -1,16 +1,16 @@
 import React, { Suspense } from "react";
 import { getUser } from "@/lib/auth/getUser";
-import WelcomeModal from "../Components/WelcomeModal";
-import HeroBanner from "../Components/HeroBanner";
+import WelcomeModal from "../Components/Organisms/WelcomeModal";
+import HeroBanner from "../Components/Organisms/HeroBanner";
 import CategoryBanner from "../Components/CategoryBanner";
 import Services from "../Components/Organisms/Services";
-import ServicesOverview from "../Components/ServicesOverview";
-import CategoriesContainer from "../Components/Organisms/CategoriesContainer";
-import GigsWithTitleServer from "../Components/GigsWithTitleServer";
-import GigSlidesServer from "../Components/GigSlidesServer";
-import GigList from "../Components/GigsSkeleton";
-import GigsWithPro from "@/Components/GigsWithProServer";
-import WelcomeContent from "../Components/WelcomeContent";
+import ServicesOverview from "../Components/Organisms/ServicesOverview";
+import CategoriesContainer from "../Components/Organisms/CategoryBoxContainer";
+import GigsWithTitleServer from "../Components/Organisms/GigsWithTitleServer";
+import GigSlidesServer from "../Components/Organisms/GigSlidesServer";
+import GigList from "../Components/Organisms/GigsSkeleton";
+import GigsWithPro from "@/Components/Organisms/GigsWithProServer";
+import WelcomeContent from "../Components/Organisms/WelcomeContent";
 import GalleryLayout from "../Components/Organisms/GalleryLayout";
 
 export const dynamic = "force-dynamic";

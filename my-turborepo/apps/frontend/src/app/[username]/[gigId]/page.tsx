@@ -19,7 +19,7 @@ import { getOneGig } from "@/lib/gig/getGig";
 import { UserLanguage } from "types/user-language";
 import { AboutGig } from "@/Components/Molecules/AboutGig";
 import RelatedTags from "@/Components/Molecules/RelatedTags";
-import PaginationReviews from "@/Components/PaginationReviews";
+import PaginationReviews from "@/Components/Molecules/PaginationReviews";
 import { Home } from "lucide-react";
 import Link from "next/link";
 import { getGigReviews } from "@/lib/gigReviews";

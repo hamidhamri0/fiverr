@@ -4,7 +4,7 @@ import LevelRatingCard from "@/Components/Molecules/LevelRatingCard";
 import RatingBox from "@/Components/Molecules/RatingBox";
 import ProCard from "@/Components/Molecules/ProCard";
 import RatingStarsCard from "@/Components/Molecules/RatingStarsCard";
-import { Location } from "@/Components/UserProfile";
+import Location from "@/Components/Atoms/Location";
 import { cn } from "@/lib/utils";
 import { UserCard as UserCardType } from "@/types/user.card.context.interface";
 import React, { createContext, useContext } from "react";

@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import MainHeader from "../Components/MainHeader";
+import MainHeader from "../Components/Organisms/MainHeader";
 import UserInfoStoreProvider from "../stores/UserInfoStore";
 import { getUser } from "@/lib/auth/getUser";
 import { Toaster } from "react-hot-toast";
 import Footer from "../Components/Organisms/Footer";
 import { Suspense } from "react";
-import HeaderSkeleton from "../Components/HeaderSkeleton";
+import HeaderSkeleton from "../Components/Molecules/HeaderSkeleton";
 import { sleep } from "@/lib/utils";
 
 const inter = Inter({ subsets: ["latin"] });

@@ -1,4 +1,4 @@
-import { twMerge } from "tailwind-merge";
+import { cn } from "@/lib/utils";
 
 export default function OpenArrowButton({
   isOpen,
@@ -9,7 +9,7 @@ export default function OpenArrowButton({
   className?: string;
   onClick?: () => void;
 }) {
-  className = twMerge(
+  className = cn(
     `ml-auto cursor-pointer hidden origin-center items-center justify-center font-bold transition-transform duration-300 sm:flex ${isOpen ? "rotate-[270deg]" : "rotate-90"}`,
     className,
   );

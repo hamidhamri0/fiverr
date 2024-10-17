@@ -1,7 +1,12 @@
 "use client";
 import React from "react";
-import GridSlider from "../GridSlider";
 import CategoryCarouselCard from "@/Components/Molecules/CategoryCarouselCard";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselSliders,
+} from "@/Components/Organisms/Carousal";
 const subCategories = [
   {
     subcategory: "Python Developers",
@@ -52,15 +57,15 @@ const subCategories = [
 
 export default function ServicesCardCarousel() {
   return (
-    <GridSlider>
-      <GridSlider.Container className="p-2">
-        <div className="mb-6 flex items-center gap-4 sm:flex-col">
-          <h2 className="text-2xl font-semibold text-gray-800 sm:text-xl">
-            Most Popular in Programming & Tech
-          </h2>
-          <GridSlider.SlidersNav color="gray" className="ml-auto" />
-        </div>
-        <GridSlider.Grid>
+    <Carousel>
+      <div className="mb-6 flex items-center gap-4 sm:flex-col">
+        <h2 className="text-2xl font-semibold text-gray-800 sm:text-xl">
+          Most Popular in Programming & Tech
+        </h2>
+        <CarouselSliders />
+      </div>
+      <CarouselContent>
+        <CarouselItem>
           <div className="mb-6 flex gap-4">
             {subCategories.map((subCategory, index) => (
               <CategoryCarouselCard
@@ -70,8 +75,8 @@ export default function ServicesCardCarousel() {
               />
             ))}
           </div>
-        </GridSlider.Grid>
-      </GridSlider.Container>
-    </GridSlider>
+        </CarouselItem>
+      </CarouselContent>
+    </Carousel>
   );
 }

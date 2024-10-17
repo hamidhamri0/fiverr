@@ -1,6 +1,6 @@
 "use client";
+import Spinner from "@/Components/Atoms/Spinner";
 import { createPortal } from "react-dom";
-import Spinner from "../Atoms/Spinner";
 
 export default function SpinnerCenterWithBlur() {
   return createPortal(
